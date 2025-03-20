@@ -1,0 +1,33 @@
+{
+  "name": "altitude-v2",
+  "version": "2.0.0",
+  "description": "",
+  "main": "index.ts",
+  "scripts": {
+    "test": "forge test",
+    "clean": "forge clean",
+    "coverage": "forge coverage --ir-minimum --report lcov",
+    "build": "forge build",
+    "node": "dotenv -- bash -c 'anvil --fork-url $RPC_URL'",
+    "lint": "npx prettier --plugin=prettier-plugin-solidity --list-different '{contracts,scripts,test}/**/*.sol'",
+    "lint-fix": "npx prettier --plugin=prettier-plugin-solidity --write '{contracts,scripts,test}/**/*.sol'"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "BUSL-1.1",
+  "devDependencies": {
+    "dotenv": "16.0.1",
+    "dotenv-cli": "5.1.0",
+    "prettier": "^3.5.3",
+    "prettier-plugin-solidity": "^1.4.2"
+  },
+  "dependencies": {
+    "@chainlink/contracts": "0.4.1",
+    "@morpho-org/morpho-blue": "1.0.0",
+    "@openzeppelin/contracts": "4.8.3",
+    "@openzeppelin/contracts-upgradeable": "4.8.3",
+    "@pendle/core-v2": "5.2.0-base-1",
+    "@uniswap/v3-core": "1.0.1",
+    "@uniswap/v3-periphery": "1.4.1"
+  }
+}

@@ -1,0 +1,13 @@
+.DS_Store
+.env
+node_modules
+
+# foundry
+lib
+out
+cache_forge
+broadcast
+
+# coverage
+lcov.info
+report
