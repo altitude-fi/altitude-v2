@@ -17,6 +17,8 @@ import "../../../../../interfaces/internal/vault/extensions/supply-loss/ISupplyL
 abstract contract SupplyLossVaultV1 is VaultStorage, ProxyExtension, ISupplyLossVaultV1 {
     /// @notice Forward execution to the SupplyLossManager
     function snapshotSupplyLoss() external override nonReentrant {
+        IIngress(ingressControl).validateSnapshotSupplyLoss(msg.sender);
+
         _exec(snapshotManager, abi.encodeWithSelector(ISupplyLossManager.snapshotSupplyLoss.selector));
 
         // Pause protocol to allow the cause of the supplyLoss to be analysed

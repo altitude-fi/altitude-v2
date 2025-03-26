@@ -53,9 +53,9 @@ library Utils {
         uint8 targetDecimals_
     ) internal pure returns (uint256) {
         if (amountDecimals_ < targetDecimals_) {
-            return amount_ * (10**(targetDecimals_ - amountDecimals_));
+            return amount_ * (10 ** (targetDecimals_ - amountDecimals_));
         } else if (amountDecimals_ > targetDecimals_) {
-            return amount_ / 10**((amountDecimals_ - targetDecimals_));
+            return amount_ / 10 ** ((amountDecimals_ - targetDecimals_));
         }
         return amount_;
     }

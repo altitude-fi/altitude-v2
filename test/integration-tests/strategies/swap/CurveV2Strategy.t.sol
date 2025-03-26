@@ -138,7 +138,7 @@ contract CurveV2StrategyTest is ForkTest, TokensGenerator {
 
     function test_SetSwapRouteWrongPoolsOracleLength() public {
         (address[] memory routeTokens, address[] memory pools, uint256[5][] memory swapParams, ) = SwapRoutes
-        .get_CurveUSDTToCRVUSD();
+            .get_CurveUSDTToCRVUSD();
 
         CurveV2Strategy.PoolOracle[] memory pools_oracle;
         vm.expectRevert(abi.encodeWithSelector(ISwapStrategy.SWAP_STRATEGY_SET_SWAP_PAIR_INPUT_INVALID.selector));
@@ -224,7 +224,7 @@ contract CurveV2StrategyTest is ForkTest, TokensGenerator {
         uint256 amountOut = 100000e18;
         uint256 amountIn = curveV2Swap.getAmountIn(USDT, crvUSD, amountOut);
         uint256 reversePrice = priceSource.getInBase(USDT, crvUSD);
-        uint256 expectedAmountIn = (amountOut * 10**6) / reversePrice;
+        uint256 expectedAmountIn = (amountOut * 10 ** 6) / reversePrice;
 
         // within 0.1%
         assertApproxEqAbs(amountIn, expectedAmountIn, 1e8);
@@ -242,7 +242,7 @@ contract CurveV2StrategyTest is ForkTest, TokensGenerator {
         uint256 amountOut = curveV2Swap.getAmountOut(USDT, crvUSD, amountIn);
 
         uint256 reversePrice = priceSource.getInBase(USDT, crvUSD);
-        uint256 expectedAmountOut = (amountIn * reversePrice) / 10**6;
+        uint256 expectedAmountOut = (amountIn * reversePrice) / 10 ** 6;
 
         // within 0.1%
         assertApproxEqAbs(amountOut, expectedAmountOut, 1e20);
@@ -425,7 +425,9 @@ contract CurveV2StrategyTest is ForkTest, TokensGenerator {
         curveV2Swap.setSwapPair(assetFrom, assetTo, customSlippage, routeTokens, pools, swapParams, pools_oracle);
     }
 
-    function _getRoute(SwapRouteType routeType)
+    function _getRoute(
+        SwapRouteType routeType
+    )
         internal
         pure
         returns (

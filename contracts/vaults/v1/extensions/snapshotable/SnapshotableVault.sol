@@ -72,12 +72,10 @@ abstract contract SnapshotableVaultV1 is
     /// @param account User wallet address
     /// @param snapshotId calculate up to this snapshot id
     /// @return commit User commit data
-    function calcCommitUser(address account, uint256 snapshotId)
-        external
-        view
-        override
-        returns (HarvestTypes.UserCommit memory commit)
-    {
+    function calcCommitUser(
+        address account,
+        uint256 snapshotId
+    ) external view override returns (HarvestTypes.UserCommit memory commit) {
         if (ILenderStrategy(activeLenderStrategy).hasSupplyLoss()) {
             revert IN_V1_SUPPLY_LOSS_SNAPSHOT_NEEDED();
         }
@@ -98,11 +96,7 @@ abstract contract SnapshotableVaultV1 is
 
     /// @notice Add supply in the lender provider directly to cover supply shortage
     /// @param targetTotalSupply the total supply we aim to have after injection
-    function injectSupply(
-        uint256 targetTotalSupply,
-        uint256 atIndex,
-        address funder
-    ) external override onlyOwner {
+    function injectSupply(uint256 targetTotalSupply, uint256 atIndex, address funder) external override onlyOwner {
         if (ILenderStrategy(activeLenderStrategy).hasSupplyLoss()) {
             revert IN_V1_SUPPLY_LOSS_SNAPSHOT_NEEDED();
         }

@@ -34,11 +34,7 @@ contract BaseFarmStrategy is FarmDropStrategy {
         super._recogniseRewardsInBase();
     }
 
-    function _swap(
-        address,
-        address,
-        uint256 amount
-    ) internal pure returns (uint256) {
+    function _swap(address, address, uint256 amount) internal pure returns (uint256) {
         return amount;
     }
 }

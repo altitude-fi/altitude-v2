@@ -14,11 +14,7 @@ library BaseGetter {
         return address(new BaseERC20(decimals, "BaseERC20", "BASE"));
     }
 
-    function getBaseERC20Detailed(
-        uint8 decimals,
-        string memory name,
-        string memory symbol
-    ) external returns (address) {
+    function getBaseERC20Detailed(uint8 decimals, string memory name, string memory symbol) external returns (address) {
         return address(new BaseERC20(decimals, name, symbol));
     }
 

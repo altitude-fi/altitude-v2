@@ -64,7 +64,7 @@ abstract contract StrategyGenericPool is FarmDropStrategy, IConvexFarmStrategy {
         cvx = IERC20(config.cvx);
         crv = IERC20(config.crv);
         crvRewards = ICVXRewards(config.crvRewards);
-        crvDecimals = 10**curveLP.decimals();
+        crvDecimals = 10 ** curveLP.decimals();
         convexPoolID = config.convexPoolID;
         assetIndex = config.assetIndex;
         toClaimExtra = true;
@@ -269,11 +269,7 @@ abstract contract StrategyGenericPool is FarmDropStrategy, IConvexFarmStrategy {
     }
 
     /// @notice Swap between different assets
-    function _swap(
-        address inputAsset,
-        address outputAsset,
-        uint256 amount
-    ) internal returns (uint256) {
+    function _swap(address inputAsset, address outputAsset, uint256 amount) internal returns (uint256) {
         if (inputAsset != outputAsset) {
             if (amount == type(uint256).max) {
                 amount = IERC20(inputAsset).balanceOf(address(this));

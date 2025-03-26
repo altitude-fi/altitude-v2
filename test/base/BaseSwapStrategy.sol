@@ -30,7 +30,7 @@ contract BaseSwapStrategy is SwapStrategy, Test, TokensGenerator {
 
         uint256 fromDecimals = IToken(assetFrom).decimals();
         uint256 price = priceSource.getInBase(assetFrom, assetTo);
-        amountOut = (amount * price) / 10**fromDecimals;
+        amountOut = (amount * price) / 10 ** fromDecimals;
 
         amountOut -= (amountOut * swapInFee) / 100;
 
@@ -64,7 +64,7 @@ contract BaseSwapStrategy is SwapStrategy, Test, TokensGenerator {
         if (amountOut == type(uint256).max) {
             amountIn = type(uint256).max;
         } else {
-            amountIn = (amountOut * 10**fromDecimals) / 10**toDecimals;
+            amountIn = (amountOut * 10 ** fromDecimals) / 10 ** toDecimals;
         }
     }
 
@@ -75,6 +75,6 @@ contract BaseSwapStrategy is SwapStrategy, Test, TokensGenerator {
     ) external view returns (uint256 amountOut) {
         uint256 fromDecimals = IToken(assetFrom).decimals();
         uint256 toDecimals = IToken(assetTo).decimals();
-        amountOut = ((amountIn * 10**toDecimals) / 10**fromDecimals);
+        amountOut = ((amountIn * 10 ** toDecimals) / 10 ** fromDecimals);
     }
 }

@@ -202,11 +202,7 @@ abstract contract Deployer is Config {
     /// @param proxyAdmin The address of the proxy admin.
     /// @param registry The address of the registry.
     /// @return address of the deployed tokens factory.
-    function _tokensFactory(
-        address admin,
-        address proxyAdmin,
-        address registry
-    ) internal returns (address) {
+    function _tokensFactory(address admin, address proxyAdmin, address registry) internal returns (address) {
         address tokensFactory = address(new TokensFactory(proxyAdmin));
         console.log("TokensFactory, tokensFactory, %s", tokensFactory);
 

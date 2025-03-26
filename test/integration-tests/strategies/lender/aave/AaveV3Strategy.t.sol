@@ -40,7 +40,7 @@ contract AaveV3Strategy is LenderStrategyIntegrationTest {
         assertNotEq(prices[0], 0);
         assertNotEq(prices[1], 0);
 
-        return (((prices[0] * (10**borrowAsset.decimals())) / prices[1]) * amount) / 10**supplyAsset.decimals();
+        return (((prices[0] * (10 ** borrowAsset.decimals())) / prices[1]) * amount) / 10 ** supplyAsset.decimals();
     }
 
     function _accumulateRewards(address[] memory rewardsList) internal virtual override {
@@ -55,7 +55,7 @@ contract AaveV3Strategy is LenderStrategyIntegrationTest {
         uint256[] memory claimedAmounts = new uint256[](rewardsList.length);
 
         for (uint256 i = 0; i < rewardsList.length; i++) {
-            claimedAmounts[i] = 100 * 10**IERC20Metadata(rewardsList[i]).decimals();
+            claimedAmounts[i] = 100 * 10 ** IERC20Metadata(rewardsList[i]).decimals();
             mintToken(rewardsList[i], address(aaveStrategy), claimedAmounts[i]);
         }
         vm.mockCall(

@@ -11,15 +11,7 @@ library BorrowVerifierSigUtils {
         Vm vm,
         address borrowVerifier,
         uint256 borrowAmount
-    )
-        public
-        view
-        returns (
-            address user,
-            address user2,
-            bytes memory signature
-        )
-    {
+    ) public view returns (address user, address user2, bytes memory signature) {
         uint256 userPrivateKey = 0xA11CE;
         uint256 user2PrivateKey = 0xB0B;
 

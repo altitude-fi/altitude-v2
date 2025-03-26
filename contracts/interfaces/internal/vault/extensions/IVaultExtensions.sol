@@ -10,6 +10,4 @@ import "./snapshotable/ISnapshotableManager.sol";
  * @author Altitude Protocol
  **/
 
-interface IVaultExtensions is IConfigurableVaultV1, IGroomableManager, ILiquidatableManager, ISnapshotableManager {
-
-}
+interface IVaultExtensions is IConfigurableVaultV1, IGroomableManager, ILiquidatableManager, ISnapshotableManager {}

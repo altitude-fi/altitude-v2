@@ -26,12 +26,7 @@ interface IAaveDebtToken {
 
     function borrowAllowance(address fromUser, address toUser) external view returns (uint256);
 
-    function mint(
-        address user,
-        address onBehalfOf,
-        uint256 amount,
-        uint256 rate
-    ) external returns (bool);
+    function mint(address user, address onBehalfOf, uint256 amount, uint256 rate) external returns (bool);
 
     function burn(address user, uint256 amount) external;
 
@@ -41,15 +36,7 @@ interface IAaveDebtToken {
 
     function getUserLastUpdated(address user) external view returns (uint40);
 
-    function getSupplyData()
-        external
-        view
-        returns (
-            uint256,
-            uint256,
-            uint256,
-            uint40
-        );
+    function getSupplyData() external view returns (uint256, uint256, uint256, uint40);
 
     function getTotalSupplyLastUpdated() external view returns (uint40);
 

@@ -66,7 +66,7 @@ contract VaultLiquidatableTest is VaultTestSuite {
         vm.mockCall(
             vault.activeLenderStrategy(),
             abi.encodeWithSelector(ILenderStrategy.getInBase.selector, deployer.borrowAsset(), deployer.supplyAsset()),
-            abi.encode(10**IToken(deployer.supplyAsset()).decimals() * 2) // make the price 2:1 for defaulting positions
+            abi.encode(10 ** IToken(deployer.supplyAsset()).decimals() * 2) // make the price 2:1 for defaulting positions
         );
 
         vault.liquidateUsers(liquidationUsers, liquidationAmount);

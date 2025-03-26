@@ -25,19 +25,11 @@ contract FarmDispatcher is Initializable, AccessControl, IFarmDispatcher {
 
     mapping(address => Strategy) public override strategies;
 
-    function initialize(
-        address vaultAddress,
-        address workingAsset,
-        address admin
-    ) public virtual override initializer {
+    function initialize(address vaultAddress, address workingAsset, address admin) public virtual override initializer {
         _initialize(vaultAddress, workingAsset, admin);
     }
 
-    function _initialize(
-        address vaultAddress,
-        address workingAsset,
-        address admin
-    ) internal {
+    function _initialize(address vaultAddress, address workingAsset, address admin) internal {
         vault = vaultAddress;
         asset = workingAsset;
 
@@ -49,11 +41,10 @@ contract FarmDispatcher is Initializable, AccessControl, IFarmDispatcher {
     /// @notice Set a strategy at a position in the priority list
     /// @param strategyAddress Address of the strategy to set
     /// @param strategyPosition The address of the strategy that is to be related as a prev one
-    function setStrategyPriority(address strategyAddress, address strategyPosition)
-        external
-        override
-        onlyRole(Roles.BETA)
-    {
+    function setStrategyPriority(
+        address strategyAddress,
+        address strategyPosition
+    ) external override onlyRole(Roles.BETA) {
         Strategy memory strategy = strategies[strategyAddress];
 
         if (!strategy.active) {
@@ -126,11 +117,7 @@ contract FarmDispatcher is Initializable, AccessControl, IFarmDispatcher {
     /// @param strategyAddress Address of the new strategy to set
     /// @param max Cap amount of the strategy
     /// @param position The address of the strategy that is to be related as a prev one
-    function addStrategy(
-        address strategyAddress,
-        uint256 max,
-        address position
-    ) public override onlyRole(Roles.ALPHA) {
+    function addStrategy(address strategyAddress, uint256 max, address position) public override onlyRole(Roles.ALPHA) {
         // Check if strategy already exists and is active
         if (strategies[strategyAddress].active) {
             revert FD_STRATEGY_EXISTS();
@@ -192,11 +179,10 @@ contract FarmDispatcher is Initializable, AccessControl, IFarmDispatcher {
     /// @dev run emergencyWithdraw on the strategy before executing this function
     /// @param strategyAddress Addresses of the strategy to be removed
     /// @param assets Assets to swap in emergencySwap (addresses)
-    function emergencyDeactivateStrategy(address strategyAddress, address[] calldata assets)
-        external
-        override
-        onlyRole(Roles.BETA)
-    {
+    function emergencyDeactivateStrategy(
+        address strategyAddress,
+        address[] calldata assets
+    ) external override onlyRole(Roles.BETA) {
         _deactivateStrategy(strategyAddress);
 
         uint256 amountWithdrawn = IFarmStrategy(strategyAddress).emergencySwap(assets);
@@ -377,7 +363,7 @@ contract FarmDispatcher is Initializable, AccessControl, IFarmDispatcher {
             } catch {
                 // Update failedStrategies
                 // @dev if 1 and 3 failed, failedStrategies = 2^1 + 2^3 = 10
-                failedStrategies += 2**strategyNumber;
+                failedStrategies += 2 ** strategyNumber;
             }
 
             strategyNumber += 1;
@@ -406,7 +392,7 @@ contract FarmDispatcher is Initializable, AccessControl, IFarmDispatcher {
             } catch {
                 // Update failedStrategies
                 // @dev if 1 and 3 failed, failedStrategies = 2^1 + 2^3 = 10
-                failedStrategies += 2**strategyNumber;
+                failedStrategies += 2 ** strategyNumber;
             }
 
             strategyNumber += 1;

@@ -18,7 +18,7 @@ contract JoiningBlockVault is VaultStorage {
             supplyToken.underlying(),
             debtToken.underlying()
         );
-        uint256 userSupplyInBase = ((supplyToken.balanceOf(account) * price) / 10**supplyToken.decimals());
+        uint256 userSupplyInBase = ((supplyToken.balanceOf(account) * price) / 10 ** supplyToken.decimals());
 
         uint256 activeAssets = ((userSupplyInBase * liquidationThreshold) / 1e18) +
             harvestStorage.userHarvest[account].claimableEarnings;

@@ -83,7 +83,7 @@ contract VaultInitializerTest is Test {
         IVaultCoreV1 vault = deployer.deployDefaultVault(vaultRegistry);
 
         (address groomableManager, address flashLoanStrategy, uint256 maxMigrationFeePercentage) = vault
-        .getGroomableConfig();
+            .getGroomableConfig();
 
         assertTrue(groomableManager == deployer.groomableManager());
         assertTrue(flashLoanStrategy != address(0));

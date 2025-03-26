@@ -15,11 +15,7 @@ interface I3PoolZap {
         uint256 minAmount
     ) external returns (uint256);
 
-    function calc_withdraw_one_coin(
-        address pool,
-        uint256 tokenAmount,
-        int128 i
-    ) external view returns (uint256);
+    function calc_withdraw_one_coin(address pool, uint256 tokenAmount, int128 i) external view returns (uint256);
 
     function remove_liquidity(
         address pool,

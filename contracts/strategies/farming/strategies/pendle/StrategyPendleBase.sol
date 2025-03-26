@@ -111,11 +111,7 @@ abstract contract StrategyPendleBase is FarmDropStrategy, SkimStrategy, IPendleF
     /// @param inputAsset Input asset address
     /// @param outputAsset Output asset address
     /// @param amount Amount to swap
-    function _swap(
-        address inputAsset,
-        address outputAsset,
-        uint256 amount
-    ) internal returns (uint256) {
+    function _swap(address inputAsset, address outputAsset, uint256 amount) internal returns (uint256) {
         if (inputAsset != outputAsset) {
             if (amount == type(uint256).max) {
                 amount = IERC20(inputAsset).balanceOf(address(this));
@@ -133,7 +129,7 @@ abstract contract StrategyPendleBase is FarmDropStrategy, SkimStrategy, IPendleF
     function _validateTwapDuration(uint32 twapDuration_) internal view {
         // Make sure the oracle has enough TWAP data
         (bool increaseCardinalityRequired, uint16 cardinalityRequired, bool oldestObservationSatisfied) = oracle
-        .getOracleState(address(market), twapDuration_);
+            .getOracleState(address(market), twapDuration_);
         if (increaseCardinalityRequired) {
             // Oracle requires cardinality increase
             revert PFS_ORACLE_CARDINALITY(cardinalityRequired);

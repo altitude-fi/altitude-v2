@@ -36,7 +36,7 @@ contract AaveV3Strategy is LenderStrategyUnitTest {
         addresses[0] = address(supplyAsset);
         addresses[1] = address(borrowAsset);
         uint256[] memory prices = IPriceOracleGetterV3(Constants.aave_v3_Oracle).getAssetsPrices(addresses);
-        return (((prices[0] * (10**borrowAsset.decimals())) / prices[1]) * amount) / 10**supplyAsset.decimals();
+        return (((prices[0] * (10 ** borrowAsset.decimals())) / prices[1]) * amount) / 10 ** supplyAsset.decimals();
     }
 
     function test_getLendingPool() public view {
@@ -45,7 +45,7 @@ contract AaveV3Strategy is LenderStrategyUnitTest {
 
     function test_paidLiquidationFee() public view {
         (, , , uint256 penalty, , , , , , ) = IProtocolDataProvider(Constants.aave_v3_DataProvider)
-        .getReserveConfigurationData(address(borrowAsset));
+            .getReserveConfigurationData(address(borrowAsset));
         assertNotEq(penalty, 0);
         uint256 supplyLoss = 10e18;
         assertEq(aaveStrategy.paidLiquidationFee(supplyLoss), supplyLoss - ((supplyLoss * 1e4) / penalty));
@@ -85,7 +85,7 @@ contract AaveV3Strategy is LenderStrategyUnitTest {
 
     function test_BorrowBalance() public {
         (, , address variableDebtTokenAddress) = IProtocolDataProvider(Constants.aave_v3_DataProvider)
-        .getReserveTokensAddresses(address(borrowAsset));
+            .getReserveTokensAddresses(address(borrowAsset));
 
         uint256 balance = 1000e18;
         vm.mockCall(

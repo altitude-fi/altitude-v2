@@ -79,11 +79,10 @@ contract Ingress is AccessControl, IIngress {
     /// @notice Set rate limit params
     /// @param _rateLimitPeriod How many blocks is the interval
     /// @param _rateLimitAmount Amount of tokens for the interval
-    function setRateLimit(uint256[3] memory _rateLimitPeriod, uint256[3] memory _rateLimitAmount)
-        external
-        override
-        onlyRole(Roles.BETA)
-    {
+    function setRateLimit(
+        uint256[3] memory _rateLimitPeriod,
+        uint256[3] memory _rateLimitAmount
+    ) external override onlyRole(Roles.BETA) {
         for (uint256 i; i < 3; ) {
             rateLimit[i].period = _rateLimitPeriod[i];
             rateLimit[i].amount = _rateLimitAmount[i];
@@ -149,11 +148,7 @@ contract Ingress is AccessControl, IIngress {
     /// @param depositor The address that is providing collateral
     /// @param recipient The address that will receive the supply tokens
     /// @param amount The amount that is provided
-    function validateDeposit(
-        address depositor,
-        address recipient,
-        uint256 amount
-    ) external view override {
+    function validateDeposit(address depositor, address recipient, uint256 amount) external view override {
         if (isFunctionDisabled[IIngress.validateDeposit.selector]) {
             revert IN_V1_FUNCTION_PAUSED();
         }
@@ -225,11 +220,7 @@ contract Ingress is AccessControl, IIngress {
     /// @notice Validate if withdraw is allowed
     /// @param withdrawer The address the supply will be withdrawn from
     /// @param recipient The address that will receive the withdrawn currency
-    function validateWithdraw(
-        address withdrawer,
-        address recipient,
-        uint256 amount
-    ) external override {
+    function validateWithdraw(address withdrawer, address recipient, uint256 amount) external override {
         if (isFunctionDisabled[IIngress.validateWithdraw.selector]) {
             revert IN_V1_FUNCTION_PAUSED();
         }
@@ -250,11 +241,7 @@ contract Ingress is AccessControl, IIngress {
     /// @notice Validate if borrow is allowed
     /// @param borrower The address the debt will be assigned
     /// @param recipient The address that will receive the borrowed currency
-    function validateBorrow(
-        address borrower,
-        address recipient,
-        uint256 amount
-    ) external override {
+    function validateBorrow(address borrower, address recipient, uint256 amount) external override {
         if (isFunctionDisabled[IIngress.validateBorrow.selector]) {
             revert IN_V1_FUNCTION_PAUSED();
         }
@@ -346,5 +333,11 @@ contract Ingress is AccessControl, IIngress {
         if (sanctioned[liquidator]) {
             revert IN_V1_ACCOUNT_HAS_BEEN_SANCTIONED();
         }
+    }
+
+    /// @notice Validate if snapshotSupplyLoss is allowed
+    /// @param sender Address calling the snapshotSupplyLoss
+    function validateSnapshotSupplyLoss(address sender) external view {
+        _checkRole(Roles.GAMMA, sender);
     }
 }

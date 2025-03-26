@@ -13,11 +13,7 @@ import "@openzeppelin/contracts/proxy/ERC1967/ERC1967Upgrade.sol";
 
 contract ProxyInitializable is Proxy, ERC1967Upgrade {
     /// @notice Used as a constructor due to create2 with no params
-    function initialize(
-        address _admin,
-        address _logic,
-        bytes memory _data
-    ) external {
+    function initialize(address _admin, address _logic, bytes memory _data) external {
         assert(_ADMIN_SLOT == bytes32(uint256(keccak256("eip1967.proxy.admin")) - 1));
         assert(_IMPLEMENTATION_SLOT == bytes32(uint256(keccak256("eip1967.proxy.implementation")) - 1));
 

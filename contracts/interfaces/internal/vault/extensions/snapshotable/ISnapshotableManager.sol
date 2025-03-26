@@ -25,9 +25,5 @@ interface ISnapshotableManager is IHarvestableManager, ISupplyLossManager {
 
     function updatePositions(address[] calldata accounts) external returns (uint256);
 
-    function injectSupply(
-        uint256 targetTotalSupply,
-        uint256 atIndex,
-        address funder
-    ) external;
+    function injectSupply(uint256 targetTotalSupply, uint256 atIndex, address funder) external;
 }

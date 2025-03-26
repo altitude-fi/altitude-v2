@@ -224,11 +224,7 @@ contract StrategyMorphoV1 is LenderStrategy, SkimStrategy, IMorphoStrategy {
     /// @notice Swaps the current balance of fromAsset to toAsset
     /// @param fromAsset asset to swap from
     /// @param toAsset asset to swap to
-    function _swap(
-        address fromAsset,
-        address toAsset,
-        uint256 amount
-    ) internal {
+    function _swap(address fromAsset, address toAsset, uint256 amount) internal {
         if (amount == type(uint256).max) {
             amount = IERC20(fromAsset).balanceOf(address(this));
         }
@@ -260,7 +256,7 @@ contract StrategyMorphoV1 is LenderStrategy, SkimStrategy, IMorphoStrategy {
         } else {
             return
                 Utils.scaleAmount(
-                    10**(oraclePriceDecimals * 2) / price,
+                    10 ** (oraclePriceDecimals * 2) / price,
                     oraclePriceDecimals,
                     IERC20Metadata(toAsset).decimals()
                 );
@@ -277,7 +273,7 @@ contract StrategyMorphoV1 is LenderStrategy, SkimStrategy, IMorphoStrategy {
         address fromAsset,
         address toAsset
     ) external view override returns (uint256) {
-        return (getInBase(fromAsset, toAsset) * amount) / 10**IERC20Metadata(fromAsset).decimals();
+        return (getInBase(fromAsset, toAsset) * amount) / 10 ** IERC20Metadata(fromAsset).decimals();
     }
 
     /// @notice Returns the fee paid on supply loss

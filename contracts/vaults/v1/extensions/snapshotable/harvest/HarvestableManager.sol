@@ -83,15 +83,9 @@ contract HarvestableManager is VaultStorage, IHarvestableManager {
 
     /// @notice Account for profit & loss
     /// @param vaultBorrows The current borrow balance of the vault
-    function _accountProfitLoss(uint256 vaultBorrows)
-        internal
-        returns (
-            uint256 farmProfit,
-            uint256 vaultLoss,
-            uint256 uncommittedLossPerc,
-            uint256 claimableLossPerc
-        )
-    {
+    function _accountProfitLoss(
+        uint256 vaultBorrows
+    ) internal returns (uint256 farmProfit, uint256 vaultLoss, uint256 uncommittedLossPerc, uint256 claimableLossPerc) {
         // Deposit available funds into strategies (for compounding)
         IFarmDispatcher(activeFarmStrategy).dispatch();
 
@@ -142,14 +136,10 @@ contract HarvestableManager is VaultStorage, IHarvestableManager {
     /// @return vaultLoss Loss part of the vault borrows
     /// @return uncommittedLossPerc Loss part of the uncommitted rewards
     /// @return claimableLossPerc Loss part of the claimable rewards
-    function _splitFarmLoss(uint256 loss, uint256 vaultBorrows)
-        internal
-        returns (
-            uint256 vaultLoss,
-            uint256 uncommittedLossPerc,
-            uint256 claimableLossPerc
-        )
-    {
+    function _splitFarmLoss(
+        uint256 loss,
+        uint256 vaultBorrows
+    ) internal returns (uint256 vaultLoss, uint256 uncommittedLossPerc, uint256 claimableLossPerc) {
         // Settle loss from vaultBorrows
         if (loss > vaultBorrows) {
             // Loss is greater than outstanding vault debt
@@ -195,11 +185,10 @@ contract HarvestableManager is VaultStorage, IHarvestableManager {
     /// @param price The current price of the borrow asset
     /// @param protocolBorrows The amount borrowed by the vault on behalf of users
     /// @return activeAssets The active assets of the vault (or zero if there are no or negative active assets)
-    function _getVaultActiveAssets(uint256 price, uint256 protocolBorrows)
-        internal
-        view
-        returns (uint256 activeAssets)
-    {
+    function _getVaultActiveAssets(
+        uint256 price,
+        uint256 protocolBorrows
+    ) internal view returns (uint256 activeAssets) {
         uint256 vaultUserBorrows;
         uint256 totalBorrowed = debtToken.totalSupply();
         uint256 totalSupplied = supplyToken.totalSupply();
@@ -211,7 +200,7 @@ contract HarvestableManager is VaultStorage, IHarvestableManager {
             vaultUserBorrows = totalBorrowed - protocolBorrows;
         }
 
-        uint256 vaultSupplyInBase = (totalSupplied * price) / 10**supplyToken.decimals();
+        uint256 vaultSupplyInBase = (totalSupplied * price) / 10 ** supplyToken.decimals();
 
         // Calculate active assets at vault level
         activeAssets = ((liquidationThreshold * vaultSupplyInBase) / 1e18) + harvestStorage.realClaimableEarnings; // 1e18 represents a 100%. liquidationThreshold is in percentage

@@ -16,23 +16,14 @@ library TransferHelper {
     error TH_SAFE_APPROVE();
     error TH_SAFE_APPROVE_RESET();
 
-    function safeTransfer(
-        address token,
-        address to,
-        uint256 value
-    ) internal {
+    function safeTransfer(address token, address to, uint256 value) internal {
         bool toThrow = _call(token, abi.encodeWithSelector(IERC20.transfer.selector, to, value));
         if (toThrow) {
             revert TH_SAFE_TRANSFER_FAILED();
         }
     }
 
-    function safeTransferFrom(
-        address token,
-        address from,
-        address to,
-        uint256 value
-    ) internal {
+    function safeTransferFrom(address token, address from, address to, uint256 value) internal {
         bool toThrow = _call(token, abi.encodeWithSelector(IERC20.transferFrom.selector, from, to, value));
         if (toThrow) {
             revert TH_SAFE_TRANSFER_FROM_FAILED();
@@ -44,11 +35,7 @@ library TransferHelper {
     /// @param token The contract address of the token to be approved
     /// @param to The target of the approval
     /// @param value The amount of the given token the target will be allowed to spend
-    function safeApprove(
-        address token,
-        address to,
-        uint256 value
-    ) internal {
+    function safeApprove(address token, address to, uint256 value) internal {
         // Reset approval first
         bool toThrow = _call(token, abi.encodeWithSelector(IERC20.approve.selector, to, 0));
         if (toThrow) {

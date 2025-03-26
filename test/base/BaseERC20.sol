@@ -6,11 +6,7 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 contract BaseERC20 is ERC20 {
     uint8 private _decimals;
 
-    constructor(
-        uint8 _decimalsNumber,
-        string memory _name,
-        string memory _symbol
-    ) ERC20(_name, _symbol) {
+    constructor(uint8 _decimalsNumber, string memory _name, string memory _symbol) ERC20(_name, _symbol) {
         _decimals = _decimalsNumber;
     }
 

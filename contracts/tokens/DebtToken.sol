@@ -14,7 +14,7 @@ import "../interfaces/internal/vault/IVaultCore.sol";
 contract DebtToken is InterestToken, IDebtToken {
     /// @notice Being non transferable, the DebtToken does not implement any of the standard ERC20 functions for transfer and allowance.
     function transfer(
-        address, /* recipient */
+        address /* recipient */,
         uint256 /* amount */
     ) public virtual override(ERC20Upgradeable, IERC20Upgradeable) returns (bool) {
         revert DT_TRANSFER_NOT_SUPPORTED();
@@ -22,8 +22,8 @@ contract DebtToken is InterestToken, IDebtToken {
 
     /// @notice Being non transferable, the DebtToken does not implement any of the standard ERC20 functions for transfer and allowance.
     function transferFrom(
-        address, /* from */
-        address, /* to */
+        address /* from */,
+        address /* to */,
         uint256 /* amount */
     ) public virtual override(ERC20Upgradeable, IERC20Upgradeable) returns (bool) {
         revert DT_TRANSFER_NOT_SUPPORTED();
@@ -31,25 +31,19 @@ contract DebtToken is InterestToken, IDebtToken {
 
     /// @notice Being non transferable, the DebtToken does not implement any of the standard ERC20 functions for transfer and allowance.
     function approve(
-        address, /* spender */
+        address /* spender */,
         uint256 /* amount */
     ) public virtual override(ERC20Upgradeable, IERC20Upgradeable) returns (bool) {
         revert DT_APPROVAL_NOT_SUPPORTED();
     }
 
     /// @notice Being non transferable, the DebtToken does not implement any of the standard ERC20 functions for transfer and allowance.
-    function increaseAllowance(
-        address, /* spender */
-        uint256 /* amount */
-    ) public virtual override returns (bool) {
+    function increaseAllowance(address /* spender */, uint256 /* amount */) public virtual override returns (bool) {
         revert DT_ALLOWANCE_INCREASE_NOT_SUPPORTED();
     }
 
     /// @notice Being non transferable, the DebtToken does not implement any of the standard ERC20 functions for transfer and allowance.
-    function decreaseAllowance(
-        address, /* spender */
-        uint256 /* amount */
-    ) public virtual override returns (bool) {
+    function decreaseAllowance(address /* spender */, uint256 /* amount */) public virtual override returns (bool) {
         revert DT_ALLOWANCE_DECREASE_NOT_SUPPORTED();
     }
 
@@ -99,16 +93,7 @@ contract DebtToken is InterestToken, IDebtToken {
     /// @return balance The uncommited balance
     /// @return earnings The uncommited balance
     /// @return claimable The earnigs the user can claim
-    function balanceOfDetails(address account)
-        external
-        view
-        override
-        returns (
-            uint256,
-            uint256,
-            uint256
-        )
-    {
+    function balanceOfDetails(address account) external view override returns (uint256, uint256, uint256) {
         HarvestTypes.UserCommit memory commit = IVaultCoreV1(vault).calcCommitUser(account, type(uint256).max);
 
         uint256 currentIndex = calcNewIndex();

@@ -20,12 +20,5 @@ interface IGroomableVaultV1 is IGroomableManager {
 
     function setGroomableConfig(VaultTypes.GroomableConfig memory) external;
 
-    function getGroomableConfig()
-        external
-        view
-        returns (
-            address,
-            address,
-            uint256
-        );
+    function getGroomableConfig() external view returns (address, address, uint256);
 }

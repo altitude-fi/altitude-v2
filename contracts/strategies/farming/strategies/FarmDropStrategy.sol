@@ -59,11 +59,9 @@ abstract contract FarmDropStrategy is Ownable, FarmStrategy, IFarmDropStrategy {
     /// If a farm drop is detected, the withdraw will be reverted
     /// @param amountRequested The amount to withdraw
 
-    function withdraw(uint256 amountRequested)
-        public
-        override(FarmStrategy, IFarmStrategy)
-        returns (uint256 amountWithdrawn)
-    {
+    function withdraw(
+        uint256 amountRequested
+    ) public override(FarmStrategy, IFarmStrategy) returns (uint256 amountWithdrawn) {
         _updateDropPercentage(balance(), 0);
         if (dropPercentage > dropThreshold) {
             revert FDS_DROP_EXCEEDED(dropPercentage, dropThreshold);
@@ -81,11 +79,9 @@ abstract contract FarmDropStrategy is Ownable, FarmStrategy, IFarmDropStrategy {
 
     /// @notice Update the drop percentage on emergencySwap
     /// @param assets The assets to swap
-    function emergencySwap(address[] calldata assets)
-        public
-        override(FarmStrategy, IFarmStrategy)
-        returns (uint256 amountWithdrawn)
-    {
+    function emergencySwap(
+        address[] calldata assets
+    ) public override(FarmStrategy, IFarmStrategy) returns (uint256 amountWithdrawn) {
         _updateDropPercentage(balance(), 0);
         amountWithdrawn = super.emergencySwap(assets);
         expectedBalance = balance();

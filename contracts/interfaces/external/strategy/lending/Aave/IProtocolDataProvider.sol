@@ -11,7 +11,9 @@ interface IProtocolDataProvider {
 
     function getAllATokens() external view returns (TokenData[] memory);
 
-    function getReserveConfigurationData(address asset)
+    function getReserveConfigurationData(
+        address asset
+    )
         external
         view
         returns (
@@ -27,7 +29,9 @@ interface IProtocolDataProvider {
             bool isFrozen
         );
 
-    function getReserveData(address asset)
+    function getReserveData(
+        address asset
+    )
         external
         view
         returns (
@@ -43,7 +47,10 @@ interface IProtocolDataProvider {
             uint40 lastUpdateTimestamp
         );
 
-    function getUserReserveData(address asset, address user)
+    function getUserReserveData(
+        address asset,
+        address user
+    )
         external
         view
         returns (
@@ -58,12 +65,7 @@ interface IProtocolDataProvider {
             bool usageAsCollateralEnabled
         );
 
-    function getReserveTokensAddresses(address asset)
-        external
-        view
-        returns (
-            address aTokenAddress,
-            address stableDebtTokenAddress,
-            address variableDebtTokenAddress
-        );
+    function getReserveTokensAddresses(
+        address asset
+    ) external view returns (address aTokenAddress, address stableDebtTokenAddress, address variableDebtTokenAddress);
 }

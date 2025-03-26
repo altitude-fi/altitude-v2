@@ -19,11 +19,7 @@ contract MorphoMock {
         return IToken(asset).balanceOf(address(this));
     }
 
-    function withdraw(
-        uint256 assets,
-        address receiver,
-        address
-    ) external returns (uint256 shares) {
+    function withdraw(uint256 assets, address receiver, address) external returns (uint256 shares) {
         IToken(asset).transfer(receiver, assets);
         return assets;
     }
@@ -32,11 +28,7 @@ contract MorphoMock {
         return IToken(asset).balanceOf(address(this));
     }
 
-    function redeem(
-        uint256 shares,
-        address receiver,
-        address
-    ) external returns (uint256) {
+    function redeem(uint256 shares, address receiver, address) external returns (uint256) {
         IToken(asset).transfer(receiver, shares);
         return shares;
     }

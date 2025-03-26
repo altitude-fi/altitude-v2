@@ -61,16 +61,7 @@ abstract contract GroomableVaultV1 is InterestVault, ProxyExtension, IGroomableV
     }
 
     //// @notice Return groomable config
-    function getGroomableConfig()
-        external
-        view
-        override
-        returns (
-            address,
-            address,
-            uint256
-        )
-    {
+    function getGroomableConfig() external view override returns (address, address, uint256) {
         return (
             groomableStorage.groomableManager,
             groomableStorage.flashLoanStrategy,

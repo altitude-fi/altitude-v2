@@ -22,9 +22,5 @@ interface IHarvestableVaultV1 is IHarvestableManager {
     function getHarvestData()
         external
         view
-        returns (
-            uint256 realClaimableEarnings,
-            uint256 realUncommittedEarnings,
-            uint256 vaultReserve
-        );
+        returns (uint256 realClaimableEarnings, uint256 realUncommittedEarnings, uint256 vaultReserve);
 }

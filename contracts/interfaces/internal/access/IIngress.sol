@@ -60,23 +60,11 @@ interface IIngress is IAccessControl {
 
     function setFunctionsPause(bytes4[] memory functions, bool toPause) external;
 
-    function validateDeposit(
-        address depositor,
-        address recipient,
-        uint256 amount
-    ) external view;
+    function validateDeposit(address depositor, address recipient, uint256 amount) external view;
 
-    function validateWithdraw(
-        address withdrawer,
-        address recipient,
-        uint256 amount
-    ) external;
+    function validateWithdraw(address withdrawer, address recipient, uint256 amount) external;
 
-    function validateBorrow(
-        address borrower,
-        address recipient,
-        uint256 amount
-    ) external;
+    function validateBorrow(address borrower, address recipient, uint256 amount) external;
 
     function validateRepay(address repayer, address recipient) external view;
 
@@ -89,4 +77,6 @@ interface IIngress is IAccessControl {
     function validateRebalance(address sender) external view;
 
     function validateLiquidateUsers(address liquidator) external view;
+
+    function validateSnapshotSupplyLoss(address sender) external view;
 }

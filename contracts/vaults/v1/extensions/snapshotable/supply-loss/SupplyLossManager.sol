@@ -94,10 +94,10 @@ contract SupplyLossManager is VaultStorage, ISupplyLossManager {
     /// @param borrowIndex Index to accumulate interest to
     /// @param snapshot SupplyLoss data containing required properties
     /// @return snapshot Updated snapshot data
-    function _reconcileBalances(uint256 borrowIndex, SupplyLossTypes.SupplyLoss memory snapshot)
-        internal
-        returns (SupplyLossTypes.SupplyLoss memory)
-    {
+    function _reconcileBalances(
+        uint256 borrowIndex,
+        SupplyLossTypes.SupplyLoss memory snapshot
+    ) internal returns (SupplyLossTypes.SupplyLoss memory) {
         // Calculate vault debtToken balance at time of supplyLoss snapshot
         uint256 vaultBorrowsAtSnapshot = Utils.calcBalanceAtIndex(
             debtToken.balanceStored(address(this)),
@@ -164,10 +164,10 @@ contract SupplyLossManager is VaultStorage, ISupplyLossManager {
     /// @param borrowIndex borrowIndex to use when setting the vaults debtToken balance
     /// @return withdrawn Amount withdrawn from the farm strategy in borrowToken
     /// @return farmLoss Loss in case the farm strategy is not able to provide the requested vault balance amount
-    function _withdrawVaultBorrows(uint256 vaultBorrows, uint256 borrowIndex)
-        internal
-        returns (uint256 withdrawn, uint256 farmLoss)
-    {
+    function _withdrawVaultBorrows(
+        uint256 vaultBorrows,
+        uint256 borrowIndex
+    ) internal returns (uint256 withdrawn, uint256 farmLoss) {
         // Limit withdraw by excluding previously accumulated rewards
         uint256 toWithdaw = _calcMaxToWithdrawn(IFarmDispatcher(activeFarmStrategy).balance(), vaultBorrows);
 
@@ -219,14 +219,7 @@ contract SupplyLossManager is VaultStorage, ISupplyLossManager {
         uint256 vaultBorrows,
         uint256 borrowLossAtSnapshot,
         uint256 borrowBalanceAtSnapshot
-    )
-        internal
-        returns (
-            uint256 vaultWindfall,
-            uint256 amountOut,
-            uint256 injectionFee
-        )
-    {
+    ) internal returns (uint256 vaultWindfall, uint256 amountOut, uint256 injectionFee) {
         // Calculate vaultWindfall: this is the amount of the vault farm loan that was repaid (during vault liquidation)
         vaultWindfall = CommitMath.calcBorrowAccountLoss(vaultBorrows, borrowLossAtSnapshot, borrowBalanceAtSnapshot);
 

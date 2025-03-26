@@ -56,11 +56,7 @@ abstract contract FlashLoanStrategy is IFlashLoanStrategy {
         migrationState.step = Step.Ready;
     }
 
-    function _onFlashLoanReceive(
-        uint256 amount,
-        uint256 fee,
-        address flashLoanGiver
-    ) internal {
+    function _onFlashLoanReceive(uint256 amount, uint256 fee, address flashLoanGiver) internal {
         // Ensure we come from flashLoan() with a trustworthy migration Info
         if (migrationState.step != Step.Flashloan) {
             revert FLS_MISSTEP();

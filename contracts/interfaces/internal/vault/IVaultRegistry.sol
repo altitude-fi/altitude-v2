@@ -99,29 +99,13 @@ interface IVaultRegistryV1 {
         VaultTypes.VaultData memory vaultData
     ) external;
 
-    function harvestVault(
-        address supplyAsset,
-        address borrowAsset,
-        uint256 price
-    ) external;
+    function harvestVault(address supplyAsset, address borrowAsset, uint256 price) external;
 
-    function injectBorrowAssetsInVault(
-        address supplyAsset,
-        address borrowAsset,
-        uint256 amount
-    ) external;
+    function injectBorrowAssetsInVault(address supplyAsset, address borrowAsset, uint256 amount) external;
 
-    function changeVaultLendingProvider(
-        address supplyAsset,
-        address borrowAsset,
-        address newProvider
-    ) external;
+    function changeVaultLendingProvider(address supplyAsset, address borrowAsset, address newProvider) external;
 
-    function changeVaultFarmDispatcher(
-        address supplyAsset,
-        address borrowAsset,
-        address newFarmDispatcher
-    ) external;
+    function changeVaultFarmDispatcher(address supplyAsset, address borrowAsset, address newFarmDispatcher) external;
 
     function setVaultConfig(
         address supplyAsset,
@@ -153,11 +137,7 @@ interface IVaultRegistryV1 {
         VaultTypes.BorrowLimits memory borrowLimits
     ) external;
 
-    function reduceVaultTargetThreshold(
-        address supplyAsset,
-        address borrowAsset,
-        uint256 targetThreshold
-    ) external;
+    function reduceVaultTargetThreshold(address supplyAsset, address borrowAsset, uint256 targetThreshold) external;
 
     function setProxyAdmin(address newProxyAdmin) external;
 
@@ -174,18 +154,9 @@ interface IVaultRegistryV1 {
 
     function setVaultReserveReceiver(address receiver) external;
 
-    function withdrawVaultReserve(
-        address supplyAsset,
-        address borrowAsset,
-        uint256 amount
-    ) external;
+    function withdrawVaultReserve(address supplyAsset, address borrowAsset, uint256 amount) external;
 
-    function injectSupplyInVault(
-        address supplyAsset,
-        address borrowAsset,
-        uint256 amount,
-        uint256 index
-    ) external;
+    function injectSupplyInVault(address supplyAsset, address borrowAsset, uint256 amount, uint256 index) external;
 
     function vaultsCount() external view returns (uint256);
 }

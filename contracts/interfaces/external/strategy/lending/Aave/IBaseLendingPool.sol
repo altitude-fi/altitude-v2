@@ -12,18 +12,9 @@ interface IBaseLendingPool {
         uint256 data;
     }
 
-    function deposit(
-        address asset,
-        uint256 amount,
-        address onBehalfOf,
-        uint16 referralCode
-    ) external payable;
+    function deposit(address asset, uint256 amount, address onBehalfOf, uint16 referralCode) external payable;
 
-    function withdraw(
-        address asset,
-        uint256 amount,
-        address to
-    ) external returns (uint256);
+    function withdraw(address asset, uint256 amount, address to) external returns (uint256);
 
     function borrow(
         address asset,
@@ -33,14 +24,11 @@ interface IBaseLendingPool {
         address onBehalfOf
     ) external;
 
-    function repay(
-        address asset,
-        uint256 amount,
-        uint256 rateMode,
-        address onBehalfOf
-    ) external returns (uint256);
+    function repay(address asset, uint256 amount, uint256 rateMode, address onBehalfOf) external returns (uint256);
 
-    function getUserAccountData(address user)
+    function getUserAccountData(
+        address user
+    )
         external
         view
         returns (

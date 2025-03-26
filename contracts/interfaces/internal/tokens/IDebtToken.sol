@@ -14,12 +14,5 @@ interface IDebtToken is IInterestToken {
     error DT_ALLOWANCE_INCREASE_NOT_SUPPORTED();
     error DT_ALLOWANCE_DECREASE_NOT_SUPPORTED();
 
-    function balanceOfDetails(address account)
-        external
-        view
-        returns (
-            uint256,
-            uint256,
-            uint256
-        );
+    function balanceOfDetails(address account) external view returns (uint256, uint256, uint256);
 }

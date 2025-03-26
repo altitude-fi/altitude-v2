@@ -106,9 +106,9 @@ abstract contract FarmStrategyIntegrationTest is ForkTest, TokensGenerator {
 
     function test_FarmBalance() public virtual {
         uint256 initialBalance = asset.balanceOf(dispatcher);
-        uint256 five = 5 * 10**asset.decimals();
-        uint256 ten = 10 * 10**asset.decimals();
-        uint256 fifteen = 15 * 10**asset.decimals();
+        uint256 five = 5 * 10 ** asset.decimals();
+        uint256 ten = 10 * 10 ** asset.decimals();
+        uint256 fifteen = 15 * 10 ** asset.decimals();
 
         _mintAsset(dispatcher, fifteen);
 

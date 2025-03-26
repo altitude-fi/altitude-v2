@@ -114,11 +114,7 @@ contract MorphoVault is FarmDropStrategy, SkimStrategy, IMorphoVault {
     /// @param inputAsset Input asset address
     /// @param outputAsset Output asset address
     /// @param amount Amount to swap
-    function _swap(
-        address inputAsset,
-        address outputAsset,
-        uint256 amount
-    ) internal returns (uint256) {
+    function _swap(address inputAsset, address outputAsset, uint256 amount) internal returns (uint256) {
         if (inputAsset != outputAsset) {
             if (amount == type(uint256).max) {
                 amount = IERC20(inputAsset).balanceOf(address(this));

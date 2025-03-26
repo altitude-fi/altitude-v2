@@ -214,6 +214,6 @@ contract LenderStrategyTest is Test, TokensGenerator {
         uint256 before = borrowAsset.balanceOf(vault);
         lenderStrategy.recogniseRewardsInBase();
         uint256 rewards = borrowAsset.balanceOf(vault) - before;
-        assertEq(rewards, 100 * (10**borrowAsset.decimals()), "Receive rewards");
+        assertEq(rewards, 100 * (10 ** borrowAsset.decimals()), "Receive rewards");
     }
 }

@@ -42,11 +42,7 @@ interface IInterestToken is IERC20Upgradeable, IERC20MetadataUpgradeable {
 
     function burn(address account, uint256 amount) external;
 
-    function vaultTransfer(
-        address owner,
-        address to,
-        uint256 amount
-    ) external returns (bool);
+    function vaultTransfer(address owner, address to, uint256 amount) external returns (bool);
 
     function setActiveLenderStrategy(address newStrategy) external;
 
@@ -62,11 +58,7 @@ interface IInterestToken is IERC20Upgradeable, IERC20MetadataUpgradeable {
 
     function setInterestIndex(uint256 newIndex) external;
 
-    function setBalance(
-        address account,
-        uint256 newBalance,
-        uint256 newIndex
-    ) external;
+    function setBalance(address account, uint256 newBalance, uint256 newIndex) external;
 
     function storedTotalSupply() external view returns (uint256);
 

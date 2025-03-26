@@ -24,7 +24,7 @@ contract BaseConvexStrategy is StrategyGenericPool, TokensGenerator {
         // 1:1 ratio
         uint256 fromDecimals = IToken(address(crvRewards)).decimals();
         uint256 toDecimals = IToken(asset).decimals();
-        return (amount * 10**toDecimals) / 10**fromDecimals;
+        return (amount * 10 ** toDecimals) / 10 ** fromDecimals;
     }
 
     function _curveWithdraw(uint256 lpAmount, uint256 minAssetOut) internal override {
@@ -36,7 +36,7 @@ contract BaseConvexStrategy is StrategyGenericPool, TokensGenerator {
         // 1:1 ratio
         uint256 fromDecimals = IToken(address(curveLP)).decimals();
         uint256 toDecimals = IToken(asset).decimals();
-        uint256 amountOut = (lpAmount * 10**toDecimals) / 10**fromDecimals;
+        uint256 amountOut = (lpAmount * 10 ** toDecimals) / 10 ** fromDecimals;
 
         burnToken(address(curveLP), address(this), lpAmount);
         mintToken(farmAsset, address(this), amountOut);

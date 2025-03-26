@@ -47,7 +47,7 @@ contract MorphoStrategy is LenderStrategyIntegrationTest {
 
         price = Utils.scaleAmount(price, oraclePriceDecimals, IERC20Metadata(borrowAsset).decimals());
 
-        return (amount * price) / 10**supplyAsset.decimals();
+        return (amount * price) / 10 ** supplyAsset.decimals();
     }
 
     function _accumulateRewards(address[] memory rewardsList) internal virtual override {
@@ -56,7 +56,7 @@ contract MorphoStrategy is LenderStrategyIntegrationTest {
         uint256[] memory claimedAmounts = new uint256[](rewardsList.length);
 
         for (uint256 i = 0; i < rewardsList.length; i++) {
-            claimedAmounts[i] = 100 * 10**IERC20Metadata(rewardsList[i]).decimals();
+            claimedAmounts[i] = 100 * 10 ** IERC20Metadata(rewardsList[i]).decimals();
             mintToken(rewardsList[i], address(morphoStrategy), claimedAmounts[i]);
         }
     }

@@ -43,12 +43,7 @@ interface IVaultCoreV1 is
     error VC_V1_NOT_AUTHORIZED_TO_DEAL_WITH_TRANSFERS();
     error VC_V1_UNHEALTHY_VAULT_RISK();
 
-    function preTransfer(
-        address from,
-        address to,
-        uint256 amount,
-        bytes4 transferSelector
-    ) external;
+    function preTransfer(address from, address to, uint256 amount, bytes4 transferSelector) external;
 
     function postTransfer(address from, address to) external;
 
@@ -56,12 +51,7 @@ interface IVaultCoreV1 is
 
     function borrow(uint256 amount) external;
 
-    function borrowOnBehalfOf(
-        uint256 amount,
-        address onBehalfOf,
-        uint256 deadline,
-        bytes calldata signature
-    ) external;
+    function borrowOnBehalfOf(uint256 amount, address onBehalfOf, uint256 deadline, bytes calldata signature) external;
 
     function withdraw(uint256 amount, address to) external returns (uint256);
 

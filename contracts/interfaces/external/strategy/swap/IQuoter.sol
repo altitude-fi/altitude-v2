@@ -15,7 +15,10 @@ interface IQuoter {
     /// @return amountOut The amount of the last token that would be received
     /// @return sqrtPriceX96AfterList List of the sqrt price after the swap for each pool in the path
     /// @return initializedTicksCrossedList List of number of initialized ticks loaded
-    function quoteExactInput(bytes memory path, uint256 amountIn)
+    function quoteExactInput(
+        bytes memory path,
+        uint256 amountIn
+    )
         external
         view
         returns (
@@ -45,15 +48,12 @@ interface IQuoter {
     /// @return amountOut The amount of `tokenOut` that would be received
     /// @return sqrtPriceX96After The sqrt price of the pool after the swap
     /// @return initializedTicksCrossed The number of initialized ticks loaded
-    function quoteExactInputSingleWithPool(QuoteExactInputSingleWithPoolParams memory params)
+    function quoteExactInputSingleWithPool(
+        QuoteExactInputSingleWithPoolParams memory params
+    )
         external
         view
-        returns (
-            uint256 amountOut,
-            uint160 sqrtPriceX96After,
-            uint32 initializedTicksCrossed,
-            uint256 gasEstimate
-        );
+        returns (uint256 amountOut, uint160 sqrtPriceX96After, uint32 initializedTicksCrossed, uint256 gasEstimate);
 
     struct QuoteExactInputSingleParams {
         address tokenIn;
@@ -73,15 +73,12 @@ interface IQuoter {
     /// @return amountOut The amount of `tokenOut` that would be received
     /// @return sqrtPriceX96After The sqrt price of the pool after the swap
     /// @return initializedTicksCrossed The number of initialized ticks loaded
-    function quoteExactInputSingle(QuoteExactInputSingleParams memory params)
+    function quoteExactInputSingle(
+        QuoteExactInputSingleParams memory params
+    )
         external
         view
-        returns (
-            uint256 amountOut,
-            uint160 sqrtPriceX96After,
-            uint32 initializedTicksCrossed,
-            uint256 gasEstimate
-        );
+        returns (uint256 amountOut, uint160 sqrtPriceX96After, uint32 initializedTicksCrossed, uint256 gasEstimate);
 
     struct QuoteExactOutputSingleWithPoolParams {
         address tokenIn;
@@ -103,15 +100,12 @@ interface IQuoter {
     /// @return amountIn The amount required as the input for the swap in order to receive `amountOut`
     /// @return sqrtPriceX96After The sqrt price of the pool after the swap
     /// @return initializedTicksCrossed The number of initialized ticks loaded
-    function quoteExactOutputSingleWithPool(QuoteExactOutputSingleWithPoolParams memory params)
+    function quoteExactOutputSingleWithPool(
+        QuoteExactOutputSingleWithPoolParams memory params
+    )
         external
         view
-        returns (
-            uint256 amountIn,
-            uint160 sqrtPriceX96After,
-            uint32 initializedTicksCrossed,
-            uint256 gasEstimate
-        );
+        returns (uint256 amountIn, uint160 sqrtPriceX96After, uint32 initializedTicksCrossed, uint256 gasEstimate);
 
     struct QuoteExactOutputSingleParams {
         address tokenIn;
@@ -131,15 +125,12 @@ interface IQuoter {
     /// @return amountIn The amount required as the input for the swap in order to receive `amountOut`
     /// @return sqrtPriceX96After The sqrt price of the pool after the swap
     /// @return initializedTicksCrossed The number of initialized ticks loaded
-    function quoteExactOutputSingle(QuoteExactOutputSingleParams memory params)
+    function quoteExactOutputSingle(
+        QuoteExactOutputSingleParams memory params
+    )
         external
         view
-        returns (
-            uint256 amountIn,
-            uint160 sqrtPriceX96After,
-            uint32 initializedTicksCrossed,
-            uint256 gasEstimate
-        );
+        returns (uint256 amountIn, uint160 sqrtPriceX96After, uint32 initializedTicksCrossed, uint256 gasEstimate);
 
     /// @notice Returns the amount in required for a given exact output swap without executing the swap
     /// @param path The path of the swap, i.e. each token pair and the pool fee. Path must be provided in reverse order
@@ -147,7 +138,10 @@ interface IQuoter {
     /// @return amountIn The amount of first token required to be paid
     /// @return sqrtPriceX96AfterList List of the sqrt price after the swap for each pool in the path
     /// @return initializedTicksCrossedList List of the initialized ticks that the swap crossed for each pool in the path
-    function quoteExactOutput(bytes memory path, uint256 amountOut)
+    function quoteExactOutput(
+        bytes memory path,
+        uint256 amountOut
+    )
         external
         view
         returns (

@@ -107,11 +107,7 @@ interface IRewardsController is IRewardsDistributor {
      * @param reward The address of the reward token
      * @return The amount of rewards claimed
      **/
-    function claimRewardsToSelf(
-        address[] calldata assets,
-        uint256 amount,
-        address reward
-    ) external returns (uint256);
+    function claimRewardsToSelf(address[] calldata assets, uint256 amount, address reward) external returns (uint256);
 
     /**
      * @dev Claims all rewards for a user to the desired address, on all the assets of the pool, accumulating the pending rewards
@@ -120,9 +116,10 @@ interface IRewardsController is IRewardsDistributor {
      * @return rewardsList List of addresses of the reward tokens
      * @return claimedAmounts List that contains the claimed amount per reward, following same order as "rewardList"
      **/
-    function claimAllRewards(address[] calldata assets, address to)
-        external
-        returns (address[] memory rewardsList, uint256[] memory claimedAmounts);
+    function claimAllRewards(
+        address[] calldata assets,
+        address to
+    ) external returns (address[] memory rewardsList, uint256[] memory claimedAmounts);
 
     /**
      * @dev Claims all rewards for a user on behalf, on all the assets of the pool, accumulating the pending rewards. The caller must
@@ -145,7 +142,7 @@ interface IRewardsController is IRewardsDistributor {
      * @return rewardsList List of addresses of the reward tokens
      * @return claimedAmounts List that contains the claimed amount per reward, following same order as "rewardsList"
      **/
-    function claimAllRewardsToSelf(address[] calldata assets)
-        external
-        returns (address[] memory rewardsList, uint256[] memory claimedAmounts);
+    function claimAllRewardsToSelf(
+        address[] calldata assets
+    ) external returns (address[] memory rewardsList, uint256[] memory claimedAmounts);
 }

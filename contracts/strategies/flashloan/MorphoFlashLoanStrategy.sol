@@ -32,10 +32,7 @@ contract MorphoFlashLoanStrategy is IMorphoFlashLoanCallback, FlashLoanStrategy 
 
     /// @notice This function is called by Morpho FlashLoan when sending loaned asset amount
     /// @param amount The amount being flash loaned
-    function onMorphoFlashLoan(
-        uint256 amount,
-        bytes calldata /* params */
-    ) external override {
+    function onMorphoFlashLoan(uint256 amount, bytes calldata /* params */) external override {
         // Execute flashloan custom logic
         _onFlashLoanReceive(amount, 0, address(MORPHO));
     }

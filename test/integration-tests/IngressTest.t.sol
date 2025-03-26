@@ -216,6 +216,19 @@ contract IngressTest is VaultTestSuite {
         vault.rebalance();
     }
 
+    function test_validateSnapshotSupplyLoss() public {
+        vm.expectRevert();
+        vm.prank(alphaUser);
+        vault.snapshotSupplyLoss();
+
+        vm.expectRevert();
+        vm.prank(betaUser);
+        vault.snapshotSupplyLoss();
+
+        vm.prank(gammaUser);
+        vault.snapshotSupplyLoss();
+    }
+
     function test_validateLiquidateUsers() public {
         deposit(aliceUser);
 

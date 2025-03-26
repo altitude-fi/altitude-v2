@@ -57,7 +57,7 @@ abstract contract SwapStrategy is ISwapStrategy, Ownable {
     ) public view virtual override returns (uint256) {
         uint256 price = _getPrice(assetFrom, assetTo);
 
-        uint256 initialQuoteAmount = (baseAmount * price) / 10**IERC20Metadata(assetFrom).decimals();
+        uint256 initialQuoteAmount = (baseAmount * price) / 10 ** IERC20Metadata(assetFrom).decimals();
 
         return _applySlippage(initialQuoteAmount, slippage);
     }
@@ -112,7 +112,7 @@ abstract contract SwapStrategy is ISwapStrategy, Ownable {
     ) public view override returns (uint256) {
         uint256 price = _getPrice(assetFrom, assetTo);
 
-        uint256 initialQuoteAmount = (amountOut * 10**IERC20Metadata(assetFrom).decimals()) / price;
+        uint256 initialQuoteAmount = (amountOut * 10 ** IERC20Metadata(assetFrom).decimals()) / price;
 
         uint256 quoteAmount = initialQuoteAmount + ((initialQuoteAmount * slippage) / SLIPPAGE_BASE);
 

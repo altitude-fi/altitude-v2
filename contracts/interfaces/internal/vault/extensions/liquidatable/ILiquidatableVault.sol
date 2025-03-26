@@ -13,14 +13,5 @@ interface ILiquidatableVaultV1 is ILiquidatableManager {
 
     function setLiquidationConfig(VaultTypes.LiquidatableConfig memory liqConfig) external;
 
-    function getLiquidationConfig()
-        external
-        view
-        returns (
-            address,
-            uint256,
-            uint256,
-            uint256,
-            uint256
-        );
+    function getLiquidationConfig() external view returns (address, uint256, uint256, uint256, uint256);
 }

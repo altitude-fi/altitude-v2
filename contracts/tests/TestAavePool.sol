@@ -14,11 +14,7 @@ contract TestAavePool {
         mockBorrowToken = new TestToken();
     }
 
-    function withdraw(
-        address supplyAsset,
-        uint256 amount,
-        address to
-    ) public returns (uint256) {
+    function withdraw(address supplyAsset, uint256 amount, address to) public returns (uint256) {
         uint256 feeAmount = (amount * feePercentage) / FEE_PRECISION;
         uint256 amountAfterFee = amount - feeAmount;
         IERC20(supplyAsset).transfer(to, amountAfterFee);
@@ -26,25 +22,12 @@ contract TestAavePool {
         return amountAfterFee;
     }
 
-    function deposit(
-        address supplyAsset,
-        uint256 amount,
-        address,
-        uint16
-    ) public {
+    function deposit(address supplyAsset, uint256 amount, address, uint16) public {
         IERC20(supplyAsset).transferFrom(msg.sender, address(this), amount);
         mockATokenBalance += amount;
     }
 
-    function getReserveTokensAddresses(address)
-        public
-        view
-        returns (
-            address,
-            address,
-            address
-        )
-    {
+    function getReserveTokensAddresses(address) public view returns (address, address, address) {
         return (address(this), address(0), address(mockBorrowToken));
     }
 

@@ -23,11 +23,10 @@ abstract contract LiquidatableVaultV1 is InterestVault, ProxyExtension, ILiquida
     /// @notice Forward execution to the LiquidatableManager
     /// @param usersForLiquidation User addresses
     /// @param repayAmountLimit Max amount the liquidator wants to pay
-    function liquidateUsers(address[] calldata usersForLiquidation, uint256 repayAmountLimit)
-        external
-        override
-        nonReentrant
-    {
+    function liquidateUsers(
+        address[] calldata usersForLiquidation,
+        uint256 repayAmountLimit
+    ) external override nonReentrant {
         IIngress(ingressControl).validateLiquidateUsers(msg.sender);
 
         // We need to update position because the liquidation will change the users' balances.
@@ -73,18 +72,7 @@ abstract contract LiquidatableVaultV1 is InterestVault, ProxyExtension, ILiquida
     }
 
     //// @notice Return liquidation config
-    function getLiquidationConfig()
-        external
-        view
-        override
-        returns (
-            address,
-            uint256,
-            uint256,
-            uint256,
-            uint256
-        )
-    {
+    function getLiquidationConfig() external view override returns (address, uint256, uint256, uint256, uint256) {
         return (
             liquidatableStorage.liquidatableManager,
             liquidatableStorage.maxPositionLiquidation,

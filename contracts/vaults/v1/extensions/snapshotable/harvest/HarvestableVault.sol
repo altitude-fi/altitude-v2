@@ -123,11 +123,7 @@ abstract contract HarvestableVaultV1 is InterestVault, JoiningBlockVault, ProxyE
         external
         view
         override
-        returns (
-            uint256 realClaimableEarnings,
-            uint256 realUncommittedEarnings,
-            uint256 vaultReserve
-        )
+        returns (uint256 realClaimableEarnings, uint256 realUncommittedEarnings, uint256 vaultReserve)
     {
         return (
             harvestStorage.realClaimableEarnings,

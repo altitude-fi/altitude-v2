@@ -73,7 +73,10 @@ contract SupplyToken is InterestToken, ISupplyToken, ReentrancyGuard {
     /// @notice Transfer tokens between users
     /// @param to The recipient of the tokens
     /// @param amount The amount to be transferred
-    function transfer(address to, uint256 amount)
+    function transfer(
+        address to,
+        uint256 amount
+    )
         public
         override(ERC20Upgradeable, IERC20Upgradeable)
         onlyEnoughBalance(msg.sender, amount)
@@ -114,12 +117,9 @@ contract SupplyToken is InterestToken, ISupplyToken, ReentrancyGuard {
     }
 
     /// @dev Overrides the balanceOf function to revert in case of vault
-    function balanceOf(address account)
-        public
-        view
-        override(IERC20Upgradeable, InterestToken)
-        returns (uint256 userBalance)
-    {
+    function balanceOf(
+        address account
+    ) public view override(IERC20Upgradeable, InterestToken) returns (uint256 userBalance) {
         // Skip position update for the vault
         if (account == vault) {
             return 0;

@@ -15,18 +15,14 @@ contract TestSwapStrategy {
     uint256 public decimals;
 
     constructor(uint256 tokenDec) {
-        decimals = 10**tokenDec;
+        decimals = 10 ** tokenDec;
     }
 
     function setPrice(uint256 newPrice) external {
         price = newPrice;
     }
 
-    function swapInBase(
-        address assetFrom,
-        address assetTo,
-        uint256 amount
-    ) external returns (uint256 amountOut) {
+    function swapInBase(address assetFrom, address assetTo, uint256 amount) external returns (uint256 amountOut) {
         TransferHelper.safeTransferFrom(assetFrom, msg.sender, address(this), amount);
 
         uint256 returnAmount = (decimals * amount) / price;

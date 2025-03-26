@@ -33,12 +33,7 @@ contract RebalanceIncentivesController is Ownable, IRebalanceIncentivesControlle
      * @param minDeviation_ The threshold deviation below on to send incentives
      * @param maxDeviation_ The threshold deviation above on to send incentives
      */
-    constructor(
-        address rewardToken_,
-        address vaultAddress_,
-        uint256 minDeviation_,
-        uint256 maxDeviation_
-    ) {
+    constructor(address rewardToken_, address vaultAddress_, uint256 minDeviation_, uint256 maxDeviation_) {
         vault = vaultAddress_;
         _validateDeviations(minDeviation_, maxDeviation_);
         rewardToken = rewardToken_;

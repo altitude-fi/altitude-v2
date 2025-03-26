@@ -341,6 +341,33 @@ contract VaultHarvestableTest is VaultTestSuite {
         assertEq(vault.getUserHarvest(user).claimableEarnings, 0);
     }
 
+    function test_ClaimRewardsWhenZeroThreshold() public {
+        address user = vm.addr(1);
+        disableReserveFactor();
+        deposit(user);
+        vault.rebalance();
+        harvestWithRewards(REWARDS);
+        vault.updatePosition(user);
+
+        vaultRegistry.reduceVaultTargetThreshold(deployer.supplyAsset(), deployer.borrowAsset(), 0);
+        vault.rebalance();
+
+        uint256 claimableRewards = vault.claimableRewards(user);
+
+        assertEq(claimableRewards, REWARDS);
+        assertEq(dispatcher.balance(), REWARDS);
+        assertEq(lenderStrategy.borrowBalance(), 0);
+        assertEq(vault.debtToken().balanceOf(address(vault)), 0 );
+
+        vm.prank(user);
+        vault.claimRewards(claimableRewards); // claim all
+        
+        assertEq(dispatcher.balance(), 0);
+        (uint256 claimable, , ) = vault.getHarvestData();
+        assertEq(claimable, 0);
+        assertEq(vault.getUserHarvest(user).claimableEarnings, 0);
+    }
+
     function test_ClaimRewardsNoMoreThanExisting() public {
         address user = vm.addr(1);
         _prepareForClaim(user, REWARDS);

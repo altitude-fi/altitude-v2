@@ -34,11 +34,7 @@ contract UniswapV3Strategy is SwapStrategy {
     /** @notice Multihop route configurations */
     mapping(address => mapping(address => SwapData)) public swapPairs;
 
-    constructor(
-        address _router,
-        IPriceSource _priceSource,
-        IQuoter _quoter
-    ) SwapStrategy(_router, _priceSource) {
+    constructor(address _router, IPriceSource _priceSource, IQuoter _quoter) SwapStrategy(_router, _priceSource) {
         quoter = _quoter;
     }
 

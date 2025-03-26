@@ -15,10 +15,10 @@ interface ISnapshotableVaultV1 is ISnapshotableManager, IHarvestableVaultV1, ISu
 
     function getSnapshotableConfig() external view returns (address, uint256);
 
-    function calcCommitUser(address account, uint256 snapshotId)
-        external
-        view
-        returns (HarvestTypes.UserCommit memory commit);
+    function calcCommitUser(
+        address account,
+        uint256 snapshotId
+    ) external view returns (HarvestTypes.UserCommit memory commit);
 
     function totalSnapshots() external view returns (uint256);
 

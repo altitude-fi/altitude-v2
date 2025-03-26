@@ -60,11 +60,11 @@ contract CRVRewardsMock is TokensGenerator {
     function getReward(address recipient, bool sendExtra) external returns (bool) {
         if (toReceiveRewards) {
             for (uint256 i = 1; i < rewards.length; i++) {
-                mintToken(rewards[i], recipient, 10**IToken(rewards[i]).decimals());
+                mintToken(rewards[i], recipient, 10 ** IToken(rewards[i]).decimals());
             }
 
             if (sendExtra) {
-                mintToken(rewards[0], recipient, 10**IToken(rewards[0]).decimals());
+                mintToken(rewards[0], recipient, 10 ** IToken(rewards[0]).decimals());
             }
         }
 
@@ -72,7 +72,7 @@ contract CRVRewardsMock is TokensGenerator {
     }
 
     function getRewardRate(uint256 i) external view returns (uint256) {
-        return 10**IToken(rewards[i]).decimals();
+        return 10 ** IToken(rewards[i]).decimals();
     }
 
     function extraRewardsLength() external pure returns (uint256) {

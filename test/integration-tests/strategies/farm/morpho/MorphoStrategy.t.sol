@@ -42,7 +42,7 @@ contract MorphoStrategy is FarmStrategyIntegrationTest {
     }
 
     function _accumulateRewards() internal virtual override returns (address[] memory) {
-        mintToken(Constants.CRV, address(farmStrategy), 100 * 10**IToken(Constants.CRV).decimals());
+        mintToken(Constants.CRV, address(farmStrategy), 100 * 10 ** IToken(Constants.CRV).decimals());
 
         address[] memory rewards = new address[](1);
         rewards[0] = Constants.CRV;

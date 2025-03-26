@@ -42,38 +42,17 @@ interface IFarmDispatcher is IAccessControl {
 
     function STRATEGY_ZERO() external view returns (address);
 
-    function strategies(address)
-        external
-        view
-        returns (
-            bool,
-            uint256,
-            uint256,
-            address,
-            address
-        );
+    function strategies(address) external view returns (bool, uint256, uint256, address, address);
 
-    function initialize(
-        address vaultAddress,
-        address workingAsset,
-        address owner
-    ) external;
+    function initialize(address vaultAddress, address workingAsset, address owner) external;
 
     function setStrategyPriority(address strategyAddress, address strategyPosition) external;
 
     function setStrategyMax(address strategyAddress, uint256 max) external;
 
-    function addStrategy(
-        address strategyAddress,
-        uint256 max,
-        address position
-    ) external;
+    function addStrategy(address strategyAddress, uint256 max, address position) external;
 
-    function addStrategies(
-        address[] calldata strategies,
-        uint256[] calldata max,
-        address position
-    ) external;
+    function addStrategies(address[] calldata strategies, uint256[] calldata max, address position) external;
 
     function deactivateStrategy(address strategyAddress) external;
 

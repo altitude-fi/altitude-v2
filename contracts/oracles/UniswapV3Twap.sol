@@ -73,11 +73,7 @@ contract UniswapV3Twap is IPriceSource, Ownable {
      * @param assetTo The asset the amount will be returned to
      * @param multiHop configuration struct
      */
-    function setOraclePair(
-        address assetFrom,
-        address assetTo,
-        PairRoute[] memory multiHop
-    ) external onlyOwner {
+    function setOraclePair(address assetFrom, address assetTo, PairRoute[] memory multiHop) external onlyOwner {
         delete oraclePairs[assetFrom][assetTo];
 
         uint256 newHopsLength = multiHop.length;
@@ -129,7 +125,7 @@ contract UniswapV3Twap is IPriceSource, Ownable {
         }
 
         // set toAssetAmount, base on fromAsset decimals
-        toAssetAmount = 10**IERC20Metadata(fromAsset).decimals();
+        toAssetAmount = 10 ** IERC20Metadata(fromAsset).decimals();
 
         // Get oracle price for each step in route
         for (uint256 i; i < pairRouteLength; ) {

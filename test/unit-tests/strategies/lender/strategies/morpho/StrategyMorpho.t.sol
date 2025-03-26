@@ -41,7 +41,7 @@ contract MorphoStrategy is LenderStrategyUnitTest {
 
         price = Utils.scaleAmount(price, oraclePriceDecimals, IERC20Metadata(borrowAsset).decimals());
 
-        return (amount * price) / 10**supplyAsset.decimals();
+        return (amount * price) / 10 ** supplyAsset.decimals();
     }
 
     function test_paidLiquidationFee() public view {
@@ -71,14 +71,14 @@ contract MorphoStrategy is LenderStrategyUnitTest {
         assets[0] = BaseGetter.getBaseERC20(18);
         assets[1] = BaseGetter.getBaseERC20(18);
 
-        mintToken(assets[0], address(morphoStrategy), 100 * 10**18);
-        mintToken(assets[1], address(morphoStrategy), 200 * 10**18);
+        mintToken(assets[0], address(morphoStrategy), 100 * 10 ** 18);
+        mintToken(assets[1], address(morphoStrategy), 200 * 10 ** 18);
 
         address receiver = makeAddr("skimReceiver");
         morphoStrategy.skim(assets, receiver);
 
-        assertEq(IERC20Metadata(assets[0]).balanceOf(receiver), 100 * 10**18);
-        assertEq(IERC20Metadata(assets[1]).balanceOf(receiver), 200 * 10**18);
+        assertEq(IERC20Metadata(assets[0]).balanceOf(receiver), 100 * 10 ** 18);
+        assertEq(IERC20Metadata(assets[1]).balanceOf(receiver), 200 * 10 ** 18);
     }
 
     function test_skimNonOwner() public {
@@ -105,8 +105,8 @@ contract MorphoStrategy is LenderStrategyUnitTest {
 
     function test_getInBaseReverse() public view {
         assertApproxEqRel(
-            (10**borrowAsset.decimals() * 10**supplyAsset.decimals()) /
-                _priceSupplyInBorrow(10**supplyAsset.decimals()),
+            (10 ** borrowAsset.decimals() * 10 ** supplyAsset.decimals()) /
+                _priceSupplyInBorrow(10 ** supplyAsset.decimals()),
             morphoStrategy.getInBase(address(borrowAsset), address(supplyAsset)),
             0.005e18
         );

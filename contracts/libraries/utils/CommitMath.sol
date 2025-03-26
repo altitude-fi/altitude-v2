@@ -58,7 +58,7 @@ library CommitMath {
         // If the user has not been snapshotted yet, we need to calculate the
         // user's commit from their last snapshot to the specified snapshot
         if (userLastSnapshot < totalSnapshots) {
-            uint256 decimals = 10**supplyToken.decimals();
+            uint256 decimals = 10 ** supplyToken.decimals();
             CommonTypes.SnapshotType memory snapshot;
 
             // Loop through snapshots to calculate the users latest position
@@ -317,11 +317,10 @@ library CommitMath {
     /// @param snapshot Supply loss snapshot data
     /// @param supplyBalance User's supply balance prior to the supply loss snapshot
     /// @return withdrawShortage The amount of withdraw shortage (originating from farming activities)
-    function _distributeWithdrawShortage(SupplyLossTypes.SupplyLoss memory snapshot, uint256 supplyBalance)
-        internal
-        pure
-        returns (uint256 withdrawShortage)
-    {
+    function _distributeWithdrawShortage(
+        SupplyLossTypes.SupplyLoss memory snapshot,
+        uint256 supplyBalance
+    ) internal pure returns (uint256 withdrawShortage) {
         // Distribute farmLoss relative to the users supply balance
         // withdraw shortage orginate from farming activities so are distributed to all users
         // @dev we're using rounding to avoid shortfalls
@@ -335,11 +334,10 @@ library CommitMath {
     /// @param snapshot Supply loss snapshot data
     /// @param borrowBalance User's borrow balance prior to the supply loss snapshot
     /// @return borrowLoss The amount of borrow loss
-    function _distributeBorrowLoss(SupplyLossTypes.SupplyLoss memory snapshot, uint256 borrowBalance)
-        internal
-        pure
-        returns (uint256 borrowLoss)
-    {
+    function _distributeBorrowLoss(
+        SupplyLossTypes.SupplyLoss memory snapshot,
+        uint256 borrowBalance
+    ) internal pure returns (uint256 borrowLoss) {
         // Distribute borrowLoss relative to the users borrow balance
         if (borrowBalance > 0 && snapshot.borrowLossAtSnapshot > 0) {
             borrowLoss = (borrowBalance * snapshot.borrowLossAtSnapshot) / snapshot.borrowBalanceAtSnapshot;

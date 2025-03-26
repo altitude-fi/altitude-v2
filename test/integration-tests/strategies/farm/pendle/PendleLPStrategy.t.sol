@@ -52,7 +52,7 @@ contract PendleLPStrategy is FarmStrategyIntegrationTest {
     }
 
     function _accumulateRewards() internal virtual override returns (address[] memory) {
-        mintToken(Constants.pendle_Token, address(farmStrategy), 100 * 10**IToken(Constants.pendle_Token).decimals());
+        mintToken(Constants.pendle_Token, address(farmStrategy), 100 * 10 ** IToken(Constants.pendle_Token).decimals());
 
         address[] memory rewards = new address[](1);
         rewards[0] = Constants.pendle_Token;

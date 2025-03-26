@@ -141,11 +141,7 @@ contract StrategyAaveV3 is LenderStrategy {
     /// @notice Swaps the current balance of fromAsset to toAsset
     /// @param fromAsset asset to swap from
     /// @param toAsset asset to swap to
-    function _swap(
-        address fromAsset,
-        address toAsset,
-        uint256 amount
-    ) internal {
+    function _swap(address fromAsset, address toAsset, uint256 amount) internal {
         if (amount > 0) {
             TransferHelper.safeApprove(fromAsset, address(swapStrategy), amount);
 
@@ -165,7 +161,7 @@ contract StrategyAaveV3 is LenderStrategy {
             addresses
         );
 
-        return (prices[0] * (10**IERC20Metadata(toAsset).decimals())) / prices[1];
+        return (prices[0] * (10 ** IERC20Metadata(toAsset).decimals())) / prices[1];
     }
 
     /// @notice Calculates value of amount in the borrow currency
@@ -178,7 +174,7 @@ contract StrategyAaveV3 is LenderStrategy {
         address fromAsset,
         address toAsset
     ) external view override returns (uint256) {
-        return (getInBase(fromAsset, toAsset) * amount) / 10**IERC20Metadata(fromAsset).decimals();
+        return (getInBase(fromAsset, toAsset) * amount) / 10 ** IERC20Metadata(fromAsset).decimals();
     }
 
     /// @notice Returns the paid supply loss fee

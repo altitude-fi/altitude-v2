@@ -3,12 +3,11 @@ name: Run Tests
 on:
   push:
     branches:
-      - dev
       - main
   pull_request:
     branches:
-      - dev
       - main
+      - release-*
 
 jobs:
   tests:
@@ -29,6 +28,9 @@ jobs:
 
       - name: Install Foundry
         uses: foundry-rs/foundry-toolchain@v1
+
+      - name: Install forge-std without git add
+        run: forge install foundry-rs/forge-std --no-commit
 
       - name: Run Tests
         run: forge test

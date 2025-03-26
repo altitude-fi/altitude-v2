@@ -114,13 +114,13 @@ abstract contract LenderStrategyIntegrationTest is ForkTest, TokensGenerator {
 
     function test_getInBase() public view {
         assertEq(
-            _priceSupplyInBorrow(10**supplyAsset.decimals()),
+            _priceSupplyInBorrow(10 ** supplyAsset.decimals()),
             lenderStrategy.getInBase(address(supplyAsset), address(borrowAsset))
         );
     }
 
     function test_convertToBase() public view {
-        uint256 amount = 150 * 10**supplyAsset.decimals();
+        uint256 amount = 150 * 10 ** supplyAsset.decimals();
         assertEq(
             _priceSupplyInBorrow(amount),
             lenderStrategy.convertToBase(amount, address(supplyAsset), address(borrowAsset))
@@ -136,7 +136,7 @@ abstract contract LenderStrategyIntegrationTest is ForkTest, TokensGenerator {
         _accumulateRewards(rewardsList);
         lenderStrategy.recogniseRewardsInBase();
         uint256 rewards = borrowAsset.balanceOf(vault) - before;
-        assertEq(rewards, 200 * (10**borrowAsset.decimals()), "Receive rewards");
+        assertEq(rewards, 200 * (10 ** borrowAsset.decimals()), "Receive rewards");
     }
 
     function test_availableBorrowLiquidity() public {

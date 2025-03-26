@@ -50,7 +50,7 @@ contract Aavev2FlashLoanStrategy is IFlashLoanReceiver, FlashLoanStrategy {
         address[] calldata,
         uint256[] calldata amounts,
         uint256[] calldata premiums,
-        address, /* initiator */
+        address /* initiator */,
         bytes calldata /* params */
     ) external override returns (bool) {
         _onFlashLoanReceive(amounts[0], premiums[0], address(AAVE_LENDING_POOL_V2));

@@ -38,11 +38,7 @@ interface ISwapStrategy {
         uint256 slippage
     ) external view returns (uint256);
 
-    function getMaximumAmountIn(
-        address assetFrom,
-        address assetTo,
-        uint256 amountOut
-    ) external view returns (uint256);
+    function getMaximumAmountIn(address assetFrom, address assetTo, uint256 amountOut) external view returns (uint256);
 
     function getMaximumAmountIn(
         address assetFrom,
@@ -51,11 +47,7 @@ interface ISwapStrategy {
         uint256 slippage
     ) external view returns (uint256);
 
-    function swapInBase(
-        address assetFrom,
-        address assetTo,
-        uint256 amount
-    ) external returns (uint256);
+    function swapInBase(address assetFrom, address assetTo, uint256 amount) external returns (uint256);
 
     function swapOutBase(
         address assetFrom,

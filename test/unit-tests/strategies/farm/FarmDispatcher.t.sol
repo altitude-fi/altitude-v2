@@ -616,9 +616,9 @@ contract FarmDispatcherTest is Test {
         (uint256 balance, uint256 revertedStrategies) = dispatcher.balanceAvailable();
         assertEq(balance, 0);
         assertEq(revertedStrategies, 5);
-        assertTrue(revertedStrategies & (2**0) > 0); // strategy 1 has reverted
-        assertTrue(revertedStrategies & (2**2) > 0); // strategy 3 has reverted
-        assertEq(revertedStrategies & (2**1), 0); // strategy 2 has not reverted
+        assertTrue(revertedStrategies & (2 ** 0) > 0); // strategy 1 has reverted
+        assertTrue(revertedStrategies & (2 ** 2) > 0); // strategy 3 has reverted
+        assertEq(revertedStrategies & (2 ** 1), 0); // strategy 2 has not reverted
     }
 
     function test_GetNextStrategy() public {

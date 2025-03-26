@@ -21,10 +21,7 @@ contract TestVault is VaultCoreV1 {
 
     function _preDeposit(uint256 amount) internal override {}
 
-    function _postWithdraw(
-        uint256, /* withdrawAmount */
-        address /* to */
-    ) internal pure override returns (uint256) {
+    function _postWithdraw(uint256 /* withdrawAmount */, address /* to */) internal pure override returns (uint256) {
         return 0;
     }
 

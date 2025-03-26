@@ -172,11 +172,7 @@ contract GroomableManager is VaultStorage, IGroomableManager {
     function calcRebalance()
         internal
         view
-        returns (
-            bool shouldBorrow,
-            uint256 calculatedAmount,
-            uint256 actionableAmount
-        )
+        returns (bool shouldBorrow, uint256 calculatedAmount, uint256 actionableAmount)
     {
         uint256 targetBorrow_ = HealthFactorCalculator.targetBorrow(
             activeLenderStrategy,

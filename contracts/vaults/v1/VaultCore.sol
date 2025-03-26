@@ -36,11 +36,7 @@ abstract contract VaultCoreV1 is
     }
 
     /** @notice check if allowee has been approved to act on behalf of another address */
-    modifier onlyAllowedOnBehalf(
-        address allowee,
-        address allower,
-        bytes4 selector
-    ) {
+    modifier onlyAllowedOnBehalf(address allowee, address allower, bytes4 selector) {
         if (allower != allowee && !allowOnBehalfList[allower][allowee] && !onBehalfFunctions[selector]) {
             revert VC_V1_NOT_ALLOWED_TO_ACT_ON_BEHALF();
         }
@@ -127,12 +123,10 @@ abstract contract VaultCoreV1 is
     /// @param amount Amount to repay
     /// @param onBehalfOf Address of the debt holder
     /// @return repayAmount Actual amount that was repaid
-    function repayBadDebt(uint256 amount, address onBehalfOf)
-        external
-        override
-        nonReentrant
-        returns (uint256 repayAmount)
-    {
+    function repayBadDebt(
+        uint256 amount,
+        address onBehalfOf
+    ) external override nonReentrant returns (uint256 repayAmount) {
         _validateRepay(onBehalfOf, amount);
         updatePosition(onBehalfOf);
 
@@ -202,11 +196,7 @@ abstract contract VaultCoreV1 is
     /// @param amount Amount to borrow
     /// @param onBehalfOf The address incurring the debt
     /// @param receiver The address receiving the borrowed amount
-    function _borrow(
-        uint256 amount,
-        address onBehalfOf,
-        address receiver
-    ) internal {
+    function _borrow(uint256 amount, address onBehalfOf, address receiver) internal {
         _validateBorrow(onBehalfOf, amount);
 
         uint256 desiredBorrow = amount;
@@ -329,11 +319,10 @@ abstract contract VaultCoreV1 is
         return _postWithdraw(realAmountWithdrawn, to);
     }
 
-    function calcWithdrawFee(address account, uint256 withdrawAmount)
-        public
-        view
-        returns (uint256 withdrawFee, uint256 feeExpiresAfter)
-    {
+    function calcWithdrawFee(
+        address account,
+        uint256 withdrawAmount
+    ) public view returns (uint256 withdrawFee, uint256 feeExpiresAfter) {
         uint256 blockPassed = block.number - userLastDepositBlock[account];
         if (withdrawFeePeriod >= blockPassed) {
             withdrawFee = (withdrawAmount * withdrawFeeFactor) / 1e18; // 1e18 represents a 100%. withdrawFeeFactor is in percentage
@@ -361,11 +350,10 @@ abstract contract VaultCoreV1 is
     /// @param amount Amount to repay
     /// @param onBehalfOf Address of the debt holder
     /// @return repayAmount amount that was repaid
-    function _repay(uint256 amount, address onBehalfOf)
-        internal
-        onlyAllowedOnBehalf(msg.sender, onBehalfOf, IVaultCoreV1.repay.selector)
-        returns (uint256 repayAmount)
-    {
+    function _repay(
+        uint256 amount,
+        address onBehalfOf
+    ) internal onlyAllowedOnBehalf(msg.sender, onBehalfOf, IVaultCoreV1.repay.selector) returns (uint256 repayAmount) {
         _validateRepay(onBehalfOf, amount);
         repayAmount = _repayUnchecked(amount, onBehalfOf);
 
@@ -410,11 +398,10 @@ abstract contract VaultCoreV1 is
     /// @notice Validate if the deposit can proceed
     /// @param account account to check
     /// @param amount amount being deposited
-    function _validateDeposit(address account, uint256 amount)
-        internal
-        view
-        onlyAllowedOnBehalf(msg.sender, account, IVaultCoreV1.deposit.selector)
-    {
+    function _validateDeposit(
+        address account,
+        uint256 amount
+    ) internal view onlyAllowedOnBehalf(msg.sender, account, IVaultCoreV1.deposit.selector) {
         IIngress(ingressControl).validateDeposit(msg.sender, account, amount);
         if (amount == 0) {
             revert VC_V1_INVALID_DEPOSIT_AMOUNT();
@@ -446,11 +433,7 @@ abstract contract VaultCoreV1 is
     }
 
     /// @notice Validate if the withdraw can proceed
-    function _validateWithdraw(
-        address withdrawer,
-        address recipient,
-        uint256 amount
-    ) internal {
+    function _validateWithdraw(address withdrawer, address recipient, uint256 amount) internal {
         IIngress(ingressControl).validateWithdraw(withdrawer, recipient, amount);
 
         if (amount == 0) {
@@ -464,11 +447,7 @@ abstract contract VaultCoreV1 is
     /// @param supplyAmount The supply amount to be taken
     /// @param borrowAmount The borrow amount to be taken
     /// @dev We should call this function after the from account's position has been updated
-    function _validateHealthFactor(
-        address from,
-        uint256 supplyAmount,
-        uint256 borrowAmount
-    ) internal view {
+    function _validateHealthFactor(address from, uint256 supplyAmount, uint256 borrowAmount) internal view {
         if (
             !HealthFactorCalculator.isPositionHealthy(
                 activeLenderStrategy,

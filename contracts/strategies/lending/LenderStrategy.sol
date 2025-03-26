@@ -64,7 +64,7 @@ abstract contract LenderStrategy is SwapStrategyConfiguration, ILenderStrategy, 
     }
 
     /// @notice Supply assets into the market on behalf of `sender` and receive aTokens in exchange
-    function deposit(uint256 amount) public override onlyVault returns (uint256) {
+    function deposit(uint256 amount) external override onlyVault returns (uint256) {
         uint256 balanceBefore = supplyBalance();
 
         if (amount > 0) {
@@ -151,11 +151,7 @@ abstract contract LenderStrategy is SwapStrategyConfiguration, ILenderStrategy, 
         public
         virtual
         onlyVault
-        returns (
-            uint256 supplyLoss,
-            uint256 borrowLoss,
-            uint256 fee
-        )
+        returns (uint256 supplyLoss, uint256 borrowLoss, uint256 fee)
     {
         uint256 currentSupply = supplyBalance();
         uint256 currentBorrow = borrowBalance();

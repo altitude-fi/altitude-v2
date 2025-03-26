@@ -45,15 +45,7 @@ interface IVaultStorage {
 
     function onBehalfFunctions(bytes4) external view returns (bool);
 
-    function snapshots(uint256)
-        external
-        view
-        returns (
-            uint256,
-            uint256,
-            uint256,
-            uint256
-        );
+    function snapshots(uint256) external view returns (uint256, uint256, uint256, uint256);
 
     function userSnapshots(address) external view returns (uint256);
 

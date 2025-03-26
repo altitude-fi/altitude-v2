@@ -47,12 +47,7 @@ library SwapRoutes {
     function get_CurveUSDTToCRVUSD()
         public
         pure
-        returns (
-            address[] memory,
-            address[] memory,
-            uint256[5][] memory,
-            CurveV2Strategy.PoolOracle[] memory
-        )
+        returns (address[] memory, address[] memory, uint256[5][] memory, CurveV2Strategy.PoolOracle[] memory)
     {
         // {USDT -> CRVUSD}
         address[] memory routeTokens = new address[](2);
@@ -75,12 +70,7 @@ library SwapRoutes {
     function get_CurveUSDCToWETHMultihop()
         public
         pure
-        returns (
-            address[] memory,
-            address[] memory,
-            uint256[5][] memory,
-            CurveV2Strategy.PoolOracle[] memory
-        )
+        returns (address[] memory, address[] memory, uint256[5][] memory, CurveV2Strategy.PoolOracle[] memory)
     {
         // {USDC -> USDT -> WETH}
         address[] memory routeTokens = new address[](3);
@@ -107,12 +97,7 @@ library SwapRoutes {
     function get_CurveCRVToCrvUSD()
         public
         pure
-        returns (
-            address[] memory,
-            address[] memory,
-            uint256[5][] memory,
-            CurveV2Strategy.PoolOracle[] memory
-        )
+        returns (address[] memory, address[] memory, uint256[5][] memory, CurveV2Strategy.PoolOracle[] memory)
     {
         // {CRV -> CrvUSD}
         address[] memory routeTokens = new address[](2);
@@ -135,12 +120,7 @@ library SwapRoutes {
     function get_CurveCRVToUSDC()
         public
         pure
-        returns (
-            address[] memory,
-            address[] memory,
-            uint256[5][] memory,
-            CurveV2Strategy.PoolOracle[] memory
-        )
+        returns (address[] memory, address[] memory, uint256[5][] memory, CurveV2Strategy.PoolOracle[] memory)
     {
         // {CRV -> CrvUSD -> USDC}
         address[] memory routeTokens = new address[](3);
@@ -167,12 +147,7 @@ library SwapRoutes {
     function get_CurveCVXToUSDC()
         public
         pure
-        returns (
-            address[] memory,
-            address[] memory,
-            uint256[5][] memory,
-            CurveV2Strategy.PoolOracle[] memory
-        )
+        returns (address[] memory, address[] memory, uint256[5][] memory, CurveV2Strategy.PoolOracle[] memory)
     {
         // {CVX -> ETH -> USDC}
         address[] memory routeTokens = new address[](3);
@@ -199,12 +174,7 @@ library SwapRoutes {
     function get_CurveCrvUSDToUSDC()
         public
         pure
-        returns (
-            address[] memory,
-            address[] memory,
-            uint256[5][] memory,
-            CurveV2Strategy.PoolOracle[] memory
-        )
+        returns (address[] memory, address[] memory, uint256[5][] memory, CurveV2Strategy.PoolOracle[] memory)
     {
         // {CrvUSD -> USDC}
         address[] memory routeTokens = new address[](2);
@@ -227,12 +197,7 @@ library SwapRoutes {
     function get_CurveUSDCToCrvUSD()
         public
         pure
-        returns (
-            address[] memory,
-            address[] memory,
-            uint256[5][] memory,
-            CurveV2Strategy.PoolOracle[] memory
-        )
+        returns (address[] memory, address[] memory, uint256[5][] memory, CurveV2Strategy.PoolOracle[] memory)
     {
         // {USDC -> CrvUSD}
         address[] memory routeTokens = new address[](2);
@@ -255,12 +220,7 @@ library SwapRoutes {
     function get_CurveUSDCToWETH()
         public
         pure
-        returns (
-            address[] memory,
-            address[] memory,
-            uint256[5][] memory,
-            CurveV2Strategy.PoolOracle[] memory
-        )
+        returns (address[] memory, address[] memory, uint256[5][] memory, CurveV2Strategy.PoolOracle[] memory)
     {
         // {USDC -> WETH}
         address[] memory routeTokens = new address[](2);
@@ -283,12 +243,7 @@ library SwapRoutes {
     function get_CurveCRVToUSDCMultihop()
         public
         pure
-        returns (
-            address[] memory,
-            address[] memory,
-            uint256[5][] memory,
-            CurveV2Strategy.PoolOracle[] memory
-        )
+        returns (address[] memory, address[] memory, uint256[5][] memory, CurveV2Strategy.PoolOracle[] memory)
     {
         // {CRV -> CrvUSD -> USDC}
         address[] memory routeTokens = new address[](3);

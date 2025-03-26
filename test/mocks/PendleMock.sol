@@ -22,16 +22,7 @@ contract RouterMock is TokensGenerator {
         uint256,
         uint256,
         TokenInput calldata input
-    )
-        external
-        payable
-        returns (
-            uint256 netLpOut,
-            uint256 netYtOut,
-            uint256 netSyMintPy,
-            uint256 netSyInterm
-        )
-    {
+    ) external payable returns (uint256 netLpOut, uint256 netYtOut, uint256 netSyMintPy, uint256 netSyInterm) {
         netYtOut = input.netTokenIn / 2;
         netLpOut = input.netTokenIn / 2;
 
@@ -49,14 +40,7 @@ contract RouterMock is TokensGenerator {
         uint256 netLpToRemove,
         TokenOutput calldata output,
         LimitOrderData calldata
-    )
-        external
-        returns (
-            uint256 netTokenOut,
-            uint256 netSyFee,
-            uint256 netSyInterm
-        )
-    {
+    ) external returns (uint256 netTokenOut, uint256 netSyFee, uint256 netSyInterm) {
         netTokenOut = netLpToRemove;
         netSyInterm = netLpToRemove;
         netSyFee = 0;
@@ -72,15 +56,7 @@ contract RouterMock is TokensGenerator {
         ApproxParams calldata,
         TokenInput calldata input,
         LimitOrderData calldata
-    )
-        external
-        payable
-        returns (
-            uint256 netPtOut,
-            uint256 netSyFee,
-            uint256 netSyInterm
-        )
-    {
+    ) external payable returns (uint256 netPtOut, uint256 netSyFee, uint256 netSyInterm) {
         burnToken(input.tokenIn, msg.sender, input.netTokenIn);
         mintToken(address(MarketMock(market).PT()), receiver, input.netTokenIn);
         return (input.netTokenIn, 0, input.netTokenIn);
@@ -92,14 +68,7 @@ contract RouterMock is TokensGenerator {
         uint256 exactPtIn,
         TokenOutput calldata output,
         LimitOrderData calldata
-    )
-        external
-        returns (
-            uint256 netTokenOut,
-            uint256 netSyFee,
-            uint256 netSyInterm
-        )
-    {
+    ) external returns (uint256 netTokenOut, uint256 netSyFee, uint256 netSyInterm) {
         burnToken(address(MarketMock(market).PT()), msg.sender, exactPtIn);
         mintToken(output.tokenOut, receiver, exactPtIn);
         return (exactPtIn, 0, exactPtIn);
@@ -111,14 +80,7 @@ contract RouterMock is TokensGenerator {
         uint256 exactYtIn,
         TokenOutput calldata output,
         LimitOrderData calldata
-    )
-        external
-        returns (
-            uint256 netTokenOut,
-            uint256 netSyFee,
-            uint256 netSyInterm
-        )
-    {
+    ) external returns (uint256 netTokenOut, uint256 netSyFee, uint256 netSyInterm) {
         burnToken(address(MarketMock(market).YT()), msg.sender, exactYtIn);
         mintToken(output.tokenOut, receiver, exactYtIn);
         return (exactYtIn, 0, exactYtIn);
@@ -138,17 +100,7 @@ contract RouterStaticMock is TokensGenerator {
         address, // market,
         uint256 exactPtIn,
         address // tokenOut
-    )
-        public
-        pure
-        returns (
-            uint256,
-            uint256,
-            uint256,
-            uint256,
-            uint256
-        )
-    {
+    ) public pure returns (uint256, uint256, uint256, uint256, uint256) {
         return (exactPtIn, 0, 0, 0, 0);
     }
 
@@ -164,16 +116,7 @@ contract RouterStaticMock is TokensGenerator {
     function swapPtForExactSyStatic(
         address, // market,
         uint256 exactSyOut
-    )
-        public
-        pure
-        returns (
-            uint256,
-            uint256,
-            uint256,
-            uint256
-        )
-    {
+    ) public pure returns (uint256, uint256, uint256, uint256) {
         return (exactSyOut, 0, 0, 0);
     }
 
@@ -181,36 +124,14 @@ contract RouterStaticMock is TokensGenerator {
         address, //market,
         uint256 netLpToRemove,
         address //tokenOut
-    )
-        public
-        view
-        returns (
-            uint256,
-            uint256,
-            uint256,
-            uint256,
-            uint256,
-            uint256,
-            uint256,
-            uint256
-        )
-    {
+    ) public view returns (uint256, uint256, uint256, uint256, uint256, uint256, uint256, uint256) {
         return (Utils.scaleAmount(netLpToRemove, 18, decimals), 0, 0, 0, 0, 0, 0, 0);
     }
 
     function swapYtForExactSyStatic(
         address, // market,
         uint256 exactSyOut
-    )
-        public
-        pure
-        returns (
-            uint256,
-            uint256,
-            uint256,
-            uint256
-        )
-    {
+    ) public pure returns (uint256, uint256, uint256, uint256) {
         return (exactSyOut, 0, 0, 0);
     }
 
@@ -218,20 +139,7 @@ contract RouterStaticMock is TokensGenerator {
         address, //market,
         uint256 exactYtIn,
         address //tokenOut
-    )
-        public
-        pure
-        returns (
-            uint256,
-            uint256,
-            uint256,
-            uint256,
-            uint256,
-            uint256,
-            uint256,
-            uint256
-        )
-    {
+    ) public pure returns (uint256, uint256, uint256, uint256, uint256, uint256, uint256, uint256) {
         return (exactYtIn, 0, 0, 0, 0, 0, 0, 0);
     }
 }
@@ -243,27 +151,14 @@ contract MarketMock is ERC20("Token", "TKN") {
     IPYieldToken public YT;
     bool public isExpired;
 
-    constructor(
-        address asset_,
-        address SY_,
-        address PT_,
-        address YT_
-    ) {
+    constructor(address asset_, address SY_, address PT_, address YT_) {
         asset = asset_;
         SY = IStandardizedYield(SY_);
         PT = IPPrincipalToken(PT_);
         YT = IPYieldToken(YT_);
     }
 
-    function readTokens()
-        external
-        view
-        returns (
-            IStandardizedYield,
-            IPPrincipalToken,
-            IPYieldToken
-        )
-    {
+    function readTokens() external view returns (IStandardizedYield, IPPrincipalToken, IPYieldToken) {
         return (SY, PT, YT);
     }
 }
@@ -276,25 +171,24 @@ contract OracleMock {
     }
 
     function getPtToSyRate(address market, uint32) external view returns (uint256) {
-        return 1 * 10**MarketMock(market).SY().decimals();
+        return 1 * 10 ** MarketMock(market).SY().decimals();
     }
 
     function getLpToSyRate(address market, uint32) external view returns (uint256) {
-        return 1 * 10**MarketMock(market).SY().decimals();
+        return 1 * 10 ** MarketMock(market).SY().decimals();
     }
 
     function getYtToSyRate(address market, uint32) external view returns (uint256) {
-        return 1 * 10**MarketMock(market).SY().decimals();
+        return 1 * 10 ** MarketMock(market).SY().decimals();
     }
 
-    function getOracleState(address, uint32)
+    function getOracleState(
+        address,
+        uint32
+    )
         external
         pure
-        returns (
-            bool increaseCardinalityRequired,
-            uint16 cardinalityRequired,
-            bool oldestObservationSatisfied
-        )
+        returns (bool increaseCardinalityRequired, uint16 cardinalityRequired, bool oldestObservationSatisfied)
     {
         return (false, 0, true);
     }

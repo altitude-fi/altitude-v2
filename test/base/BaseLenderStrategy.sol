@@ -94,14 +94,10 @@ contract BaseLenderStrategy is LenderStrategy, TokensGenerator {
 
     function _recogniseRewardsInBase(address asset) internal override {
         // 100 tokens rewards
-        mintToken(asset, address(this), 100 * 10**IERC20Metadata(asset).decimals());
+        mintToken(asset, address(this), 100 * 10 ** IERC20Metadata(asset).decimals());
     }
 
-    function setSupplyLoss(
-        uint256 supplyLossPerc,
-        uint256 borrowLossPerc,
-        uint256 feePerc
-    ) external {
+    function setSupplyLoss(uint256 supplyLossPerc, uint256 borrowLossPerc, uint256 feePerc) external {
         feeLoss = (totalDeposited * feePerc) / 100;
         totalDeposited -= (totalDeposited * supplyLossPerc) / 100;
         totalBorrowed -= (totalBorrowed * borrowLossPerc) / 100;
@@ -129,7 +125,7 @@ contract BaseLenderStrategy is LenderStrategy, TokensGenerator {
         address fromAsset,
         address toAsset
     ) external view override returns (uint256) {
-        return (getInBase(fromAsset, toAsset) * amount) / 10**IERC20Metadata(fromAsset).decimals();
+        return (getInBase(fromAsset, toAsset) * amount) / 10 ** IERC20Metadata(fromAsset).decimals();
     }
 
     function availableBorrowLiquidity() public pure override returns (uint256) {

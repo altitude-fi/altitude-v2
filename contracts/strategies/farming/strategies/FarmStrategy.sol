@@ -62,13 +62,9 @@ abstract contract FarmStrategy is Ownable, SwapStrategyConfiguration, IFarmStrat
     /// @notice Withdraws from the Farm Provider
     /// @param amountRequested The amount to withdraw
     /// @return amountWithdrawn The amount actually withdrawn
-    function withdraw(uint256 amountRequested)
-        public
-        virtual
-        override
-        onlyDispatcher
-        returns (uint256 amountWithdrawn)
-    {
+    function withdraw(
+        uint256 amountRequested
+    ) public virtual override onlyDispatcher returns (uint256 amountWithdrawn) {
         if (amountRequested > 0 && !inEmergency) {
             _withdraw(amountRequested);
             amountWithdrawn = IERC20(asset).balanceOf(address(this));
@@ -97,13 +93,9 @@ abstract contract FarmStrategy is Ownable, SwapStrategyConfiguration, IFarmStrat
     /// @notice Swap specified tokens to asset
     /// @param assets The assets to swap
     /// @return amountWithdrawn The amount withdrawn after swap
-    function emergencySwap(address[] calldata assets)
-        public
-        virtual
-        override
-        onlyDispatcher
-        returns (uint256 amountWithdrawn)
-    {
+    function emergencySwap(
+        address[] calldata assets
+    ) public virtual override onlyDispatcher returns (uint256 amountWithdrawn) {
         if (!inEmergency) {
             revert FM_NOT_IN_EMERGENCY_MODE();
         }
@@ -168,12 +160,9 @@ abstract contract FarmStrategy is Ownable, SwapStrategyConfiguration, IFarmStrat
     /// @param farmAssetAmount The amount from the farm provider
     /// @return totalBalance The amount available to be withdrawn (including amount swapped)
     /// @return swapAmount Amount of totalBalance that is subject to swapping
-    function _balance(uint256 farmAssetAmount)
-        internal
-        view
-        virtual
-        returns (uint256 totalBalance, uint256 swapAmount)
-    {
+    function _balance(
+        uint256 farmAssetAmount
+    ) internal view virtual returns (uint256 totalBalance, uint256 swapAmount) {
         totalBalance = IERC20(asset).balanceOf(address(this));
         if (farmAssetAmount > 0) {
             if (farmAsset == asset) {

@@ -48,19 +48,11 @@ abstract contract VaultTestSuite is TokensGenerator {
         _deposit(user, onBehalf, DEPOSIT);
     }
 
-    function deposit(
-        address user,
-        address onBehalf,
-        uint256 amount
-    ) public {
+    function deposit(address user, address onBehalf, uint256 amount) public {
         _deposit(user, onBehalf, amount);
     }
 
-    function _deposit(
-        address user,
-        address onBehalf,
-        uint256 amount
-    ) internal {
+    function _deposit(address user, address onBehalf, uint256 amount) internal {
         vm.startPrank(user);
         mintToken(deployer.supplyAsset(), user, amount);
         IToken(deployer.supplyAsset()).approve(address(vault), amount);
@@ -76,19 +68,11 @@ abstract contract VaultTestSuite is TokensGenerator {
         _depositAndBorrow(user, depositAmount, BORROW);
     }
 
-    function depositAndBorrow(
-        address user,
-        uint256 depositAmount,
-        uint256 borrowAmount
-    ) public {
+    function depositAndBorrow(address user, uint256 depositAmount, uint256 borrowAmount) public {
         _depositAndBorrow(user, depositAmount, borrowAmount);
     }
 
-    function _depositAndBorrow(
-        address user,
-        uint256 depositAmount,
-        uint256 borrowAmount
-    ) internal {
+    function _depositAndBorrow(address user, uint256 depositAmount, uint256 borrowAmount) internal {
         vm.startPrank(user);
         mintToken(deployer.supplyAsset(), user, depositAmount);
         IToken(deployer.supplyAsset()).approve(address(vault), depositAmount);
@@ -109,19 +93,11 @@ abstract contract VaultTestSuite is TokensGenerator {
         _repay(user, user, amount);
     }
 
-    function repay(
-        address user,
-        address onBehalf,
-        uint256 amount
-    ) public {
+    function repay(address user, address onBehalf, uint256 amount) public {
         _repay(user, onBehalf, amount);
     }
 
-    function _repay(
-        address user,
-        address onBehalf,
-        uint256 amount
-    ) internal {
+    function _repay(address user, address onBehalf, uint256 amount) internal {
         vm.startPrank(user);
         // Mint tokens to the user to be able to repay the amount
         mintToken(deployer.borrowAsset(), user, amount);
@@ -134,19 +110,11 @@ abstract contract VaultTestSuite is TokensGenerator {
         _depositAndWithdraw(user, DEPOSIT, WITHDRAW);
     }
 
-    function depositAndWithdraw(
-        address user,
-        uint256 depositAmount,
-        uint256 withdrawAmount
-    ) public {
+    function depositAndWithdraw(address user, uint256 depositAmount, uint256 withdrawAmount) public {
         _depositAndWithdraw(user, depositAmount, withdrawAmount);
     }
 
-    function _depositAndWithdraw(
-        address user,
-        uint256 depositAmount,
-        uint256 withdrawAmount
-    ) internal {
+    function _depositAndWithdraw(address user, uint256 depositAmount, uint256 withdrawAmount) internal {
         vm.startPrank(user);
         mintToken(deployer.supplyAsset(), user, depositAmount);
         IToken(deployer.supplyAsset()).approve(address(vault), depositAmount);
@@ -213,11 +181,7 @@ abstract contract VaultTestSuite is TokensGenerator {
         );
     }
 
-    function simulateSupplyLoss(
-        uint256 supplyPerc,
-        uint256 borrowPerc,
-        uint256 feePerc
-    ) public {
+    function simulateSupplyLoss(uint256 supplyPerc, uint256 borrowPerc, uint256 feePerc) public {
         BaseLenderStrategy(vault.activeLenderStrategy()).setSupplyLoss(supplyPerc, borrowPerc, feePerc);
     }
 
@@ -225,14 +189,10 @@ abstract contract VaultTestSuite is TokensGenerator {
         BaseLenderStrategy(vault.activeLenderStrategy()).accumulateInterest(supplyInterest, borrowInterest);
     }
 
-    function setPrice(
-        address from,
-        address to,
-        uint256 price
-    ) public {
+    function setPrice(address from, address to, uint256 price) public {
         BasePriceSource oracle = BasePriceSource(deployer.priceProvider());
         oracle.setInBase(from, to, price);
-        oracle.setInBase(to, from, (10**IToken(from).decimals() * 10**IToken(to).decimals()) / price);
+        oracle.setInBase(to, from, (10 ** IToken(from).decimals() * 10 ** IToken(to).decimals()) / price);
     }
 
     function getPrice() public view returns (uint256) {
@@ -240,11 +200,7 @@ abstract contract VaultTestSuite is TokensGenerator {
             ILenderStrategy(vault.activeLenderStrategy()).getInBase(vault.supplyUnderlying(), vault.borrowUnderlying());
     }
 
-    function setBorrowLimits(
-        uint256 sLimit,
-        uint256 lLimit,
-        uint256 tLimit
-    ) public {
+    function setBorrowLimits(uint256 sLimit, uint256 lLimit, uint256 tLimit) public {
         vaultRegistry.setVaultBorrowLimits(
             deployer.supplyAsset(),
             deployer.borrowAsset(),

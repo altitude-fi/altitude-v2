@@ -28,13 +28,9 @@ contract SnapshotableManager is VaultStorage, HarvestableManager, SupplyLossMana
     /// @notice Update the user's position for all uncomitted harvests and supply losses up to now.
     /// @notice It is payable because of deposit is payable
     /// @param account User wallet address
-    function updatePosition(address account)
-        public
-        payable
-        override
-        onlyNotVault(account)
-        returns (uint256 numberOfSnapshots)
-    {
+    function updatePosition(
+        address account
+    ) public payable override onlyNotVault(account) returns (uint256 numberOfSnapshots) {
         // In case the user is operating with the protocol for the first time ever
         if (
             supplyToken.balanceStored(account) == 0 &&
@@ -60,12 +56,10 @@ contract SnapshotableManager is VaultStorage, HarvestableManager, SupplyLossMana
     /// @param account User wallet address
     /// @param snapshotId Index the user to be commited to.
     /// @dev To update to the latest commit, simply provide snapshotId bigger than snapshots.length
-    function updatePositionTo(address account, uint256 snapshotId)
-        external
-        override
-        onlyNotVault(account)
-        returns (uint256 numberOfSnapshots)
-    {
+    function updatePositionTo(
+        address account,
+        uint256 snapshotId
+    ) external override onlyNotVault(account) returns (uint256 numberOfSnapshots) {
         if (snapshotId >= snapshots.length) {
             numberOfSnapshots = updatePosition(account);
         } else {
@@ -91,10 +85,10 @@ contract SnapshotableManager is VaultStorage, HarvestableManager, SupplyLossMana
     /// @param snapshotId Index the user to be commited to
     /// @return commit data calculated on commit
     /// @return numOfSnapshots number of harvests and supply losses committed
-    function _commitUser(address account, uint256 snapshotId)
-        internal
-        returns (HarvestTypes.UserCommit memory commit, uint256 numOfSnapshots)
-    {
+    function _commitUser(
+        address account,
+        uint256 snapshotId
+    ) internal returns (HarvestTypes.UserCommit memory commit, uint256 numOfSnapshots) {
         IIngress(ingressControl).validateCommit();
 
         (commit, numOfSnapshots) = CommitMath.calcCommit(
@@ -134,11 +128,7 @@ contract SnapshotableManager is VaultStorage, HarvestableManager, SupplyLossMana
     /// @dev In case of a deposit fee or rewards they are getting distributed among the users by index
     /// @param amountToInject supply amount to be injected
     /// @param atIndex index we calculated amountToInject at
-    function injectSupply(
-        uint256 amountToInject,
-        uint256 atIndex,
-        address funder
-    ) external override {
+    function injectSupply(uint256 amountToInject, uint256 atIndex, address funder) external override {
         // Note, if we are here, hasSupplyLoss() == false
 
         // Interest accrues between supply shortage calculation and supply injection

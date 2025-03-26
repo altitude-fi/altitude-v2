@@ -99,11 +99,7 @@ abstract contract InterestToken is ERC20Upgradeable, IInterestToken {
     /// @param owner The owner of the tokens
     /// @param to The recipient of the tokens
     /// @param amount The amount to be transferred
-    function vaultTransfer(
-        address owner,
-        address to,
-        uint256 amount
-    ) external override onlyVault returns (bool) {
+    function vaultTransfer(address owner, address to, uint256 amount) external override onlyVault returns (bool) {
         _accrualTransfer(owner, to, amount);
         return true;
     }
@@ -111,11 +107,7 @@ abstract contract InterestToken is ERC20Upgradeable, IInterestToken {
     /// @notice Performs a transfer of supplyTokens between users by:
     /// 1. SupplyLoss the interest being accrued to this moment for both users
     /// 2. Process the transfer
-    function _accrualTransfer(
-        address sender,
-        address receiver,
-        uint256 amount
-    ) internal {
+    function _accrualTransfer(address sender, address receiver, uint256 amount) internal {
         if (sender == receiver) {
             revert IT_TRANSFER_BETWEEN_THE_SAME_ADDRESSES();
         }
@@ -166,13 +158,9 @@ abstract contract InterestToken is ERC20Upgradeable, IInterestToken {
 
     /// @notice Override the balanceOf function to update user's position due to harvest or supply loss
     /// @param account The address of the user
-    function balanceOf(address account)
-        public
-        view
-        virtual
-        override(ERC20Upgradeable, IERC20Upgradeable)
-        returns (uint256 userBalance)
-    {
+    function balanceOf(
+        address account
+    ) public view virtual override(ERC20Upgradeable, IERC20Upgradeable) returns (uint256 userBalance) {
         HarvestTypes.UserCommit memory commit = IVaultCoreV1(vault).calcCommitUser(account, type(uint256).max);
 
         return _balanceOf(commit);
@@ -262,11 +250,7 @@ abstract contract InterestToken is ERC20Upgradeable, IInterestToken {
     /// @param account The account the balance to be set for
     /// @param newBalance The new balance of the account
     /// @param newIndex The new index of the account
-    function setBalance(
-        address account,
-        uint256 newBalance,
-        uint256 newIndex
-    ) external override onlyVault {
+    function setBalance(address account, uint256 newBalance, uint256 newIndex) external override onlyVault {
         userIndex[account] = newIndex;
         uint256 oldBalance = super.balanceOf(account);
 

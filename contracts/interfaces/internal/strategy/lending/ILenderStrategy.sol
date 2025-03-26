@@ -53,13 +53,7 @@ interface ILenderStrategy is ISwapStrategyConfiguration {
 
     function availableBorrowLiquidity() external view returns (uint256);
 
-    function preSupplyLossSnapshot()
-        external
-        returns (
-            uint256 supplyLoss,
-            uint256 borrowLoss,
-            uint256 fee
-        );
+    function preSupplyLossSnapshot() external returns (uint256 supplyLoss, uint256 borrowLoss, uint256 fee);
 
     function updatePrincipal() external;
 
@@ -67,11 +61,7 @@ interface ILenderStrategy is ISwapStrategyConfiguration {
 
     function getInBase(address fromAsset, address toAsset) external view returns (uint256);
 
-    function convertToBase(
-        uint256 amount,
-        address fromAsset,
-        address toAsset
-    ) external view returns (uint256);
+    function convertToBase(uint256 amount, address fromAsset, address toAsset) external view returns (uint256);
 
     function paidLiquidationFee(uint256 supplyLoss) external view returns (uint256 fee);
 

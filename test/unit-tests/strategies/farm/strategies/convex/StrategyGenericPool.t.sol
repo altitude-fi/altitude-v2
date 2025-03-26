@@ -88,8 +88,8 @@ contract StrategyGenericPoolTest is FarmStrategyUnitTest, TokensGenerator {
 
     function test_DepositEntireLPBalance() public {
         // Mint directly by manipulating the internal storage
-        mintToken(curveLP, address(farmStrategy), 100 * 10**IToken(curveLP).decimals());
-        assertEq(IToken(curveLP).balanceOf(address(farmStrategy)), 100 * 10**IToken(curveLP).decimals());
+        mintToken(curveLP, address(farmStrategy), 100 * 10 ** IToken(curveLP).decimals());
+        assertEq(IToken(curveLP).balanceOf(address(farmStrategy)), 100 * 10 ** IToken(curveLP).decimals());
 
         vm.startPrank(dispatcher);
         IToken(asset).mint(dispatcher, DEPOSIT);

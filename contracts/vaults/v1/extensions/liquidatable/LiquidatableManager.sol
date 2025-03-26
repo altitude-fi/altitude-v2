@@ -51,7 +51,7 @@ contract LiquidatableManager is JoiningBlockVault, ILiquidatableManager {
 
                 {
                     // Calculate the total amount of supply available to cover the liquidation
-                    uint256 maxLiquidatableBorrow = (supplyAmount * 10**borrowDecimals) /
+                    uint256 maxLiquidatableBorrow = (supplyAmount * 10 ** borrowDecimals) /
                         (borrowToSupplyExchangeRate +
                             ((borrowToSupplyExchangeRate * liquidatableStorage.liquidationBonus) / 1e18)); // 1e18 represents a 100%.
 
@@ -65,7 +65,7 @@ contract LiquidatableManager is JoiningBlockVault, ILiquidatableManager {
                         supplyLiquidatableAmount =
                             (borrowToSupplyExchangeRate *
                                 (amount + ((amount * liquidatableStorage.liquidationBonus) / 1e18))) /
-                            10**borrowDecimals; // 1e18 represents a 100%.
+                            10 ** borrowDecimals; // 1e18 represents a 100%.
                     }
                 }
 

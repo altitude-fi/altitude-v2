@@ -143,13 +143,13 @@ contract CurveV2Strategy is ISwapStrategy, SwapStrategy {
         SwapData storage swapData = _swapPairs[assetFrom][assetTo];
         uint256 poolsLength = swapData.pools.length;
 
-        uint256 price = 10**PRICE_ORACLE_DECIMALS;
+        uint256 price = 10 ** PRICE_ORACLE_DECIMALS;
         for (uint256 i; i < poolsLength; ++i) {
             PoolOracle useOracle = swapData.pools_oracle[i];
             if (useOracle > PoolOracle.OnlyExternal) {
                 // if using curve's oracle for this pool
-                uint256 priceInput = 10**PRICE_ORACLE_DECIMALS;
-                uint256 priceOutput = 10**PRICE_ORACLE_DECIMALS;
+                uint256 priceInput = 10 ** PRICE_ORACLE_DECIMALS;
+                uint256 priceOutput = 10 ** PRICE_ORACLE_DECIMALS;
                 if (useOracle == PoolOracle.TwoCoin) {
                     if (swapData.swap_params[i][0] > 0) {
                         priceInput = ICurve2(swapData.pools[i]).price_oracle();
@@ -166,8 +166,8 @@ contract CurveV2Strategy is ISwapStrategy, SwapStrategy {
                     }
                 }
                 price =
-                    (price * ((priceInput * (10**PRICE_ORACLE_DECIMALS)) / priceOutput)) /
-                    (10**PRICE_ORACLE_DECIMALS);
+                    (price * ((priceInput * (10 ** PRICE_ORACLE_DECIMALS)) / priceOutput)) /
+                    (10 ** PRICE_ORACLE_DECIMALS);
             } else {
                 // PoolOracle.OnlyExternal - use external oracle for the whole path
                 return SwapStrategy.getMinimumAmountOut(assetFrom, assetTo, baseAmount, slippage);
@@ -228,15 +228,9 @@ contract CurveV2Strategy is ISwapStrategy, SwapStrategy {
         emit SwapProceed(amountIn);
     }
 
-    function _prepareSwapParameters(SwapData storage swapData)
-        internal
-        view
-        returns (
-            address[11] memory route,
-            uint256[5][5] memory swapParams,
-            address[5] memory pools
-        )
-    {
+    function _prepareSwapParameters(
+        SwapData storage swapData
+    ) internal view returns (address[11] memory route, uint256[5][5] memory swapParams, address[5] memory pools) {
         uint256 routeIdx;
         uint256 poolsLength = swapData.pools.length;
         //@dev last token pushed after the loop as there is one pool less than tokens
