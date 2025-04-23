@@ -169,10 +169,10 @@ contract SupplyLossManager is VaultStorage, ISupplyLossManager {
         uint256 borrowIndex
     ) internal returns (uint256 withdrawn, uint256 farmLoss) {
         // Limit withdraw by excluding previously accumulated rewards
-        uint256 toWithdaw = _calcMaxToWithdrawn(IFarmDispatcher(activeFarmStrategy).balance(), vaultBorrows);
+        uint256 toWithdraw = _calcMaxToWithdrawn(IFarmDispatcher(activeFarmStrategy).balance(), vaultBorrows);
 
         // Withdraw available funds from the farm strategy
-        withdrawn = IFarmDispatcher(activeFarmStrategy).withdraw(toWithdaw);
+        withdrawn = IFarmDispatcher(activeFarmStrategy).withdraw(toWithdraw);
 
         if (withdrawn < vaultBorrows) {
             // Consider the missing amount as a loss to allow for distribution amoungst users
