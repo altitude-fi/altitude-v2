@@ -357,11 +357,11 @@ contract VaultHarvestableTest is VaultTestSuite {
         assertEq(claimableRewards, REWARDS);
         assertEq(dispatcher.balance(), REWARDS);
         assertEq(lenderStrategy.borrowBalance(), 0);
-        assertEq(vault.debtToken().balanceOf(address(vault)), 0 );
+        assertEq(vault.debtToken().balanceOf(address(vault)), 0);
 
         vm.prank(user);
         vault.claimRewards(claimableRewards); // claim all
-        
+
         assertEq(dispatcher.balance(), 0);
         (uint256 claimable, , ) = vault.getHarvestData();
         assertEq(claimable, 0);
