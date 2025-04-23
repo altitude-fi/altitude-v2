@@ -42,16 +42,14 @@ contract RebalanceIncentivesController is Ownable, IRebalanceIncentivesControlle
         maxDeviation = maxDeviation_;
     }
 
-    /// @notice Set rebalance thresholds
+    /// @notice Set rebalance deviation
     /// @param minDeviation_ minDeviation_ value
     /// @param maxDeviation_ maxDeviation_ value
-    function setThresholds(uint256 minDeviation_, uint256 maxDeviation_) external override onlyOwner {
-        _validateDeviations(minDeviation_, maxDeviation_);
-
+    function setDeviation(uint256 minDeviation_, uint256 maxDeviation_) external override onlyOwner {
         minDeviation = minDeviation_;
         maxDeviation = maxDeviation_;
 
-        emit UpdateRebalanceThresholds(minDeviation_, maxDeviation_);
+        emit UpdateRebalanceDeviation(minDeviation_, maxDeviation_);
     }
 
     function rebalance() external override {
