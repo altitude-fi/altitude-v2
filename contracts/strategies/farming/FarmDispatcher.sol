@@ -304,19 +304,19 @@ contract FarmDispatcher is Initializable, AccessControl, IFarmDispatcher {
                         withdrawn += strategyWithdrawn;
 
                         // Decrease totalDeposit to release capacity
-                        if (strategy.totalDeposit < toWithdraw) {
-                            availableLimit += strategy.totalDeposit;
-                            strategy.totalDeposit = 0;
-                        } else {
+                        if (strategy.totalDeposit > toWithdraw) {
                             availableLimit += toWithdraw;
                             strategy.totalDeposit -= toWithdraw;
+                        } else {
+                            availableLimit += strategy.totalDeposit;
+                            strategy.totalDeposit = 0;
                         }
 
                         // Remainder to withdraw in the next iteration
-                        if (toWithdraw < withdrawn) {
-                            toWithdraw = 0;
-                        } else {
+                        if (requested > withdrawn) {
                             toWithdraw = requested - withdrawn;
+                        } else {
+                            toWithdraw = 0;
                         }
                     } catch (bytes memory lowLevelData) {
                         // Log a failed withdraw

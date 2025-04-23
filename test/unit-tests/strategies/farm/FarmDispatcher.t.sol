@@ -333,6 +333,52 @@ contract FarmDispatcherTest is Test {
         assertEq(dispatcher.balance(), 0);
     }
 
+    function test_WithdrawFromManyStrategiesWithUnorderedBalances() public {
+        address newStrategy3 = BaseGetter.getBaseFarmStrategy(workingAsset, address(dispatcher), address(dispatcher));
+        dispatcher.addStrategy(newStrategy3, 10e18, address(0));
+        IToken(workingAsset).mint(address(dispatcher), 7e18);
+        vm.prank(vaultAddress);
+        dispatcher.dispatch();
+
+        address newStrategy2 = BaseGetter.getBaseFarmStrategy(workingAsset, address(dispatcher), address(dispatcher));
+        dispatcher.addStrategy(newStrategy2, 10e18, address(0));
+        IToken(workingAsset).mint(address(dispatcher), 1e18);
+        vm.prank(vaultAddress);
+        dispatcher.dispatch();
+
+        address newStrategy1 = BaseGetter.getBaseFarmStrategy(workingAsset, address(dispatcher), address(dispatcher));
+        dispatcher.addStrategy(newStrategy1, 10e18, address(0));
+        IToken(workingAsset).mint(address(dispatcher), 10e18);
+        vm.prank(vaultAddress);
+        dispatcher.dispatch();
+
+        // Now the dispatcher has these strategies and withdraws in reverse order
+        // Strategy1 - 10 tokens
+        // Strategy2 - 1 tokens
+        // Strategy3 - 7 tokens
+
+        vm.prank(vaultAddress);
+        dispatcher.withdraw(10e18);
+
+        (, , uint256 totalDeposit3, , ) = dispatcher.strategies(newStrategy3);
+        (, , uint256 totalDeposit2, , ) = dispatcher.strategies(newStrategy2);
+        (, , uint256 totalDeposit1, , ) = dispatcher.strategies(newStrategy1);
+        assertEq(totalDeposit3, 0, "Strategy3 totalDeposit");
+        assertEq(totalDeposit2, 0, "Strategy2 totalDeposit");
+        assertEq(totalDeposit1, 8e18, "Strategy1 totalDeposit");
+
+        // These are the actual checks
+        assertEq(IToken(workingAsset).balanceOf(vaultAddress), 10e18);
+        assertEq(dispatcher.balance(), 8e18);
+
+        // BaseFarmStrategy has no underlying farming strategy and the tokens reside in it.
+        // On any withdraw it sends the whole balance. These checks are BaseFarmStrategy specific.
+        assertEq(IToken(workingAsset).balanceOf(address(dispatcher)), 8e18, "Dispatcher balance");
+        assertEq(IToken(workingAsset).balanceOf(newStrategy3), 0, "Strategy3 balance");
+        assertEq(IToken(workingAsset).balanceOf(newStrategy2), 0, "Strategy2 balance");
+        assertEq(IToken(workingAsset).balanceOf(newStrategy1), 0, "Strategy1 balance");
+    }
+
     function test_WithdrawFromManyStrategies() public {
         address newStrategy1 = BaseGetter.getBaseFarmStrategy(workingAsset, address(dispatcher), address(dispatcher));
         address newStrategy2 = BaseGetter.getBaseFarmStrategy(workingAsset, address(dispatcher), address(dispatcher));
