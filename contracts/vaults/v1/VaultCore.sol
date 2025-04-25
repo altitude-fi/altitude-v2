@@ -249,27 +249,25 @@ abstract contract VaultCoreV1 is
 
         _validateWithdraw(msg.sender, to, withdrawAmount);
 
+        // The total sum of the users balances is slightly bigger then the one in the lender
+        // The last user exisitng the system is to withdraw a little less
+        uint256 totalSupplyBalance = ILenderStrategy(activeLenderStrategy).supplyBalance();
+        if (totalSupplyBalance < withdrawAmount) {
+            withdrawAmount = totalSupplyBalance;
+        }
+
+        // Withdraw fee is based on the true amount being withdrawn
         (uint256 withdrawFee, ) = calcWithdrawFee(msg.sender, withdrawAmount);
         withdrawAmount -= withdrawFee;
 
-        uint256 targetBorrow;
-        uint256 totalSupplyBalance = ILenderStrategy(activeLenderStrategy).supplyBalance();
-
-        // totalSupplyBalance could be lower than withdrawAmount with a few wei for the last user
-        if (totalSupplyBalance >= withdrawAmount) {
-            // Calculate the target borrow for the new target supply (= current - withdraw)
-            targetBorrow = HealthFactorCalculator.targetBorrow(
-                activeLenderStrategy,
-                supplyUnderlying,
-                borrowUnderlying,
-                targetThreshold,
-                totalSupplyBalance - withdrawAmount
-            );
-        } else {
-            // The total sum of the users balances is slightly bigger then the one in the lender
-            // The last user exisitng the system is to withdraw a little less
-            withdrawAmount = totalSupplyBalance;
-        }
+        // Calculate the target borrow for the new target supply (= current - withdraw)
+        uint256 targetBorrow = HealthFactorCalculator.targetBorrow(
+            activeLenderStrategy,
+            supplyUnderlying,
+            borrowUnderlying,
+            targetThreshold,
+            totalSupplyBalance - withdrawAmount
+        );
 
         uint256 totalBorrowBalance = ILenderStrategy(activeLenderStrategy).borrowBalance();
 
@@ -334,16 +332,25 @@ abstract contract VaultCoreV1 is
         address account,
         uint256 withdrawFee,
         uint256 withdrawAmount,
-        uint256 maxWithdrawalAmount
+        uint256 userBalance
     ) internal {
         // Manually apply the fee to be distributed among all the users by increasing the index
         uint256 balanceNow = supplyToken.storedTotalSupply();
+        uint256 userFinalBalance = userBalance - (withdrawAmount + withdrawFee);
 
-        uint256 indexIncrease = supplyToken.calcIndex(balanceNow - withdrawFee);
+        // Due to rounding, adjust the user final balance
+        if (balanceNow < userFinalBalance + withdrawFee) {
+            userFinalBalance = balanceNow - withdrawFee;
+        }
+
+        uint256 indexIncrease = supplyToken.calcIndex(
+            balanceNow - userFinalBalance - withdrawFee,
+            balanceNow - userFinalBalance
+        );
         supplyToken.setInterestIndex(indexIncrease);
 
         // Don't include user into the fee distribution
-        supplyToken.setBalance(account, maxWithdrawalAmount - (withdrawAmount + withdrawFee), indexIncrease);
+        supplyToken.setBalance(account, userFinalBalance, indexIncrease);
     }
 
     /// @notice Internal function to transfer vault debtTokens to reduce users debt

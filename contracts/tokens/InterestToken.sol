@@ -190,16 +190,15 @@ abstract contract InterestToken is ERC20Upgradeable, IInterestToken {
     /// @notice Calculates the new index based on the latest balances
     /// @return interestIndex_ The new interest index
     function calcNewIndex() public view override returns (uint256) {
-        return calcIndex(storedTotalSupply());
+        return calcIndex(storedTotalSupply(), totalSupply());
     }
 
     /// @notice Calculates the index based on a given balance
     /// @dev The index typically only goes up, but in the case of a reduction in the vault balance (e.g. due to supply loss) it can go down
     /// @dev New index is based on the total lending strategy balance and the balance provided
     /// @return interestIndex_ The new interest index
-    function calcIndex(uint256 balanceOld) public view returns (uint256) {
+    function calcIndex(uint256 balanceOld, uint256 balanceNew) public view returns (uint256) {
         uint256 interestIndex_ = interestIndex;
-        uint256 balanceNew = totalSupply();
 
         if (balanceOld > balanceNew && !ILenderStrategy(activeLenderStrategy).hasSupplyLoss()) {
             interestIndex_ = _calcIndexDecrease(interestIndex_, balanceOld, balanceNew);
