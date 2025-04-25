@@ -66,10 +66,15 @@ abstract contract FarmStrategy is Ownable, SwapStrategyConfiguration, IFarmStrat
         uint256 amountRequested
     ) public virtual override onlyDispatcher returns (uint256 amountWithdrawn) {
         if (amountRequested > 0 && !inEmergency) {
+            // When trying to withdraw all
+            if (amountRequested == type(uint256).max) {
+                // balanceAvailable() skips the swap slippage check, as that will happen in the actual withdraw
+                amountRequested = balanceAvailable();
+            }
+
             _withdraw(amountRequested);
             amountWithdrawn = IERC20(asset).balanceOf(address(this));
 
-            // Gas optimizations
             if (amountWithdrawn > 0) {
                 TransferHelper.safeTransfer(asset, msg.sender, amountWithdrawn);
             }
@@ -126,14 +131,13 @@ abstract contract FarmStrategy is Ownable, SwapStrategyConfiguration, IFarmStrat
     }
 
     /// @notice Return the balance in borrow asset excluding rewards (includes slippage validations)
-    /// @dev Reverts is slippage is too high
+    /// @dev Reverts if slippage is too high
     /// @return balance that can be withdrawn from the farm
     function balance() public view virtual returns (uint256) {
         // Get amount of tokens
         uint256 farmAssetAmount = _getFarmAssetAmount();
         (uint256 totalBalance, uint256 swapAmount) = _balance(farmAssetAmount);
 
-        // gas optimisations
         if (swapAmount > 0) {
             // Validate slippage
             uint256 minimumAssetAmount = swapStrategy.getMinimumAmountOut(farmAsset, asset, farmAssetAmount);
@@ -149,7 +153,7 @@ abstract contract FarmStrategy is Ownable, SwapStrategyConfiguration, IFarmStrat
     }
 
     /// @notice Return the balance in borrow asset excluding rewards (no slippage validations)
-    /// @dev Function will not revert on high slippage, should not be used when executing transactions
+    /// @dev Function will not revert on high slippage, should used with care in transactions
     /// @return availableBalance Balance that can be withdrawn from the farm
     function balanceAvailable() public view virtual returns (uint256 availableBalance) {
         // No slippage validations
