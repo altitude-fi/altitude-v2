@@ -367,7 +367,9 @@ abstract contract VaultCoreV1 is
     /// @dev params should be validated beforehand
     function _repayUnchecked(uint256 amount, address onBehalfOf) internal returns (uint256 repayAmount) {
         uint256 userBalance = debtToken.balanceOf(onBehalfOf);
-        if (userBalance > 0) {
+        if (userBalance == 0) {
+            revert VC_V1_NO_DEBT_TO_REPAY();
+        } else if (userBalance > 0) {
             repayAmount = amount;
 
             // Repay upto the users balance of the borrow asset

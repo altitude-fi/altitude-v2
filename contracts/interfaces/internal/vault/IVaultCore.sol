@@ -42,6 +42,7 @@ interface IVaultCoreV1 is
     error VC_V1_NOT_ALLOWED_TO_ACT_ON_BEHALF();
     error VC_V1_NOT_AUTHORIZED_TO_DEAL_WITH_TRANSFERS();
     error VC_V1_UNHEALTHY_VAULT_RISK();
+    error VC_V1_NO_DEBT_TO_REPAY();
 
     function preTransfer(address from, address to, uint256 amount, bytes4 transferSelector) external;
 

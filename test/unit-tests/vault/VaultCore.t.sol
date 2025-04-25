@@ -281,12 +281,10 @@ contract VaultCoreTest is VaultTestSuite {
         address user = vm.addr(1);
         deposit(user);
 
-        // Mint tokens for the repayment
-        repay(user);
-
-        assertEq(lenderStrategy.borrowBalance(), 0);
-        assertEq(vault.debtToken().balanceOf(user), 0);
-        assertEq(IToken(deployer.borrowAsset()).balanceOf(user), REPAY);
+        // Try to repay without having any debt
+        vm.expectRevert(IVaultCoreV1.VC_V1_NO_DEBT_TO_REPAY.selector);
+        vm.prank(user);
+        vault.repay(REPAY, user);
     }
 
     function test_RepayMoreThanUserBalance() public {
