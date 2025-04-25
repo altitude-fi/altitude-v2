@@ -677,4 +677,9 @@ contract FarmDispatcherTest is Test {
         assertEq(IToken(workingAsset).balanceOf(newStrategy1), reward);
         assertEq(IToken(workingAsset).balanceOf(newStrategy2), 0);
     }
+
+    function test_SetStrategyMaxZeroStrategy() public {
+        vm.expectRevert(IFarmDispatcher.FD_ZERO_STRATEGY_REMOVAL.selector);
+        dispatcher.setStrategyMax(address(0), 100);
+    }
 }

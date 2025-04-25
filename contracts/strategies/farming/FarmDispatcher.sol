@@ -78,6 +78,10 @@ contract FarmDispatcher is Initializable, AccessControl, IFarmDispatcher {
     /// @param strategyAddress Address of the strategy to set
     /// @param newMax Cap amount of the strategy
     function setStrategyMax(address strategyAddress, uint256 newMax) external override onlyRole(Roles.BETA) {
+        if (strategyAddress == STRATEGY_ZERO) {
+            revert FD_ZERO_STRATEGY_REMOVAL();
+        }
+
         Strategy storage strategy = strategies[strategyAddress];
 
         if (!strategy.active) {
