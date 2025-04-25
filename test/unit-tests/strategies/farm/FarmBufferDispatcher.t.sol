@@ -335,4 +335,19 @@ contract FarmBufferDispatcherTest is Test {
 
         assertEq(dispatcher.balance(), 0);
     }
+
+    function test_ApprovalResetAfterFill() public {
+        IToken(workingAsset).mint(address(this), BUFFER);
+
+        // Increase buffer size
+        IToken(workingAsset).approve(address(dispatcher), BUFFER);
+        dispatcher.increaseBufferSize(BUFFER);
+
+        // Mint tokens to dispatcher and fill buffer
+        IToken(workingAsset).mint(address(dispatcher), BUFFER);
+        dispatcher.dispatch();
+
+        // Verify approval was reset
+        assertEq(IToken(workingAsset).allowance(address(dispatcher), address(dispatcher.farmBuffer())), 0);
+    }
 }
