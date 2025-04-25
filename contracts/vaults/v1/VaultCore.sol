@@ -197,7 +197,7 @@ abstract contract VaultCoreV1 is
     /// @param onBehalfOf The address incurring the debt
     /// @param receiver The address receiving the borrowed amount
     function _borrow(uint256 amount, address onBehalfOf, address receiver) internal {
-        _validateBorrow(onBehalfOf, amount);
+        _validateBorrow(amount, onBehalfOf, receiver);
 
         uint256 desiredBorrow = amount;
 
@@ -418,17 +418,18 @@ abstract contract VaultCoreV1 is
     }
 
     /// @notice Validate if the borrow can proceed
-    /// @param account account to check
     /// @param amount amount requested to borrow
+    /// @param onBehalfOf account to incur the debt
+    /// @param receiver account to receive the tokens
     /// @dev We should call this function after the account's position has been updated
-    function _validateBorrow(address account, uint256 amount) internal {
-        IIngress(ingressControl).validateBorrow(msg.sender, account, amount);
+    function _validateBorrow(uint256 amount, address onBehalfOf, address receiver) internal {
+        IIngress(ingressControl).validateBorrow(amount, onBehalfOf, receiver);
 
         if (amount == 0) {
             revert VC_V1_INVALID_BORROW_AMOUNT();
         }
 
-        _validateHealthFactor(account, 0, amount);
+        _validateHealthFactor(onBehalfOf, 0, amount);
     }
 
     /// @notice Validate if the repay can proceed

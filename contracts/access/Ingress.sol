@@ -239,9 +239,14 @@ contract Ingress is AccessControl, IIngress {
     }
 
     /// @notice Validate if borrow is allowed
-    /// @param borrower The address the debt will be assigned
-    /// @param recipient The address that will receive the borrowed currency
-    function validateBorrow(address borrower, address recipient, uint256 amount) external override {
+    /// @param amount amount requested to borrow
+    /// @param onBehalfOf account to incur the debt
+    /// @param receiver account to receive the tokens
+    function validateBorrow(
+        uint256 amount,
+        address onBehalfOf,
+        address receiver
+    ) external override {
         if (isFunctionDisabled[IIngress.validateBorrow.selector]) {
             revert IN_V1_FUNCTION_PAUSED();
         }
@@ -250,7 +255,7 @@ contract Ingress is AccessControl, IIngress {
             revert IN_V1_PROTOCOL_PAUSED();
         }
 
-        if (sanctioned[borrower] || sanctioned[recipient]) {
+        if (sanctioned[onBehalfOf] || sanctioned[receiver]) {
             revert IN_V1_ACCOUNT_HAS_BEEN_SANCTIONED();
         }
 
