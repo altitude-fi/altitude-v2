@@ -67,7 +67,6 @@ abstract contract Deployer is Config {
         deployerSender = signer;
 
         vaultInitImpl = _vaultInitImpl();
-        borrowVerifier = _borrowVerifier();
         configurableManager = _configurableManager();
         liquidatableManager = _liquidatableManager();
         groomableManager = _groomableManager();
@@ -100,8 +99,8 @@ abstract contract Deployer is Config {
 
     /// @notice Returns the address of the borrow verifier implementation.
     /// @return address of the borrow verifier implementation.
-    function _borrowVerifier() internal returns (address) {
-        address addr = address(new BorrowVerifier());
+    function _borrowVerifier(address vault) internal returns (address) {
+        address addr = address(new BorrowVerifier(vault));
         console.log("BorrowVerifier, borrowVerifier, %s", addr);
         return addr;
     }
@@ -244,6 +243,7 @@ abstract contract Deployer is Config {
         address farmDispatcher = _farmDispatcher(vault);
         address lenderStrategy = _lenderStrategy(vault, farmDispatcher);
 
+        borrowVerifier = _borrowVerifier(vault);
         return
             VaultTypes.VaultData(
                 VaultTypes.VaultInit(
