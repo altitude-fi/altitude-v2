@@ -255,6 +255,8 @@ contract FarmDispatcher is Initializable, AccessControl, IFarmDispatcher {
                         // Log a failed deposit
                         emit StrategyError(strategyAddress, lowLevelData);
                     }
+                    // Removes approval
+                    TransferHelper.safeApprove(asset, strategyAddress, 0);
                 }
             }
         }

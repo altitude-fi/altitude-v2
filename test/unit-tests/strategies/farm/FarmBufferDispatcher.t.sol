@@ -336,6 +336,40 @@ contract FarmBufferDispatcherTest is Test {
         assertEq(dispatcher.balance(), 0);
     }
 
+    function test_ApprovalResetOnFailedDeposit() public {
+        address failingStrategy = makeAddr("failingStrategy");
+        dispatcher.addStrategy(failingStrategy, BUFFER, address(0));
+
+        IToken(workingAsset).mint(address(dispatcher), BUFFER);
+
+        vm.mockCallRevert(
+            failingStrategy,
+            abi.encodeWithSelector(IFarmStrategy.deposit.selector, BUFFER),
+            abi.encodeWithSignature("Error(string)", "Deposit failed")
+        );
+
+        dispatcher.dispatch();
+
+        assertEq(IToken(workingAsset).allowance(address(dispatcher), failingStrategy), 0);
+    }
+
+    function test_ApprovalResetOnSuccessfulDeposit() public {
+        address successfulStrategy = makeAddr("successfulStrategy");
+        dispatcher.addStrategy(successfulStrategy, BUFFER, address(0));
+
+        IToken(workingAsset).mint(address(dispatcher), BUFFER);
+
+        vm.mockCall(
+            successfulStrategy,
+            abi.encodeWithSelector(IFarmStrategy.deposit.selector, BUFFER),
+            abi.encodeWithSignature("Error(string)", "Deposit failed")
+        );
+
+        dispatcher.dispatch();
+
+        assertEq(IToken(workingAsset).allowance(address(dispatcher), successfulStrategy), 0);
+    }
+
     function test_ApprovalResetAfterFill() public {
         IToken(workingAsset).mint(address(this), BUFFER);
 
