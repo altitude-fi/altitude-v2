@@ -265,9 +265,7 @@ abstract contract Deployer is Config {
                 VaultTypes.LiquidatableConfig(
                     liquidatableManager,
                     this.MAX_POSITION_LIQUIDATION(),
-                    this.LIQUIDATION_BONUS(),
-                    this.MIN_USERS_TO_LIQUIDATE(),
-                    this.MIN_REPAY_AMOUNT()
+                    this.LIQUIDATION_BONUS()
                 ),
                 VaultTypes.GroomableConfig(groomableManager, _flashLoanStrategy(), this.MAX_MIGRATION_FEE_PERCENTAGE()),
                 VaultTypes.SnapshotableConfig(

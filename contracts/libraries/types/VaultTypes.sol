@@ -50,8 +50,6 @@ library VaultTypes {
         address liquidatableManager; // liquidatable manager implementation
         uint256 maxPositionLiquidation; // The maximum liquidation allowed by the contract, 18 decimals
         uint256 liquidationBonus; // The supply bonus that will be received by the liquidator, 18 decimals
-        uint256 minUsersToLiquidate; // The minimum amount of users that should be liquidated
-        uint256 minRepayAmount; // The minimum amount that should be repayed
     }
 
     /// @notice Vault Groomable configuration parameters

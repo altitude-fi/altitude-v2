@@ -92,13 +92,6 @@ contract LiquidatableManager is JoiningBlockVault, ILiquidatableManager {
             revert LQ_V1_INSUFFICIENT_REPAY_AMOUNT();
         }
 
-        if (
-            liquidatedUsers < liquidatableStorage.minUsersToLiquidate &&
-            totalRepayAmount < liquidatableStorage.minRepayAmount
-        ) {
-            revert LQ_V1_LIQUIDATION_CONSTRAINTS();
-        }
-
         userLastDepositBlock[msg.sender] = block.number;
         _updateEarningsRatio(msg.sender);
 

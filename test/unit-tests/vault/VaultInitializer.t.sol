@@ -102,19 +102,12 @@ contract VaultInitializerTest is Test {
 
     function test_CorrectLiquidatableVault() public {
         IVaultCoreV1 vault = deployer.deployDefaultVault(vaultRegistry);
-        (
-            address liquidatableManager,
-            uint256 maxPositionLiquidation,
-            uint256 liquidationBonus,
-            uint256 minUsersToLiquidate,
-            uint256 minRepayAmount
-        ) = vault.getLiquidationConfig();
+        (address liquidatableManager, uint256 maxPositionLiquidation, uint256 liquidationBonus) = vault
+            .getLiquidationConfig();
 
         assertTrue(liquidatableManager == deployer.liquidatableManager());
         assertTrue(maxPositionLiquidation == deployer.MAX_POSITION_LIQUIDATION());
         assertTrue(liquidationBonus == deployer.LIQUIDATION_BONUS());
-        assertTrue(minUsersToLiquidate == deployer.MIN_USERS_TO_LIQUIDATE());
-        assertTrue(minRepayAmount == deployer.MIN_REPAY_AMOUNT());
     }
 
     function test_LiquidationBonusHigherThanLimit() public {
