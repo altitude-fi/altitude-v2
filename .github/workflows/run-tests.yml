@@ -30,7 +30,7 @@ jobs:
         uses: foundry-rs/foundry-toolchain@v1
 
       - name: Install forge-std without git add
-        run: forge install foundry-rs/forge-std --no-commit
+        run: forge install foundry-rs/forge-std
 
       - name: Run Tests
         run: forge test
