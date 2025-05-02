@@ -337,11 +337,48 @@ contract FarmBufferDispatcherTest is Test {
     }
 
     function test_ApprovalResetOnFailedDeposit() public {
-        address failingStrategy = makeAddr("failingStrategy");
+        address failingStrategy = BaseGetter.getBaseFarmStrategy(
+            workingAsset,
+            address(dispatcher),
+            address(dispatcher)
+        );
         dispatcher.addStrategy(failingStrategy, BUFFER, address(0));
 
         IToken(workingAsset).mint(address(dispatcher), BUFFER);
 
+        // Set up the strategy's expected balance to avoid drop checks
+        BaseFarmStrategy(failingStrategy).setFarmAssetAmount(0);
+        BaseFarmStrategy(failingStrategy).transferOwnership(address(this));
+        BaseFarmStrategy(failingStrategy).reset();
+
+        // Mock the deposit function to revert
+        vm.mockCallRevert(
+            failingStrategy,
+            abi.encodeWithSelector(IFarmStrategy.deposit.selector, BUFFER),
+            abi.encodeWithSignature("Error(string)", "Deposit failed")
+        );
+
+        dispatcher.dispatch();
+
+        assertEq(IToken(workingAsset).allowance(address(dispatcher), failingStrategy), 0);
+    }
+
+    function test_ApprovalResetOnFailedDepositWithMockRevert() public {
+        address failingStrategy = BaseGetter.getBaseFarmStrategy(
+            workingAsset,
+            address(dispatcher),
+            address(dispatcher)
+        );
+        dispatcher.addStrategy(failingStrategy, BUFFER, address(0));
+
+        IToken(workingAsset).mint(address(dispatcher), BUFFER);
+
+        // Set up the strategy's expected balance to avoid drop checks
+        BaseFarmStrategy(failingStrategy).setFarmAssetAmount(0);
+        BaseFarmStrategy(failingStrategy).transferOwnership(address(this));
+        BaseFarmStrategy(failingStrategy).reset();
+
+        // Mock the deposit function to revert
         vm.mockCallRevert(
             failingStrategy,
             abi.encodeWithSelector(IFarmStrategy.deposit.selector, BUFFER),
@@ -354,16 +391,22 @@ contract FarmBufferDispatcherTest is Test {
     }
 
     function test_ApprovalResetOnSuccessfulDeposit() public {
-        address successfulStrategy = makeAddr("successfulStrategy");
+        address successfulStrategy = BaseGetter.getBaseFarmStrategy(
+            workingAsset,
+            address(dispatcher),
+            address(dispatcher)
+        );
         dispatcher.addStrategy(successfulStrategy, BUFFER, address(0));
 
         IToken(workingAsset).mint(address(dispatcher), BUFFER);
 
-        vm.mockCall(
-            successfulStrategy,
-            abi.encodeWithSelector(IFarmStrategy.deposit.selector, BUFFER),
-            abi.encodeWithSignature("Error(string)", "Deposit failed")
-        );
+        // Set up the strategy's expected balance to avoid drop checks
+        BaseFarmStrategy(successfulStrategy).setFarmAssetAmount(0);
+        BaseFarmStrategy(successfulStrategy).transferOwnership(address(this));
+        BaseFarmStrategy(successfulStrategy).reset();
+
+        // Mock a successful deposit by returning empty bytes
+        vm.mockCall(successfulStrategy, abi.encodeWithSelector(IFarmStrategy.deposit.selector, BUFFER), abi.encode());
 
         dispatcher.dispatch();
 

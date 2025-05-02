@@ -27,6 +27,14 @@ contract FarmDispatcherTest is Test {
         dispatcher.grantRole(Roles.GAMMA, vaultAddress);
     }
 
+    /**
+     * @dev Creates a new BaseFarmStrategy with standard test parameters
+     * @return BaseFarmStrategy A new strategy instance
+     */
+    function createStrategyHelper() internal returns (BaseFarmStrategy) {
+        return new BaseFarmStrategy(workingAsset, address(dispatcher), address(0), address(0));
+    }
+
     function test_CorrectInitialization() public view {
         assertEq(dispatcher.vault(), vaultAddress);
         assertEq(dispatcher.asset(), workingAsset);
@@ -38,7 +46,7 @@ contract FarmDispatcherTest is Test {
     }
 
     function test_AddStrategy() public {
-        address newStrategy = makeAddr("newStrategy");
+        address newStrategy = address(createStrategyHelper());
         dispatcher.addStrategy(newStrategy, CAP, address(0));
         (, , , address firstPrev, address firstNext) = dispatcher.strategies(address(0));
         (bool secondActive, uint256 secondAmount, , address secondPrev, address secondNext) = dispatcher.strategies(
@@ -52,9 +60,28 @@ contract FarmDispatcherTest is Test {
         assertEq(secondNext, address(0));
     }
 
+    function test_AddStrategyWithIncorrectDispatcher() public {
+        FarmDispatcher newDispatcher = new FarmDispatcher();
+        newDispatcher.initialize(vaultAddress, workingAsset, address(this));
+        newDispatcher.grantRole(Roles.ALPHA, address(this));
+        newDispatcher.grantRole(Roles.BETA, address(this));
+        newDispatcher.grantRole(Roles.GAMMA, address(this));
+        newDispatcher.grantRole(Roles.GAMMA, vaultAddress);
+
+        BaseFarmStrategy newStrategyWithWrongDispatcher = new BaseFarmStrategy(
+            workingAsset,
+            address(newDispatcher), // Wrong dispatcher
+            address(0),
+            address(0)
+        );
+
+        vm.expectRevert(IFarmDispatcher.FD_INVALID_STRATEGY_DISPATCHER.selector);
+        dispatcher.addStrategy(address(newStrategyWithWrongDispatcher), CAP, address(0));
+    }
+
     function test_AddStrategyAtPosition() public {
-        address newStrategy1 = makeAddr("newStrategy1");
-        address newStrategy2 = makeAddr("newStrategy2");
+        address newStrategy1 = address(createStrategyHelper());
+        address newStrategy2 = address(createStrategyHelper());
         dispatcher.addStrategy(newStrategy1, CAP, address(0));
         dispatcher.addStrategy(newStrategy2, CAP, address(0));
 
@@ -70,7 +97,7 @@ contract FarmDispatcherTest is Test {
     }
 
     function test_CannotAddStrategyTwice() public {
-        address newStrategy = makeAddr("newStrategy");
+        address newStrategy = address(createStrategyHelper());
         dispatcher.addStrategy(newStrategy, CAP, address(0));
         vm.expectRevert(IFarmDispatcher.FD_STRATEGY_EXISTS.selector);
         dispatcher.addStrategy(newStrategy, CAP, address(0));
@@ -83,8 +110,8 @@ contract FarmDispatcherTest is Test {
     }
 
     function test_AddManyStrategies() public {
-        address newStrategy1 = makeAddr("newStrategy1");
-        address newStrategy2 = makeAddr("newStrategy2");
+        address newStrategy1 = address(createStrategyHelper());
+        address newStrategy2 = address(createStrategyHelper());
         address[] memory strategies = new address[](2);
         uint256[] memory caps = new uint256[](2);
         strategies[0] = newStrategy1;
@@ -105,10 +132,10 @@ contract FarmDispatcherTest is Test {
     }
 
     function test_AddManyStrategiesAtNPosition() public {
-        address newStrategy1 = makeAddr("newStrategy1");
-        address newStrategy2 = makeAddr("newStrategy2");
-        address newStrategy3 = makeAddr("newStrategy3");
-        address newStrategy4 = makeAddr("newStrategy4");
+        address newStrategy1 = address(createStrategyHelper());
+        address newStrategy2 = address(createStrategyHelper());
+        address newStrategy3 = address(createStrategyHelper());
+        address newStrategy4 = address(createStrategyHelper());
         address[] memory strategies = new address[](2);
         uint256[] memory caps = new uint256[](2);
         strategies[0] = newStrategy1;
@@ -176,8 +203,8 @@ contract FarmDispatcherTest is Test {
     }
 
     function test_SetStrategyPosition() public {
-        address newStrategy1 = makeAddr("newStrategy1");
-        address newStrategy2 = makeAddr("newStrategy2");
+        address newStrategy1 = address(createStrategyHelper());
+        address newStrategy2 = address(createStrategyHelper());
         address[] memory strategies = new address[](2);
         uint256[] memory caps = new uint256[](2);
         strategies[0] = newStrategy1;
@@ -199,33 +226,18 @@ contract FarmDispatcherTest is Test {
     }
 
     function test_SetStrategyPositionToItself() public {
-        address newStrategy1 = makeAddr("newStrategy1");
-        address newStrategy2 = makeAddr("newStrategy2");
-        address[] memory strategies = new address[](2);
-        uint256[] memory caps = new uint256[](2);
-        strategies[0] = newStrategy1;
-        strategies[1] = newStrategy2;
-        caps[0] = CAP;
-        caps[1] = CAP;
-        dispatcher.addStrategies(strategies, caps, address(0));
+        address newStrategy = address(createStrategyHelper());
+        dispatcher.addStrategy(newStrategy, CAP, address(0));
         vm.expectRevert(IFarmDispatcher.FD_STRATEGY_PRIORITY_THE_SAME.selector);
-        dispatcher.setStrategyPriority(newStrategy1, newStrategy1);
+        dispatcher.setStrategyPriority(newStrategy, newStrategy);
     }
 
     function test_SetStrategyPositionUnauthorized() public {
-        address newStrategy1 = makeAddr("newStrategy1");
-        address newStrategy2 = makeAddr("newStrategy2");
-        address[] memory strategies = new address[](2);
-        uint256[] memory caps = new uint256[](2);
-        strategies[0] = newStrategy1;
-        strategies[1] = newStrategy2;
-        caps[0] = CAP;
-        caps[1] = CAP;
-
-        dispatcher.addStrategies(strategies, caps, address(0));
+        address newStrategy = address(createStrategyHelper());
+        dispatcher.addStrategy(newStrategy, CAP, address(0));
         vm.prank(makeAddr("unauthorized"));
         vm.expectRevert();
-        dispatcher.setStrategyPriority(newStrategy2, address(0));
+        dispatcher.setStrategyPriority(newStrategy, address(0));
     }
 
     function test_SetStrategyPositionInactive() public {
@@ -235,16 +247,10 @@ contract FarmDispatcherTest is Test {
     }
 
     function test_SetStrategyPositionToInactive() public {
-        address newStrategy1 = makeAddr("newStrategy1");
-        address newStrategy2 = makeAddr("newStrategy2");
-        address[] memory strategies = new address[](1);
-        uint256[] memory caps = new uint256[](1);
-        strategies[0] = newStrategy1;
-        caps[0] = CAP;
-
-        dispatcher.addStrategies(strategies, caps, address(0));
+        address newStrategy = address(createStrategyHelper());
+        dispatcher.addStrategy(newStrategy, CAP, address(0));
         vm.expectRevert(IFarmDispatcher.FD_INACTIVE_STRATEGY_POSITION.selector);
-        dispatcher.setStrategyPriority(newStrategy1, newStrategy2);
+        dispatcher.setStrategyPriority(address(newStrategy), makeAddr("inactive"));
     }
 
     function test_Dispatch() public {

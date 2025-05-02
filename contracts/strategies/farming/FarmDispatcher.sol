@@ -30,6 +30,16 @@ contract FarmDispatcher is Initializable, AccessControl, IFarmDispatcher {
     }
 
     function _initialize(address vaultAddress, address workingAsset, address admin) internal {
+        if (vaultAddress == address(0)) {
+            revert FD_VAULT_OR_OWNER();
+        }
+        if (workingAsset == address(0)) {
+            revert FD_ZERO_ASSET();
+        }
+        if (admin == address(0)) {
+            revert FD_VAULT_OR_OWNER();
+        }
+
         vault = vaultAddress;
         asset = workingAsset;
 
@@ -130,6 +140,11 @@ contract FarmDispatcher is Initializable, AccessControl, IFarmDispatcher {
         // Prevent a new strategy linking to an inactive strategy
         if (!strategies[position].active) {
             revert FD_INACTIVE_STRATEGY_POSITION();
+        }
+
+        // Check if the strategy's farmDispatcher matches this contract
+        if (IFarmStrategy(strategyAddress).farmDispatcher() != address(this)) {
+            revert FD_INVALID_STRATEGY_DISPATCHER();
         }
 
         strategies[strategyAddress] = Strategy(true, max, 0, position, strategies[position].next);

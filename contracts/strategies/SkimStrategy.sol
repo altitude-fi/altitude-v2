@@ -34,6 +34,10 @@ contract SkimStrategy is Ownable, ISkimStrategy {
      * @param receiver Receiving account
      */
     function skim(address[] calldata assets, address receiver) public override onlyOwner {
+        if (receiver == address(0)) {
+            revert SK_INVALID_RECEIVER();
+        }
+
         uint256 assetsLength = assets.length;
         for (uint256 i; i < assetsLength; ) {
             if (nonSkimAssets[assets[i]]) {

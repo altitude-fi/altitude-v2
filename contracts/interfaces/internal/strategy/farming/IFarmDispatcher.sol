@@ -29,12 +29,14 @@ interface IFarmDispatcher is IAccessControl {
     error FD_ONLY_VAULT();
     error FD_VAULT_OR_OWNER();
     error FD_STRATEGY_EXISTS();
+    error FD_ZERO_ASSET();
     error FS_EMPTY_STRATEGIES();
     error FS_STRATEGIES_MISMATCH();
     error FD_ZERO_STRATEGY_REMOVAL();
     error FD_STRATEGY_PRIORITY_THE_SAME();
     error FD_INACTIVE_STRATEGY();
     error FD_INACTIVE_STRATEGY_POSITION();
+    error FD_INVALID_STRATEGY_DISPATCHER();
 
     function vault() external view returns (address);
 

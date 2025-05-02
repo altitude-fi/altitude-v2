@@ -43,6 +43,7 @@ interface IPendleFarmStrategy is IFarmStrategy {
     error PFS_ORACLE_UNPOPULATED();
     error PFS_SLIPPAGE(uint256 twapRate, uint256 currentRate);
     error PFS_MARKET_EXPIRED();
+    error PFS_INVALID_SLIPPAGE();
 
     function setRewardAssets(address[] memory rewardAssets_) external;
 
