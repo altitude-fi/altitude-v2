@@ -22,7 +22,6 @@ interface IFarmDispatcher is IAccessControl {
     event StrategyError(address strategy, bytes lowLevelData);
 
     event DeactivateStrategy(address strategyAddress);
-    event EmergencyDeactivateStrategy(address strategyAddress, uint256 amountWithdrawn);
     event AddStrategy(address strategyAddress, uint256 max, address position);
     event RecogniseRewards(uint256 allRewards, uint256 failedStrategies);
 
@@ -57,8 +56,6 @@ interface IFarmDispatcher is IAccessControl {
     function addStrategies(address[] calldata strategies, uint256[] calldata max, address position) external;
 
     function deactivateStrategy(address strategyAddress) external;
-
-    function emergencyDeactivateStrategy(address strategyAddress, address[] calldata assets) external;
 
     function dispatch() external;
 

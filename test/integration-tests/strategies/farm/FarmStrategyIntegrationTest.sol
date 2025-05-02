@@ -124,7 +124,7 @@ abstract contract FarmStrategyIntegrationTest is ForkTest, TokensGenerator {
 
         // Withdrawal from farm strategy may return slightly more (for example curve)
 
-        assertTrue(asset.balanceOf(dispatcher) - initialBalance >= ten);
+        assertGe(asset.balanceOf(dispatcher) - initialBalance, ten);
 
         // TODO this tolerance check is incorrect
         // 100
@@ -138,7 +138,7 @@ abstract contract FarmStrategyIntegrationTest is ForkTest, TokensGenerator {
 
         uint256 balanceTolerance = five - (five * FEE_TOLERANCE) / MAX_FEE_TOLERANCE;
 
-        assertTrue(farmStrategy.balance() >= balanceTolerance, "Fee tolerance");
+        assertGe(farmStrategy.balance(), balanceTolerance, "Fee tolerance");
     }
 
     function test_EmergencyWithdraw() public {
@@ -147,10 +147,10 @@ abstract contract FarmStrategyIntegrationTest is ForkTest, TokensGenerator {
         farmStrategy.deposit(DEPOSIT);
         vm.stopPrank();
 
-        assertTrue(farmAsset.balanceOf(address(farmStrategy)) == 0);
+        assertEq(farmAsset.balanceOf(address(farmStrategy)), 0);
         farmStrategy.emergencyWithdraw();
 
-        assertTrue(farmAsset.balanceOf(address(farmStrategy)) > 0);
+        assertGt(farmAsset.balanceOf(address(farmStrategy)), 0);
     }
 
     function test_EmergencySwap() public {
@@ -159,10 +159,9 @@ abstract contract FarmStrategyIntegrationTest is ForkTest, TokensGenerator {
 
         address[] memory rewards = _accumulateRewards();
 
-        vm.prank(dispatcher);
         farmStrategy.emergencySwap(rewards);
 
-        assertTrue(asset.balanceOf(dispatcher) > initialBalance);
+        assertGt(asset.balanceOf(dispatcher), initialBalance);
     }
 
     function _mintAsset(address to, uint256 amount) internal virtual {

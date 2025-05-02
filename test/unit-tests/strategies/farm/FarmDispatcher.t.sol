@@ -521,39 +521,6 @@ contract FarmDispatcherTest is Test {
         dispatcher.deactivateStrategy(address(0));
     }
 
-    function test_EmergencyDeactivateStrategy() public {
-        address newStrategy1 = BaseGetter.getBaseFarmStrategy(workingAsset, address(dispatcher), address(dispatcher));
-
-        dispatcher.addStrategy(newStrategy1, CAP, address(0));
-        IToken(workingAsset).mint(address(dispatcher), CAP);
-        vm.prank(vaultAddress);
-        dispatcher.dispatch();
-        IFarmStrategy(newStrategy1).emergencyWithdraw();
-        dispatcher.emergencyDeactivateStrategy(newStrategy1, new address[](0));
-        (bool active, , uint256 totalDeposit, , ) = dispatcher.strategies(newStrategy1);
-        assertEq(active, false);
-        assertEq(totalDeposit, CAP);
-        (, , , address prev, address next) = dispatcher.strategies(address(0));
-        assertEq(prev, address(0));
-        assertEq(next, address(0));
-    }
-
-    function test_EmergencyDeactivatesStrategyUnauthorized() public {
-        vm.prank(makeAddr("unauthorized"));
-        vm.expectRevert();
-        dispatcher.emergencyDeactivateStrategy(vm.addr(1), new address[](0));
-    }
-
-    function test_EmergencyDeactivateInactiveStrategy() public {
-        vm.expectRevert(IFarmDispatcher.FD_INACTIVE_STRATEGY.selector);
-        dispatcher.emergencyDeactivateStrategy(vm.addr(1), new address[](0));
-    }
-
-    function test_EmergencyDeactivateZeroStrategy() public {
-        vm.expectRevert(IFarmDispatcher.FD_ZERO_STRATEGY_REMOVAL.selector);
-        dispatcher.emergencyDeactivateStrategy(address(0), new address[](0));
-    }
-
     function test_SkipRevertStrategyDeposit() public {
         address newStrategy1 = BaseGetter.getBaseFarmStrategy(workingAsset, address(dispatcher), address(dispatcher));
         address newStrategy2 = BaseGetter.getBaseFarmStrategy(workingAsset, address(dispatcher), address(dispatcher));

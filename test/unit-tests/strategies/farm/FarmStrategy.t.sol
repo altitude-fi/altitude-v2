@@ -100,34 +100,6 @@ contract FarmStrategyTest is Test {
         assertEq(IToken(workingAsset).balanceOf(address(farmStrategy)), 0);
     }
 
-    function test_EmergencyWithdraw() public {
-        IToken(workingAsset).mint(address(this), DEPOSIT);
-        IToken(workingAsset).approve(address(farmStrategy), DEPOSIT);
-        farmStrategy.deposit(DEPOSIT);
-        farmStrategy.emergencyWithdraw();
-        assertEq(farmStrategy.inEmergency(), true);
-    }
-
-    function test_WithdrawInEmergencyMode() public {
-        IToken(workingAsset).mint(address(this), DEPOSIT);
-        IToken(workingAsset).approve(address(farmStrategy), DEPOSIT);
-        farmStrategy.deposit(DEPOSIT);
-        farmStrategy.emergencyWithdraw();
-        farmStrategy.withdraw(DEPOSIT);
-        farmStrategy.withdraw(DEPOSIT);
-        assertEq(IToken(workingAsset).balanceOf(address(this)), 0);
-        assertEq(IToken(workingAsset).balanceOf(address(farmStrategy)), DEPOSIT);
-    }
-
-    function test_RewardsRecognitionInEmergencyMode() public {
-        IToken(workingAsset).mint(address(this), DEPOSIT);
-        IToken(workingAsset).approve(address(farmStrategy), DEPOSIT);
-        farmStrategy.deposit(DEPOSIT);
-        farmStrategy.emergencyWithdraw();
-        vm.expectRevert(IFarmStrategy.FS_IN_EMERGENCY_MODE.selector);
-        farmStrategy.recogniseRewardsInBase();
-    }
-
     function test_EmergencyWithdrawUnauthorized() public {
         address unauthorized = makeAddr("unauthorized");
         vm.prank(unauthorized);
@@ -144,18 +116,12 @@ contract FarmStrategyTest is Test {
         // As the deposit amount is in the balance, it is being withdrawn
         assertEq(IToken(workingAsset).balanceOf(address(this)), DEPOSIT);
         assertEq(IToken(workingAsset).balanceOf(address(farmStrategy)), 0);
-        assertEq(farmStrategy.inEmergency(), false);
-    }
-
-    function test_EmergencySwapWhenNotInEmergencyMode() public {
-        vm.expectRevert(IFarmStrategy.FM_NOT_IN_EMERGENCY_MODE.selector);
-        farmStrategy.emergencySwap(new address[](0));
     }
 
     function test_EmergencySwapUnauthorized() public {
         address unauthorized = makeAddr("unauthorized");
         vm.prank(unauthorized);
-        vm.expectRevert(IFarmStrategy.FS_ONLY_DISPATCHER.selector);
+        vm.expectRevert("Ownable: caller is not the owner");
         farmStrategy.emergencySwap(new address[](0));
     }
 

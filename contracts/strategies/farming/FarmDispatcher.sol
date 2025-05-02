@@ -189,29 +189,6 @@ contract FarmDispatcher is Initializable, AccessControl, IFarmDispatcher {
     /// @notice Disable a strategy from the linkedlist
     /// @param strategyAddress Addresses of the strategy to be deactivated
     function deactivateStrategy(address strategyAddress) external override onlyRole(Roles.GAMMA) {
-        _deactivateStrategy(strategyAddress);
-        emit DeactivateStrategy(strategyAddress);
-    }
-
-    /// @notice Remove a strategy in emergency. This will disable the strategy,
-    ///         perform an emergencySwap and withdraw all possible funds from the strategy
-    /// @dev run emergencyWithdraw on the strategy before executing this function
-    /// @param strategyAddress Addresses of the strategy to be removed
-    /// @param assets Assets to swap in emergencySwap (addresses)
-    function emergencyDeactivateStrategy(
-        address strategyAddress,
-        address[] calldata assets
-    ) external override onlyRole(Roles.BETA) {
-        _deactivateStrategy(strategyAddress);
-
-        uint256 amountWithdrawn = IFarmStrategy(strategyAddress).emergencySwap(assets);
-
-        emit EmergencyDeactivateStrategy(strategyAddress, amountWithdrawn);
-    }
-
-    /// @notice Re-usable function for deactivating a strategy
-    /// @param strategyAddress Addresses of the strategy to be deactivated
-    function _deactivateStrategy(address strategyAddress) internal {
         Strategy storage strategy = strategies[strategyAddress];
 
         if (!strategy.active) {
@@ -227,6 +204,8 @@ contract FarmDispatcher is Initializable, AccessControl, IFarmDispatcher {
         strategy.active = false;
         strategies[strategy.prev].next = strategy.next;
         strategies[strategy.next].prev = strategy.prev;
+
+        emit DeactivateStrategy(strategyAddress);
     }
 
     /// @notice Deposit any available funds into the strategies
