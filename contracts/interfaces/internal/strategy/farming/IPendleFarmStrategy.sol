@@ -37,6 +37,7 @@ interface IPendleFarmStrategy is IFarmStrategy {
 
     event SetRewardAssets(address[] oldAssets, address[] newAssets);
     event SetTwapDuration(uint32 oldDuration, uint32 newDuration);
+    event SetSlippage(uint256 oldSlippage, uint256 newSlippage);
 
     error PFS_ORACLE_CARDINALITY(uint16 cardinalityRequired);
     error PFS_ORACLE_UNPOPULATED();
@@ -46,4 +47,6 @@ interface IPendleFarmStrategy is IFarmStrategy {
     function setRewardAssets(address[] memory rewardAssets_) external;
 
     function setTwapDuration(uint32 twapDuration_) external;
+
+    function setSlippage(uint256 slippage_) external;
 }

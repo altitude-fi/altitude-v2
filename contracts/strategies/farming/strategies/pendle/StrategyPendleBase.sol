@@ -80,6 +80,16 @@ abstract contract StrategyPendleBase is FarmDropStrategy, SkimStrategy, IPendleF
         twapDuration = twapDuration_;
     }
 
+    /// @notice Set the acceptable slippage for market operations
+    /// @param slippage_ New slippage value, where SLIPPAGE_BASE = 1e6 = 100%
+    function setSlippage(uint256 slippage_) external override onlyOwner {
+        if (slippage_ > SLIPPAGE_BASE) {
+            revert PFS_SLIPPAGE(slippage, slippage_);
+        }
+        emit SetSlippage(slippage, slippage_);
+        slippage = slippage_;
+    }
+
     /// @notice Swap assets to borrow asset
     /// @param assets Array of assets to swap
     function _emergencySwap(address[] calldata assets) internal override {
