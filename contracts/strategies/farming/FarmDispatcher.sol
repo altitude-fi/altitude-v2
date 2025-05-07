@@ -188,7 +188,7 @@ contract FarmDispatcher is Initializable, AccessControl, IFarmDispatcher {
 
     /// @notice Disable a strategy from the linkedlist
     /// @param strategyAddress Addresses of the strategy to be deactivated
-    function deactivateStrategy(address strategyAddress) external override onlyRole(Roles.GAMMA) {
+    function deactivateStrategy(address strategyAddress, bool toWithdraw) external override onlyRole(Roles.GAMMA) {
         Strategy storage strategy = strategies[strategyAddress];
 
         if (!strategy.active) {
@@ -202,10 +202,17 @@ contract FarmDispatcher is Initializable, AccessControl, IFarmDispatcher {
         availableLimit -= strategy.maxAmount - strategy.totalDeposit;
 
         strategy.active = false;
+
         strategies[strategy.prev].next = strategy.next;
         strategies[strategy.next].prev = strategy.prev;
 
-        emit DeactivateStrategy(strategyAddress);
+        if (toWithdraw) {
+            strategy.maxAmount = 0;
+            strategy.totalDeposit = 0;
+            IFarmStrategy(strategyAddress).withdraw(type(uint256).max);
+        }
+
+        emit DeactivateStrategy(strategyAddress, toWithdraw);
     }
 
     /// @notice Deposit any available funds into the strategies

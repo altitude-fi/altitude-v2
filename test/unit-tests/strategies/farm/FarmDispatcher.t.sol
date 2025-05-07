@@ -533,38 +533,58 @@ contract FarmDispatcherTest is Test {
         dispatcher.setStrategyMax(vm.addr(1), CAP);
     }
 
-    function test_DeactivateStrategy() public {
+    function test_DeactivateStrategy_Withdraw() public {
         address newStrategy1 = BaseGetter.getBaseFarmStrategy(workingAsset, address(dispatcher), address(dispatcher));
         dispatcher.addStrategy(newStrategy1, CAP, address(0));
         IToken(workingAsset).mint(address(dispatcher), CAP);
         vm.prank(vaultAddress);
         dispatcher.dispatch();
-        dispatcher.deactivateStrategy(newStrategy1);
-        (bool active, , uint256 totalDeposit, , ) = dispatcher.strategies(newStrategy1);
+        dispatcher.deactivateStrategy(newStrategy1, true);
+        (bool active, uint256 maxAmount, uint256 totalDeposit, , ) = dispatcher.strategies(newStrategy1);
         assertEq(active, false);
+        assertEq(maxAmount, 0);
+        assertEq(totalDeposit, 0);
+        (, , , address prev, address next) = dispatcher.strategies(address(0));
+        assertEq(prev, address(0));
+        assertEq(next, address(0));
+        assertEq(IToken(workingAsset).balanceOf(address(dispatcher)), CAP);
+        assertEq(IToken(workingAsset).balanceOf(newStrategy1), 0);
+        assertEq(dispatcher.balance(), CAP);
+    }
+
+    function test_DeactivateStrategy_NoWithdraw() public {
+        address newStrategy1 = BaseGetter.getBaseFarmStrategy(workingAsset, address(dispatcher), address(dispatcher));
+        dispatcher.addStrategy(newStrategy1, CAP, address(0));
+        IToken(workingAsset).mint(address(dispatcher), CAP);
+        vm.prank(vaultAddress);
+        dispatcher.dispatch();
+        dispatcher.deactivateStrategy(newStrategy1, false);
+        (bool active, uint256 maxAmount, uint256 totalDeposit, , ) = dispatcher.strategies(newStrategy1);
+        assertEq(active, false);
+        assertEq(maxAmount, CAP);
         assertEq(totalDeposit, CAP);
         (, , , address prev, address next) = dispatcher.strategies(address(0));
         assertEq(prev, address(0));
         assertEq(next, address(0));
         assertEq(IToken(workingAsset).balanceOf(address(dispatcher)), 0);
         assertEq(IToken(workingAsset).balanceOf(newStrategy1), CAP);
-        assertEq(dispatcher.balance(), 0); // deactivated strategies are not included into the balance
+        assertEq(dispatcher.balance(), 0);
     }
 
     function test_DeactivatesStrategyUnauthorized() public {
         vm.prank(makeAddr("unauthorized"));
         vm.expectRevert();
-        dispatcher.deactivateStrategy(vm.addr(1));
+        dispatcher.deactivateStrategy(vm.addr(1), false);
     }
 
     function test_DeactivateInactiveStrategy() public {
         vm.expectRevert(IFarmDispatcher.FD_INACTIVE_STRATEGY.selector);
-        dispatcher.deactivateStrategy(vm.addr(1));
+        dispatcher.deactivateStrategy(vm.addr(1), false);
     }
 
     function test_DeactivateZeroStrategy() public {
         vm.expectRevert(IFarmDispatcher.FD_ZERO_STRATEGY_REMOVAL.selector);
-        dispatcher.deactivateStrategy(address(0));
+        dispatcher.deactivateStrategy(address(0), false);
     }
 
     function test_SkipRevertStrategyDeposit() public {
