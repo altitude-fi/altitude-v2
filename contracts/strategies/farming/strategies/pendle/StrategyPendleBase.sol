@@ -57,8 +57,13 @@ abstract contract StrategyPendleBase is FarmDropStrategy, SkimStrategy, IPendleF
         oracle = IPPYLpOracle(oracle_);
         market = IPMarket(market_);
 
-        if (market.isExpired()) revert PFS_MARKET_EXPIRED();
-        if (slippage_ > SLIPPAGE_BASE) revert PFS_INVALID_SLIPPAGE();
+        if (market.isExpired()) {
+            revert PFS_MARKET_EXPIRED();
+        }
+
+        if (slippage_ > SLIPPAGE_BASE) {
+            revert PFS_INVALID_SLIPPAGE();
+        }
 
         (SY, PT, YT) = IPMarket(market).readTokens();
         rewardAssets = rewardAssets_;

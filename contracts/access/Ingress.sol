@@ -242,11 +242,7 @@ contract Ingress is AccessControl, IIngress {
     /// @param amount amount requested to borrow
     /// @param onBehalfOf account to incur the debt
     /// @param receiver account to receive the tokens
-    function validateBorrow(
-        uint256 amount,
-        address onBehalfOf,
-        address receiver
-    ) external override {
+    function validateBorrow(uint256 amount, address onBehalfOf, address receiver) external override {
         if (isFunctionDisabled[IIngress.validateBorrow.selector]) {
             revert IN_V1_FUNCTION_PAUSED();
         }
