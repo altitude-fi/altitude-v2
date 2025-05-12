@@ -33,7 +33,7 @@ abstract contract StrategyPendleBase is FarmDropStrategy, SkimStrategy, IPendleF
     /// @notice Price slippage tolerance, where 1e6 = 100%
     uint256 public slippage;
     /// @notice TWAP duration in seconds, used to check `slippage`
-    uint32 public twapDuration = 300;
+    uint32 public twapDuration = 1800;
 
     address[] public rewardAssets;
 
