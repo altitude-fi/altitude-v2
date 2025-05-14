@@ -15,6 +15,7 @@ interface ILenderStrategy is ISwapStrategyConfiguration {
     error LS_ZERO_ADDRESS();
     error LS_DEPOSIT_FEE_TOO_BIG();
     error LS_WITHDRAW_INSUFFICIENT();
+        error LS_BORROW_INSUFFICIENT(uint256 requestedBorrow, uint256 actualBorrow);
     error LS_INVALID_ASSET_PAIR();
 
     function vault() external view returns (address);

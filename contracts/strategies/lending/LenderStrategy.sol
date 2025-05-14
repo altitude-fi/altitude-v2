@@ -100,7 +100,9 @@ abstract contract LenderStrategy is SwapStrategyConfiguration, ILenderStrategy, 
             _borrow(amount);
 
             amountToTransfer = IERC20(borrowAsset).balanceOf(address(this)) - amountToTransfer;
-
+            if (amount > amountToTransfer) {
+                revert LS_BORROW_INSUFFICIENT(amount, amountToTransfer);
+            }
             TransferHelper.safeTransfer(borrowAsset, msg.sender, amountToTransfer);
         }
 
