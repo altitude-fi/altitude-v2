@@ -9,7 +9,6 @@ import "@pendle/core-v2/contracts/interfaces/IPAllActionV3.sol";
 import "@pendle/core-v2/contracts/interfaces/IPMarket.sol";
 import "@pendle/core-v2/contracts/interfaces/IPPYLpOracle.sol";
 import "@pendle/core-v2/contracts/interfaces/IPRouterStatic.sol";
-
 import "../../../../interfaces/internal/strategy/farming/IPendleFarmStrategy.sol";
 
 /**
@@ -182,7 +181,13 @@ abstract contract StrategyPendleBase is FarmDropStrategy, SkimStrategy, IPendleF
 
     /// @notice Validate the difference for input and output value for market operations is within our tolerance
     function _validateRate(uint256 input, uint256 output) internal view {
-        if (input - ((input * slippage) / SLIPPAGE_BASE) > output) {
+        uint256 delta = (input * slippage) / SLIPPAGE_BASE;
+        if (slippage > 0 && delta == 0) {
+            /// @dev If the amount is so small that slippage didn't have an effect due to rounding
+            delta = 1;
+        }
+
+        if (input - delta > output) {
             revert PFS_SLIPPAGE(input, output);
         }
     }

@@ -66,6 +66,12 @@ abstract contract FarmStrategy is Ownable, SwapStrategyConfiguration, IFarmStrat
         uint256 amountRequested
     ) public virtual override onlyDispatcher returns (uint256 amountWithdrawn) {
         if (amountRequested > 0 && !inEmergency) {
+            // When trying to withdraw all
+            if (amountRequested == type(uint256).max) {
+                // balanceAvailable() skips the swap slippage check, as that will happen in the actual withdraw
+                amountRequested = balanceAvailable();
+            }
+
             _withdraw(amountRequested);
             amountWithdrawn = IERC20(asset).balanceOf(address(this));
 
