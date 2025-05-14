@@ -363,14 +363,14 @@ abstract contract VaultCoreV1 is
     /// @notice Internal function to perform the actual repayment
     /// @param amount Amount to repay
     /// @param onBehalfOf Address of the debt holder
-    /// @return repayAmount amount that was repaid
+    /// @return repayAmount amount that was repaid by the user to us
     /// @dev params should be validated beforehand
     function _repayUnchecked(uint256 amount, address onBehalfOf) internal returns (uint256 repayAmount) {
         uint256 userBalance = debtToken.balanceOf(onBehalfOf);
         if (userBalance > 0) {
             repayAmount = amount;
 
-            // Repay upto the users balance of the borrow asset
+            // Repay up to the users balance of the borrow asset
             if (userBalance < repayAmount) {
                 repayAmount = userBalance;
             }
@@ -378,18 +378,9 @@ abstract contract VaultCoreV1 is
             TransferHelper.safeTransferFrom(borrowUnderlying, msg.sender, address(this), repayAmount);
 
             debtToken.burn(onBehalfOf, repayAmount);
-
-            // Only repay the lenderStrategy if there is outstanding debt to repay
-            uint256 currentLenderBalance = ILenderStrategy(activeLenderStrategy).borrowBalance();
-
-            if (currentLenderBalance > 0) {
-                // Limit the repayment amount to the existing debt
-                if (repayAmount > currentLenderBalance) {
-                    repayAmount = currentLenderBalance;
-                }
-                TransferHelper.safeApprove(borrowUnderlying, activeLenderStrategy, repayAmount);
-                ILenderStrategy(activeLenderStrategy).repay(repayAmount);
-            }
+            TransferHelper.safeApprove(borrowUnderlying, activeLenderStrategy, repayAmount);
+            ILenderStrategy(activeLenderStrategy).repay(repayAmount);
+            TransferHelper.safeApprove(borrowUnderlying, activeLenderStrategy, 0);
 
             _updateEarningsRatio(onBehalfOf);
         }

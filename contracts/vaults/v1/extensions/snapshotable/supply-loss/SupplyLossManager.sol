@@ -61,7 +61,10 @@ contract SupplyLossManager is VaultStorage, ISupplyLossManager {
             supplyToken.setInterestIndex(snapshotType.supplyIndex);
 
             // Reset internal lending strategy balances
-            ILenderStrategy(activeLenderStrategy).updatePrincipal();
+            ILenderStrategy(activeLenderStrategy).resetPrincipal(
+                ILenderStrategy(activeLenderStrategy).supplyBalance(),
+                ILenderStrategy(activeLenderStrategy).borrowBalance()
+            );
 
             // Update global variables
             supplyLossStorage.supplyLosses.push(snapshot);

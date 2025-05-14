@@ -10,12 +10,13 @@ import "../swap/ISwapStrategyConfiguration.sol";
 interface ILenderStrategy is ISwapStrategyConfiguration {
     event SetMaxDepositFee(uint256 depositFee);
     event RewardsRecognition(uint256 rewards);
+    event ReconcileBorrowLoss(uint256 amount);
 
     error LS_ONLY_VAULT();
     error LS_ZERO_ADDRESS();
     error LS_DEPOSIT_FEE_TOO_BIG();
     error LS_WITHDRAW_INSUFFICIENT();
-        error LS_BORROW_INSUFFICIENT(uint256 requestedBorrow, uint256 actualBorrow);
+    error LS_BORROW_INSUFFICIENT(uint256 requestedBorrow, uint256 actualBorrow);
     error LS_INVALID_ASSET_PAIR();
 
     function vault() external view returns (address);
@@ -58,7 +59,9 @@ interface ILenderStrategy is ISwapStrategyConfiguration {
 
     function updatePrincipal() external;
 
-    function updatePrincipal(uint256 supplyPrincipal, uint256 borrowPrincipal) external;
+    function reconcileBorrowLoss() external;
+
+    function resetPrincipal(uint256 supplyPrincipal, uint256 borrowPrincipal) external;
 
     function getInBase(address fromAsset, address toAsset) external view returns (uint256);
 

@@ -439,10 +439,12 @@ contract InterestTokenTest is Test {
         _mockCalcCommit(users[2]);
         _mockCalcCommit(users[3]);
 
-        assertEq(interestToken.balanceOf(users[0]) / 1e9, 10868650391);
-        assertEq(interestToken.balanceOf(users[1]) / 1e9, 16302975587);
-        assertEq(interestToken.balanceOf(users[2]) / 1e9, 5327462515);
-        assertEq(interestToken.balanceOf(users[3]) / 1e7, 81604706636);
+        assertEq(interestToken.interestIndex(), interestToken.calcNewIndex());
+
+        assertEq(interestToken.balanceOf(users[0]) / 1e9, 13318656288);
+        assertEq(interestToken.balanceOf(users[1]) / 1e9, 19977984432);
+        assertEq(interestToken.balanceOf(users[2]) / 1e9, 6528376529);
+        assertEq(interestToken.balanceOf(users[3]) / 1e7, 100000000000);
     }
 
     function test_DropScenario2() public {
@@ -472,12 +474,14 @@ contract InterestTokenTest is Test {
 
         // Drop happens (50%)
         // Total balance drops to 10.20058833
+        assertNotEq(interestToken.interestIndex(), interestToken.calcNewIndex());
         _setBorrowBalance(10.20058833e18);
+        assertEq(interestToken.interestIndex(), interestToken.calcNewIndex());
         _mockCalcCommit(users[0]);
         _mockCalcCommit(users[1]);
 
-        assertEq(interestToken.balanceOf(users[0]) / 1e9, 4080235332);
-        assertEq(interestToken.balanceOf(users[1]) / 1e9, 6120352998);
+        assertEq(interestToken.balanceOf(users[0]) / 1e9, 5000000000);
+        assertEq(interestToken.balanceOf(users[1]) / 1e9, 7500000000);
     }
 
     function test_DropScenario3() public {

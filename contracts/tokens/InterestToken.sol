@@ -125,7 +125,7 @@ abstract contract InterestToken is ERC20Upgradeable, IInterestToken {
         return (super.balanceOf(account), userIndex[account]);
     }
 
-    /// @notice Updates balance and index
+    /// @notice Updates the index
     function snapshot() external override onlyVault {
         interestIndex = calcNewIndex();
     }
@@ -194,40 +194,20 @@ abstract contract InterestToken is ERC20Upgradeable, IInterestToken {
     }
 
     /// @notice Calculates the index based on a given balance
-    /// @dev The index typically only goes up, but in the case of a reduction in the vault balance (e.g. due to supply loss) it can go down
+    /// @dev The index only goes up
+    /// @dev Unexpected lender supply reduction is handled by SupplyLossManager
+    /// @dev Unexpected lender borrow reduction is handled by freezing the index until we reach again the corresponding borrowPrincipal
     /// @dev New index is based on the total lending strategy balance and the balance provided
     /// @return interestIndex_ The new interest index
     function calcIndex(uint256 balanceOld) public view returns (uint256) {
         uint256 interestIndex_ = interestIndex;
         uint256 balanceNew = totalSupply();
 
-        if (balanceOld > balanceNew && !ILenderStrategy(activeLenderStrategy).hasSupplyLoss()) {
-            interestIndex_ = _calcIndexDecrease(interestIndex_, balanceOld, balanceNew);
-        }
-
         if (balanceOld > 0 && balanceNew > 0 && balanceOld < balanceNew) {
             interestIndex_ = _calcIndexIncrease(interestIndex_, balanceOld, balanceNew);
         }
 
         return interestIndex_;
-    }
-
-    /// @notice In case the lender balance is lower than the last stored balance, adjust the index accordingly
-    /// @dev Supply loss is not counted as a condition for decreasing the index
-    /// @dev Function is typically called in cases where the lender returns balance based on some internal tokens
-    /// conversions that decreases the balance slightly (e.g. Compound)
-    /// @param interestIndex_ The last stored interest index
-    /// @param balancePrev The last stored balance
-    /// @param balanceNew The balance in lender
-    /// @return newInterestIndex The new index accounting for interest accumulation
-    function _calcIndexDecrease(
-        uint256 interestIndex_,
-        uint256 balancePrev,
-        uint256 balanceNew
-    ) internal pure returns (uint256) {
-        uint256 indexDecrease = Utils.divRoundingUp(interestIndex_ * (balancePrev - balanceNew), balancePrev);
-
-        return interestIndex_ - indexDecrease;
     }
 
     /// @notice In case the lender balance is bigger than the last one being stored, account for the interest accumulation
