@@ -34,8 +34,6 @@ abstract contract StrategyPendleBase is FarmDropStrategy, SkimStrategy, IPendleF
     /// @notice TWAP duration in seconds, used to check `slippage`
     uint32 public twapDuration = 1800;
 
-    address[] public rewardAssets;
-
     constructor(
         address farmDispatcherAddress_,
         address swapStrategy_,
@@ -49,7 +47,7 @@ abstract contract StrategyPendleBase is FarmDropStrategy, SkimStrategy, IPendleF
         address[] memory rewardAssets_,
         address[] memory nonSkimAssets_
     )
-        FarmDropStrategy(farmAsset_, farmDispatcherAddress_, rewardsAddress_, swapStrategy_)
+        FarmDropStrategy(farmAsset_, farmDispatcherAddress_, rewardsAddress_, rewardAssets_, swapStrategy_)
         SkimStrategy(nonSkimAssets_)
     {
         router = IPAllActionV3(router_);
@@ -57,18 +55,10 @@ abstract contract StrategyPendleBase is FarmDropStrategy, SkimStrategy, IPendleF
         oracle = IPPYLpOracle(oracle_);
         market = IPMarket(market_);
         (SY, PT, YT) = IPMarket(market).readTokens();
-        rewardAssets = rewardAssets_;
         slippage = slippage_;
         SY_DECIMALS = SY.decimals();
 
         _validateTwapDuration(twapDuration);
-    }
-
-    /// @notice Sets the reward tokens to be recognised
-    /// @param rewardAssets_ Token addresses
-    function setRewardAssets(address[] memory rewardAssets_) external override onlyOwner {
-        emit SetRewardAssets(rewardAssets, rewardAssets_);
-        rewardAssets = rewardAssets_;
     }
 
     /// @notice Set the twap duration
@@ -89,14 +79,6 @@ abstract contract StrategyPendleBase is FarmDropStrategy, SkimStrategy, IPendleF
         slippage = slippage_;
     }
 
-    /// @notice Swap assets to borrow asset
-    /// @param assets Array of assets to swap
-    function _emergencySwap(address[] calldata assets) internal override {
-        for (uint256 i; i < assets.length; ++i) {
-            _swap(assets[i], asset, type(uint256).max);
-        }
-    }
-
     /// @notice Internal reusable function
     function _recogniseRewardsInBase() internal override {
         SY.claimRewards(address(this));
@@ -114,25 +96,6 @@ abstract contract StrategyPendleBase is FarmDropStrategy, SkimStrategy, IPendleF
         }
         // Update drop percentage
         super._recogniseRewardsInBase();
-    }
-
-    /// @notice Swap between different assets
-    /// @param inputAsset Input asset address
-    /// @param outputAsset Output asset address
-    /// @param amount Amount to swap
-    function _swap(address inputAsset, address outputAsset, uint256 amount) internal returns (uint256) {
-        if (inputAsset != outputAsset) {
-            if (amount == type(uint256).max) {
-                amount = IERC20(inputAsset).balanceOf(address(this));
-            }
-
-            if (amount > 0) {
-                TransferHelper.safeApprove(inputAsset, address(swapStrategy), amount);
-                amount = swapStrategy.swapInBase(inputAsset, outputAsset, amount);
-            }
-        }
-
-        return amount;
     }
 
     function _validateTwapDuration(uint32 twapDuration_) internal view {

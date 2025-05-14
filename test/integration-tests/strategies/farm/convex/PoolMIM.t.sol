@@ -30,8 +30,6 @@ contract PoolMIM is ConvexStrategy {
             Constants.curve_MIMZap,
             Constants.convex_Booster, // convex
             40, // convex pid
-            Constants.CVX,
-            Constants.CRV,
             Constants.convex_RewardsToken_MIM_CRV,
             1,
             BaseGetter.getBaseSwapStrategy(BaseGetter.getBasePriceSource()),
@@ -40,7 +38,11 @@ contract PoolMIM is ConvexStrategy {
             Constants.DAI
         );
 
-        farmStrategy = new StrategyMeta3Pool(dispatcher, dispatcher, config);
+        address[] memory rewardAssets = new address[](2);
+        rewardAssets[0] = Constants.CVX;
+        rewardAssets[1] = Constants.CRV;
+
+        farmStrategy = new StrategyMeta3Pool(dispatcher, dispatcher, rewardAssets, config);
     }
 
     function _mintAsset(address to, uint256 amount) internal virtual override {

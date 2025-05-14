@@ -11,8 +11,9 @@ contract BaseFarmStrategy is FarmDropStrategy {
         address assetAddress,
         address dispatcherAddress,
         address rewardsAddress,
+        address[] memory rewardAssets_,
         address swapAddress
-    ) FarmDropStrategy(assetAddress, dispatcherAddress, rewardsAddress, swapAddress) {}
+    ) FarmDropStrategy(assetAddress, dispatcherAddress, rewardsAddress, rewardAssets_, swapAddress) {}
 
     function setFarmAssetAmount(uint256 amount) external {
         farmAssetAmount = amount;
@@ -34,7 +35,7 @@ contract BaseFarmStrategy is FarmDropStrategy {
         super._recogniseRewardsInBase();
     }
 
-    function _swap(address, address, uint256 amount) internal pure returns (uint256) {
+    function _swap(address, address, uint256 amount) internal pure override returns (uint256) {
         return amount;
     }
 }
