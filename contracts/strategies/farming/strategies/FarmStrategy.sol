@@ -34,7 +34,7 @@ abstract contract FarmStrategy is Ownable, SwapStrategyConfiguration, IFarmStrat
     /// @param farmAssetAddress The address of the token we are farming with
     /// @param farmDispatcherAddress The manager of the strategy
     /// @param rewardsAddress Where to send any reward tokens
-    /// @param rewardAssets Reward tokens to recognise
+    /// @param rewardAssets_ Reward tokens to recognise
     /// @param swapStrategyAddress Swap strategy needed in case farmAsset != baseAsset
     constructor(
         address farmAssetAddress,
