@@ -8,7 +8,7 @@ contract PendlePTStrategyRebasing is PendlePTStrategy {
         // pendle_Market_aUSDC_Jun_25 must exist
         vm.rollFork(22463000);
 
-        IPMarket(Constants.pendle_Market_aUSDC_Jun_25).increaseObservationsCardinalityNext(29);
+        IPMarket(Constants.pendle_Market_aUSDC_Jun_25).increaseObservationsCardinalityNext(165);
 
         DEPOSIT = 1000e6;
         // TODO this is higher than it should be because there are checks on cumulative withdraws
