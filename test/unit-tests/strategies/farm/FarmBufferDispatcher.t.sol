@@ -104,7 +104,12 @@ contract FarmBufferDispatcherTest is Test {
     }
 
     function test_FulfillBufferAndDeposit() public {
-        address newStrategy1 = BaseGetter.getBaseFarmStrategy(workingAsset, address(dispatcher), address(dispatcher));
+        address newStrategy1 = BaseGetter.getBaseFarmStrategy(
+            workingAsset,
+            address(dispatcher),
+            new address[](0),
+            address(dispatcher)
+        );
 
         dispatcher.addStrategy(newStrategy1, BUFFER * 3, address(0));
         IToken(workingAsset).mint(address(this), BUFFER);
@@ -167,7 +172,12 @@ contract FarmBufferDispatcherTest is Test {
     }
 
     function test_FillBufferFirstWhenFarmLoss() public {
-        address newStrategy1 = BaseGetter.getBaseFarmStrategy(workingAsset, address(dispatcher), address(dispatcher));
+        address newStrategy1 = BaseGetter.getBaseFarmStrategy(
+            workingAsset,
+            address(dispatcher),
+            new address[](0),
+            address(dispatcher)
+        );
 
         dispatcher.addStrategy(newStrategy1, BUFFER * 2, address(0));
         IToken(workingAsset).mint(address(this), BUFFER);
@@ -197,7 +207,12 @@ contract FarmBufferDispatcherTest is Test {
     }
 
     function test_WithdrawBufferToNotBeLocked() public {
-        address newStrategy1 = BaseGetter.getBaseFarmStrategy(workingAsset, address(dispatcher), address(dispatcher));
+        address newStrategy1 = BaseGetter.getBaseFarmStrategy(
+            workingAsset,
+            address(dispatcher),
+            new address[](0),
+            address(dispatcher)
+        );
 
         dispatcher.addStrategy(newStrategy1, BUFFER * 2, address(0));
         IToken(workingAsset).mint(address(this), BUFFER);
@@ -267,7 +282,12 @@ contract FarmBufferDispatcherTest is Test {
     }
 
     function test_LossNotCoveredByTheBuffer() public {
-        address newStrategy1 = BaseGetter.getBaseFarmStrategy(workingAsset, address(dispatcher), address(dispatcher));
+        address newStrategy1 = BaseGetter.getBaseFarmStrategy(
+            workingAsset,
+            address(dispatcher),
+            new address[](0),
+            address(dispatcher)
+        );
 
         dispatcher.addStrategy(newStrategy1, BUFFER * 2, address(0));
         IToken(workingAsset).mint(address(this), BUFFER);
@@ -340,6 +360,7 @@ contract FarmBufferDispatcherTest is Test {
         address failingStrategy = BaseGetter.getBaseFarmStrategy(
             workingAsset,
             address(dispatcher),
+            new address[](0),
             address(dispatcher)
         );
         dispatcher.addStrategy(failingStrategy, BUFFER, address(0));
@@ -367,6 +388,7 @@ contract FarmBufferDispatcherTest is Test {
         address failingStrategy = BaseGetter.getBaseFarmStrategy(
             workingAsset,
             address(dispatcher),
+            new address[](0),
             address(dispatcher)
         );
         dispatcher.addStrategy(failingStrategy, BUFFER, address(0));
@@ -394,6 +416,7 @@ contract FarmBufferDispatcherTest is Test {
         address successfulStrategy = BaseGetter.getBaseFarmStrategy(
             workingAsset,
             address(dispatcher),
+            new address[](0),
             address(dispatcher)
         );
         dispatcher.addStrategy(successfulStrategy, BUFFER, address(0));

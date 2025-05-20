@@ -220,7 +220,11 @@ contract Ingress is AccessControl, IIngress {
     /// @notice Validate if withdraw is allowed
     /// @param withdrawer The address the supply will be withdrawn from
     /// @param recipient The address that will receive the withdrawn currency
-    function validateWithdraw(address withdrawer, address recipient, uint256 amount) external override {
+    function validateWithdraw(
+        address withdrawer,
+        address recipient,
+        uint256 amount
+    ) external override onlyRole(Roles.GAMMA) {
         if (isFunctionDisabled[IIngress.validateWithdraw.selector]) {
             revert IN_V1_FUNCTION_PAUSED();
         }
@@ -242,7 +246,12 @@ contract Ingress is AccessControl, IIngress {
     /// @param amount amount requested to borrow
     /// @param onBehalfOf account to incur the debt
     /// @param receiver account to receive the tokens
-    function validateBorrow(uint256 amount, address onBehalfOf, address receiver) external override {
+    /// @dev The vault has GAMMA role
+    function validateBorrow(
+        uint256 amount,
+        address onBehalfOf,
+        address receiver
+    ) external override onlyRole(Roles.GAMMA) {
         if (isFunctionDisabled[IIngress.validateBorrow.selector]) {
             revert IN_V1_FUNCTION_PAUSED();
         }
@@ -291,7 +300,7 @@ contract Ingress is AccessControl, IIngress {
 
     /// @notice Validate if claim rewards is allowed
     /// @param claimer Address to check if allowed to claim
-    function validateClaimRewards(address claimer, uint256 amount) external override {
+    function validateClaimRewards(address claimer, uint256 amount) external override onlyRole(Roles.GAMMA) {
         if (isFunctionDisabled[IIngress.validateClaimRewards.selector]) {
             revert IN_V1_FUNCTION_PAUSED();
         }

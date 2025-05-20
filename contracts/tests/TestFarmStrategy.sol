@@ -12,8 +12,9 @@ contract TestFarmStrategy is StrategyMeta3Pool {
     constructor(
         address dispatcherAddress,
         address rewardsAddress,
+        address[] memory rewardAssets_,
         IConvexFarmStrategy.Config memory config
-    ) StrategyMeta3Pool(dispatcherAddress, rewardsAddress, config) {}
+    ) StrategyMeta3Pool(dispatcherAddress, rewardsAddress, rewardAssets_, config) {}
 
     function testWithdraw(uint256 amount) external {
         uint256 crvAmount = _calcExactLP(amount);

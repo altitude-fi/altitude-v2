@@ -10,10 +10,4 @@ import "./IFarmStrategy.sol";
 
 interface IMorphoVault is IFarmStrategy {
     function morphoVault() external returns (IERC4626);
-
-    function rewardAssets(uint256) external returns (address);
-
-    event SetRewardAssets(address[] oldAssets, address[] newAssets);
-
-    function setRewardAssets(address[] memory rewardAssets_) external;
 }

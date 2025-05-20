@@ -13,6 +13,7 @@ contract BaseLenderStrategy is LenderStrategy, TokensGenerator {
     uint256 public withdrawFee;
     uint256 public feeLoss;
     uint256 public depositFee;
+    uint256 public borrowFee;
     uint256 public depositRewards;
     IPriceSource public priceSource;
 
@@ -50,7 +51,9 @@ contract BaseLenderStrategy is LenderStrategy, TokensGenerator {
     function setDepositFee(uint256 depositFeePerc) public {
         depositFee = depositFeePerc;
     }
-
+    function setBorrowFee(uint256 borrowFeePerc) public {
+        borrowFee = borrowFeePerc;
+    }
     function setPriceSource(address oracle) public {
         priceSource = IPriceSource(oracle);
     }
@@ -82,6 +85,7 @@ contract BaseLenderStrategy is LenderStrategy, TokensGenerator {
 
     function _borrow(uint256 amount) internal override {
         totalBorrowed += amount;
+        amount = amount - ((amount * borrowFee) / 100);
         mintToken(borrowAsset, address(this), amount);
     }
 

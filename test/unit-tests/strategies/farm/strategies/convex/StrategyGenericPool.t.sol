@@ -46,8 +46,6 @@ contract StrategyGenericPoolTest is FarmStrategyUnitTest, TokensGenerator {
             address(0),
             convex,
             0,
-            cvxToken,
-            crvToken,
             crvRewards,
             0,
             BaseGetter.getBaseSwapStrategy(BaseGetter.getBasePriceSource()),
@@ -57,7 +55,11 @@ contract StrategyGenericPoolTest is FarmStrategyUnitTest, TokensGenerator {
         );
 
         // Rewards receiver = address(this)
-        farmStrategy = new BaseConvexStrategy(dispatcher, address(this), config);
+        address[] memory rewardAssets = new address[](3);
+        rewardAssets[0] = CRVRewardsMock(crvRewards).rewards(0);
+        rewardAssets[1] = CRVRewardsMock(crvRewards).rewards(1);
+        rewardAssets[2] = CRVRewardsMock(crvRewards).rewards(2);
+        farmStrategy = new BaseConvexStrategy(dispatcher, address(this), rewardAssets, config);
     }
 
     function test_CorrectInitialization() public view {
@@ -66,8 +68,9 @@ contract StrategyGenericPoolTest is FarmStrategyUnitTest, TokensGenerator {
         assertEq(address(convexStrategy.curveLP()), config.curveLP);
         assertEq(convexStrategy.zapPool(), config.zapPool);
         assertEq(address(convexStrategy.convex()), config.convex);
-        assertEq(address(convexStrategy.cvx()), config.cvx);
-        assertEq(address(convexStrategy.crv()), config.crv);
+        assertEq(convexStrategy.rewardAssets(0), CRVRewardsMock(crvRewards).rewards(0));
+        assertEq(convexStrategy.rewardAssets(1), CRVRewardsMock(crvRewards).rewards(1));
+        assertEq(convexStrategy.rewardAssets(2), CRVRewardsMock(crvRewards).rewards(2));
         assertEq(address(convexStrategy.crvRewards()), config.crvRewards);
         assertEq(convexStrategy.convexPoolID(), config.convexPoolID);
         assertEq(convexStrategy.assetIndex(), config.assetIndex);
@@ -78,12 +81,12 @@ contract StrategyGenericPoolTest is FarmStrategyUnitTest, TokensGenerator {
     function test_InitializationReverts() public {
         config.slippage = 1000001;
         vm.expectRevert(IConvexFarmStrategy.CFS_OUT_OF_BOUNDS.selector);
-        farmStrategy = new BaseConvexStrategy(dispatcher, address(this), config);
+        farmStrategy = new BaseConvexStrategy(dispatcher, address(this), new address[](0), config);
 
         config.slippage = 1000000;
         config.referencePrice = 0;
         vm.expectRevert(IConvexFarmStrategy.CFS_OUT_OF_BOUNDS.selector);
-        farmStrategy = new BaseConvexStrategy(dispatcher, address(this), config);
+        farmStrategy = new BaseConvexStrategy(dispatcher, address(this), new address[](0), config);
     }
 
     function test_DepositEntireLPBalance() public {

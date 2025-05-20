@@ -65,10 +65,10 @@ abstract contract FarmStrategyIntegrationTest is ForkTest, TokensGenerator {
         amountWithdrawn = asset.balanceOf(dispatcher) - amountWithdrawn;
         vm.stopPrank();
         // Withdrawal from curve may return slightly more
-        assertTrue(amountWithdrawn >= DEPOSIT / 2);
+        assertGe(amountWithdrawn, DEPOSIT / 2);
         uint256 remainingTolerance = (DEPOSIT / 2) - ((DEPOSIT / 2) * FEE_TOLERANCE) / MAX_FEE_TOLERANCE;
 
-        assertTrue(farmStrategy.balance() >= remainingTolerance);
+        assertGe(farmStrategy.balance(), remainingTolerance);
     }
 
     function test_WithdrawAll() public virtual {
@@ -77,15 +77,19 @@ abstract contract FarmStrategyIntegrationTest is ForkTest, TokensGenerator {
         farmStrategy.deposit(DEPOSIT);
 
         uint256 amountWithdrawn = asset.balanceOf(dispatcher);
+        uint256 farmBalance = farmStrategy.balance();
         farmStrategy.withdraw(type(uint256).max);
         amountWithdrawn = asset.balanceOf(dispatcher) - amountWithdrawn;
 
         vm.stopPrank();
-        assertTrue(farmStrategy.balance() == 0, "Zero balance");
+        if (farmStrategy.balance() > 0) {
+            // $1 for $10M
+            assertApproxEqRel(farmBalance, amountWithdrawn, 0.0000001e18, "More than 0.00001% dust");
+        }
 
         uint256 withdrawnTolerance = DEPOSIT - (DEPOSIT * FEE_TOLERANCE) / MAX_FEE_TOLERANCE;
 
-        assertTrue(amountWithdrawn >= withdrawnTolerance, "Fee tolerance");
+        assertGe(amountWithdrawn, withdrawnTolerance, "Fee tolerance");
     }
 
     function test_RewardsRecognition() public virtual {

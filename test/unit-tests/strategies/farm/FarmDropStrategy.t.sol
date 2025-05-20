@@ -62,8 +62,9 @@ contract DropStrategy is FarmDropStrategy {
         address farmAssetAddress,
         address farmDispatcherAddress,
         address rewardsAddress,
+        address[] memory rewardAssets_,
         address swapStrategyAddress
-    ) FarmDropStrategy(farmAssetAddress, farmDispatcherAddress, rewardsAddress, swapStrategyAddress) {
+    ) FarmDropStrategy(farmAssetAddress, farmDispatcherAddress, rewardsAddress, rewardAssets_, swapStrategyAddress) {
         farmProvider = new FarmProvider(farmAssetAddress);
     }
 
@@ -100,7 +101,13 @@ contract FarmDropStrategyTest is Test {
             abi.encodeWithSelector(IFarmDispatcher.asset.selector),
             abi.encode(address(workingAsset))
         );
-        farmStrategy = new DropStrategy(address(workingAsset), address(this), address(this), address(0));
+        farmStrategy = new DropStrategy(
+            address(workingAsset),
+            address(this),
+            address(this),
+            new address[](0),
+            address(0)
+        );
 
         farmStrategy.setDropThreshold(1e18);
     }

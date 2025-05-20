@@ -8,6 +8,7 @@ import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "../swap/SwapStrategyConfiguration.sol";
 import "../../libraries/uniswap-v3/TransferHelper.sol";
 import "../../interfaces/internal/strategy/lending/ILenderStrategy.sol";
+import "../../libraries/utils/Utils.sol";
 
 /**
  * @title LenderStrategy
@@ -71,7 +72,7 @@ abstract contract LenderStrategy is SwapStrategyConfiguration, ILenderStrategy, 
             _deposit(amount);
         }
 
-        _updatePrincipal();
+        _updatePrincipal(0, 0);
 
         // Flat fee
         if (amount >= maxDepositFee && supplyPrincipal - balanceBefore < amount - maxDepositFee) {
@@ -88,41 +89,45 @@ abstract contract LenderStrategy is SwapStrategyConfiguration, ILenderStrategy, 
             amountOut = _withdraw(amount);
         }
 
-        _updatePrincipal();
+        _updatePrincipal(0, 0);
     }
 
     /// @notice Borrow a specific `amount` of the borrow asset, provided that the borrower has enough supply
     /// @param amount The amount to borrow
     function borrow(uint256 amount) external override onlyVault {
         if (amount > 0) {
-            uint256 amountToTransfer = IERC20(borrowAsset).balanceOf(address(this));
-
-            _borrow(amount);
-
-            amountToTransfer = IERC20(borrowAsset).balanceOf(address(this)) - amountToTransfer;
-
-            TransferHelper.safeTransfer(borrowAsset, msg.sender, amountToTransfer);
+            _borrowAndTransfer(amount);
         }
 
-        _updatePrincipal();
+        _updatePrincipal(amount, 0);
     }
 
-    /// @notice Repays the already transferred borrowed `amount` on a specific `asset`, burning the equivalent debt
-    /// @param amount The amount to repay
+    /// @notice Repays a borrowed amount back to the lender
+    /// @param amount Amount the user repaid the vault
     function repay(uint256 amount) external override onlyVault {
         if (amount > 0) {
-            TransferHelper.safeTransferFrom(borrowAsset, msg.sender, address(this), amount);
+            uint256 actualAmount;
+            uint256 currentLenderBalance = borrowBalance();
+            if (currentLenderBalance > 0) {
+                // Limit repayment to actual debt
+                if (amount > currentLenderBalance) {
+                    actualAmount = currentLenderBalance;
+                } else {
+                    actualAmount = amount;
+                }
 
-            _repay(amount);
+                TransferHelper.safeTransferFrom(borrowAsset, msg.sender, address(this), actualAmount);
+                _repay(actualAmount);
+            }
         }
 
-        _updatePrincipal();
+        _updatePrincipal(0, amount);
     }
 
     /// @notice Redeem all aTokens in exchange for the underlying asset
     function withdrawAll() external override onlyVault {
         _withdrawAll();
-        _updatePrincipal();
+        _updatePrincipal(0, 0);
     }
 
     /// @notice Claim and swap reward tokens to farm token
@@ -133,6 +138,17 @@ abstract contract LenderStrategy is SwapStrategyConfiguration, ILenderStrategy, 
         TransferHelper.safeTransfer(borrowAsset, rewardsRecipient, rewards);
 
         emit RewardsRecognition(rewards);
+    }
+
+    /// @notice If lender borrow is lower than expected, borrow the difference and keep it as vault reserve
+    /// @dev This preserves the vault accounting in case of external debt repayment to the lender
+    function reconcileBorrowLoss() external onlyOwner {
+        uint256 currentBorrow = borrowBalance();
+        if (borrowPrincipal > currentBorrow) {
+            uint256 amount = borrowPrincipal - currentBorrow;
+            _borrowAndTransfer(amount);
+            emit ReconcileBorrowLoss(amount);
+        }
     }
 
     /// @notice Check if the supply has been decreased
@@ -168,21 +184,47 @@ abstract contract LenderStrategy is SwapStrategyConfiguration, ILenderStrategy, 
         supplyLoss -= fee;
     }
 
-    /// @notice Adjust supply and borrow principals in case the vault has been liquidated
+    /// @notice Keep track of supply and borrow principals as we update the token indexes
     function updatePrincipal() public onlyVault {
-        _updatePrincipal();
+        _updatePrincipal(0, 0);
     }
 
-    /// @notice Adjust supply and borrow principals
-    function updatePrincipal(uint256 supplyPrincial_, uint256 borrowPrincipal_) public onlyVault {
+    /// @notice Set supply and borrow principals
+    /// @dev Used to preserve the state (which may be a supply/borrow loss) during lender migration
+    function resetPrincipal(uint256 supplyPrincial_, uint256 borrowPrincipal_) public onlyVault {
         supplyPrincipal = supplyPrincial_;
         borrowPrincipal = borrowPrincipal_;
     }
 
-    /// @notice Update both principals for keep tracking the accrued interest
-    function _updatePrincipal() internal {
+    /// @dev Special care of the borrow principal to manage borrow loss (e.g. external repayment to the lender)
+    /// @dev If the lender borrow balance is less than expected, the token index is kept unchanged,
+    /// @dev as the interest still hasn't covered what was forgiven in the lender (externally repaid)
+    function _updatePrincipal(uint256 borrowed, uint256 repaid) internal {
         supplyPrincipal = supplyBalance();
-        borrowPrincipal = borrowBalance();
+        if (borrowed > 0) {
+            borrowPrincipal += borrowed;
+        }
+
+        if (repaid > 0) {
+            borrowPrincipal = Utils.subOrZero(borrowPrincipal, repaid);
+        }
+
+        uint256 currentLenderBorrow = borrowBalance();
+        if (currentLenderBorrow > borrowPrincipal) {
+            borrowPrincipal = currentLenderBorrow;
+        }
+    }
+
+    /// @notice Takes tokens from the lending provider and sends them to the vault
+    /// @param amount How much to borrow from the lender
+    function _borrowAndTransfer(uint256 amount) private {
+        uint256 amountToTransfer = IERC20(borrowAsset).balanceOf(address(this));
+        _borrow(amount);
+        amountToTransfer = IERC20(borrowAsset).balanceOf(address(this)) - amountToTransfer;
+        if (amount > amountToTransfer) {
+            revert LS_BORROW_INSUFFICIENT(amount, amountToTransfer);
+        }
+        TransferHelper.safeTransfer(borrowAsset, vault, amountToTransfer);
     }
 
     /// @notice Lending-specific implementation for total supply balance

@@ -512,7 +512,8 @@ contract VaultSnapshotableTest is VaultTestSuite {
         assertApproxEqAbs(
             vault.debtToken().balanceOf(user),
             BORROW - supplyLossSnapshot.borrowLossAtSnapshot + 100, // interest being accumulated
-            5 // wei rounding tolerance
+            5, // wei rounding tolerance
+            "Borrow balance"
         );
 
         CommonTypes.SnapshotType memory snapshotGeneric = vault.getSnapshot(0);

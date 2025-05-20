@@ -6,5 +6,5 @@ libs = ['node_modules', 'lib']
 test = 'test'
 cache_path  = 'cache_forge'
 solc = "0.8.28"
-evm_version = 'shanghai'
+evm_version = 'cancun'
 no_match_coverage = 'libraries\/Compound|uniswap-v3|migration|UniswapV3Twap.sol|aave\/v2|compound\/v2|compound\/v3|contracts\/tests|test'

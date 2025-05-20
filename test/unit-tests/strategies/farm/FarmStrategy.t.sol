@@ -18,7 +18,9 @@ contract FarmStrategyTest is Test {
     function setUp() public {
         workingAsset = BaseGetter.getBaseERC20(18);
         vm.mockCall(address(this), abi.encodeWithSelector(IFarmDispatcher.asset.selector), abi.encode(workingAsset));
-        farmStrategy = BaseFarmStrategy(BaseGetter.getBaseFarmStrategy(workingAsset, address(this), address(this)));
+        farmStrategy = BaseFarmStrategy(
+            BaseGetter.getBaseFarmStrategy(workingAsset, address(this), new address[](0), address(this))
+        );
     }
 
     function test_CorrectInitialization() public view {
@@ -140,7 +142,9 @@ contract FarmStrategyTest is Test {
     function test_BalanceTooHighSlippage() public {
         IToken farmAsset = IToken(BaseGetter.getBaseERC20(18));
         vm.mockCall(address(this), abi.encodeWithSelector(IFarmDispatcher.asset.selector), abi.encode(farmAsset));
-        farmStrategy = BaseFarmStrategy(BaseGetter.getBaseFarmStrategy(workingAsset, address(this), address(this)));
+        farmStrategy = BaseFarmStrategy(
+            BaseGetter.getBaseFarmStrategy(workingAsset, address(this), new address[](0), address(this))
+        );
         farmStrategy.setFarmAssetAmount(1e18);
         farmAsset.mint(address(farmStrategy), 1e18);
         // Simulate swap functions

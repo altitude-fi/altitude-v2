@@ -29,10 +29,6 @@ abstract contract StrategyGenericPool is FarmDropStrategy, IConvexFarmStrategy {
     IConvex public immutable override convex;
     /// @notice Convex pool ID where we will deposit the Curve LP token
     uint256 public immutable override convexPoolID;
-    /// @notice Convex (CVX) token address
-    IERC20 public immutable override cvx;
-    /// @notice Curve (CRV) token address
-    IERC20 public immutable override crv;
     /// @notice Convex contract for rewards distribution
     ICVXRewards public immutable override crvRewards;
     /// @notice Index in the Curve pool of the token we are depositing
@@ -51,8 +47,9 @@ abstract contract StrategyGenericPool is FarmDropStrategy, IConvexFarmStrategy {
     constructor(
         address farmDispatcherAddress,
         address rewardsAddress,
+        address[] memory rewardAssets_,
         IConvexFarmStrategy.Config memory config
-    ) FarmDropStrategy(config.farmAsset, farmDispatcherAddress, rewardsAddress, config.swapStrategy) {
+    ) FarmDropStrategy(config.farmAsset, farmDispatcherAddress, rewardsAddress, rewardAssets_, config.swapStrategy) {
         if (config.slippage > SLIPPAGE_BASE || config.referencePrice == 0) {
             revert CFS_OUT_OF_BOUNDS();
         }
@@ -61,8 +58,6 @@ abstract contract StrategyGenericPool is FarmDropStrategy, IConvexFarmStrategy {
         curveLP = IERC20Metadata(config.curveLP);
         zapPool = config.zapPool;
         convex = IConvex(config.convex);
-        cvx = IERC20(config.cvx);
-        crv = IERC20(config.crv);
         crvRewards = ICVXRewards(config.crvRewards);
         crvDecimals = 10 ** curveLP.decimals();
         convexPoolID = config.convexPoolID;
@@ -215,35 +210,9 @@ abstract contract StrategyGenericPool is FarmDropStrategy, IConvexFarmStrategy {
         // Calculate and transfer the rewards from the convex pool
         crvRewards.getReward(address(this), toClaimExtra);
 
-        // Swap all crv reward tokens to the asset
-        uint256 amount = crv.balanceOf(address(this));
-        if (amount > 0) {
-            // Approve and swap
-            TransferHelper.safeApprove(address(crv), address(swapStrategy), amount);
-            swapStrategy.swapInBase(address(crv), asset, amount);
-        }
-
-        // Swap all cvx reward tokens to the asset
-        amount = cvx.balanceOf(address(this));
-        if (amount > 0) {
-            TransferHelper.safeApprove(address(cvx), address(swapStrategy), amount);
-
-            swapStrategy.swapInBase(address(cvx), asset, amount);
-        }
-
-        // If needed, loop over other reward tokens and swap to the asset
-        if (toClaimExtra) {
-            uint256 length = crvRewards.extraRewardsLength();
-            for (uint256 i; i < length; ++i) {
-                address extra = ICVXRewards(crvRewards.extraRewards(i)).rewardToken();
-
-                amount = IERC20(extra).balanceOf(address(this));
-                if (amount > 0) {
-                    TransferHelper.safeApprove(extra, address(swapStrategy), amount);
-
-                    swapStrategy.swapInBase(address(extra), asset, amount);
-                }
-            }
+        // Swap the rewards
+        for (uint256 i; i < rewardAssets.length; ++i) {
+            _swap(rewardAssets[i], asset, type(uint256).max);
         }
 
         // Update drop percentage
@@ -258,31 +227,6 @@ abstract contract StrategyGenericPool is FarmDropStrategy, IConvexFarmStrategy {
             convex.withdrawAll(convexPoolID);
             _curveEmergencyWithdraw(curveLP.balanceOf(address(this)));
         }
-    }
-
-    /// @notice Swap assets to borrow asset
-    /// @param assets Array of assets to swap
-    function _emergencySwap(address[] calldata assets) internal override {
-        for (uint256 i; i < assets.length; ++i) {
-            _swap(assets[i], asset, type(uint256).max);
-        }
-    }
-
-    /// @notice Swap between different assets
-    function _swap(address inputAsset, address outputAsset, uint256 amount) internal returns (uint256) {
-        if (inputAsset != outputAsset) {
-            if (amount == type(uint256).max) {
-                amount = IERC20(inputAsset).balanceOf(address(this));
-            }
-
-            if (amount > 0) {
-                TransferHelper.safeApprove(inputAsset, address(swapStrategy), amount);
-
-                amount = swapStrategy.swapInBase(inputAsset, outputAsset, amount);
-            }
-        }
-
-        return amount;
     }
 
     /// @notice Handles farm deposit

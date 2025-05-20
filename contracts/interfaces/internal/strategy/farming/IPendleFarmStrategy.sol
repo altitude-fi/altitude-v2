@@ -27,15 +27,12 @@ interface IPendleFarmStrategy is IFarmStrategy {
 
     function YT() external view returns (IPYieldToken);
 
-    function rewardAssets(uint256) external view returns (address);
-
     function SLIPPAGE_BASE() external view returns (uint256);
 
     function slippage() external view returns (uint256);
 
     function twapDuration() external view returns (uint32);
 
-    event SetRewardAssets(address[] oldAssets, address[] newAssets);
     event SetTwapDuration(uint32 oldDuration, uint32 newDuration);
     event SetSlippage(uint256 oldSlippage, uint256 newSlippage);
 
@@ -44,8 +41,6 @@ interface IPendleFarmStrategy is IFarmStrategy {
     error PFS_SLIPPAGE(uint256 twapRate, uint256 currentRate);
     error PFS_MARKET_EXPIRED();
     error PFS_INVALID_SLIPPAGE();
-
-    function setRewardAssets(address[] memory rewardAssets_) external;
 
     function setTwapDuration(uint32 twapDuration_) external;
 
