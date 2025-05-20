@@ -9,7 +9,6 @@ import "@pendle/core-v2/contracts/interfaces/IPAllActionV3.sol";
 import "@pendle/core-v2/contracts/interfaces/IPMarket.sol";
 import "@pendle/core-v2/contracts/interfaces/IPPYLpOracle.sol";
 import "@pendle/core-v2/contracts/interfaces/IPRouterStatic.sol";
-
 import "../../../../interfaces/internal/strategy/farming/IPendleFarmStrategy.sol";
 
 /**
@@ -33,9 +32,7 @@ abstract contract StrategyPendleBase is FarmDropStrategy, SkimStrategy, IPendleF
     /// @notice Price slippage tolerance, where 1e6 = 100%
     uint256 public slippage;
     /// @notice TWAP duration in seconds, used to check `slippage`
-    uint32 public twapDuration = 300;
-
-    address[] public rewardAssets;
+    uint32 public twapDuration = 1800;
 
     constructor(
         address farmDispatcherAddress_,
@@ -50,7 +47,7 @@ abstract contract StrategyPendleBase is FarmDropStrategy, SkimStrategy, IPendleF
         address[] memory rewardAssets_,
         address[] memory nonSkimAssets_
     )
-        FarmDropStrategy(farmAsset_, farmDispatcherAddress_, rewardsAddress_, swapStrategy_)
+        FarmDropStrategy(farmAsset_, farmDispatcherAddress_, rewardsAddress_, rewardAssets_, swapStrategy_)
         SkimStrategy(nonSkimAssets_)
     {
         router = IPAllActionV3(router_);
@@ -58,18 +55,10 @@ abstract contract StrategyPendleBase is FarmDropStrategy, SkimStrategy, IPendleF
         oracle = IPPYLpOracle(oracle_);
         market = IPMarket(market_);
         (SY, PT, YT) = IPMarket(market).readTokens();
-        rewardAssets = rewardAssets_;
         slippage = slippage_;
         SY_DECIMALS = SY.decimals();
 
         _validateTwapDuration(twapDuration);
-    }
-
-    /// @notice Sets the reward tokens to be recognised
-    /// @param rewardAssets_ Token addresses
-    function setRewardAssets(address[] memory rewardAssets_) external override onlyOwner {
-        emit SetRewardAssets(rewardAssets, rewardAssets_);
-        rewardAssets = rewardAssets_;
     }
 
     /// @notice Set the twap duration
@@ -80,12 +69,14 @@ abstract contract StrategyPendleBase is FarmDropStrategy, SkimStrategy, IPendleF
         twapDuration = twapDuration_;
     }
 
-    /// @notice Swap assets to borrow asset
-    /// @param assets Array of assets to swap
-    function _emergencySwap(address[] calldata assets) internal override {
-        for (uint256 i; i < assets.length; ++i) {
-            _swap(assets[i], asset, type(uint256).max);
+    /// @notice Set the acceptable slippage for market operations
+    /// @param slippage_ New slippage value, where SLIPPAGE_BASE = 1e6 = 100%
+    function setSlippage(uint256 slippage_) external override onlyOwner {
+        if (slippage_ > SLIPPAGE_BASE) {
+            revert PFS_SLIPPAGE(slippage, slippage_);
         }
+        emit SetSlippage(slippage, slippage_);
+        slippage = slippage_;
     }
 
     /// @notice Internal reusable function
@@ -105,25 +96,6 @@ abstract contract StrategyPendleBase is FarmDropStrategy, SkimStrategy, IPendleF
         }
         // Update drop percentage
         super._recogniseRewardsInBase();
-    }
-
-    /// @notice Swap between different assets
-    /// @param inputAsset Input asset address
-    /// @param outputAsset Output asset address
-    /// @param amount Amount to swap
-    function _swap(address inputAsset, address outputAsset, uint256 amount) internal returns (uint256) {
-        if (inputAsset != outputAsset) {
-            if (amount == type(uint256).max) {
-                amount = IERC20(inputAsset).balanceOf(address(this));
-            }
-
-            if (amount > 0) {
-                TransferHelper.safeApprove(inputAsset, address(swapStrategy), amount);
-                amount = swapStrategy.swapInBase(inputAsset, outputAsset, amount);
-            }
-        }
-
-        return amount;
     }
 
     function _validateTwapDuration(uint32 twapDuration_) internal view {
@@ -172,7 +144,13 @@ abstract contract StrategyPendleBase is FarmDropStrategy, SkimStrategy, IPendleF
 
     /// @notice Validate the difference for input and output value for market operations is within our tolerance
     function _validateRate(uint256 input, uint256 output) internal view {
-        if (input - ((input * slippage) / SLIPPAGE_BASE) > output) {
+        uint256 delta = (input * slippage) / SLIPPAGE_BASE;
+        if (slippage > 0 && delta == 0) {
+            /// @dev If the amount is so small that slippage didn't have an effect due to rounding
+            delta = 1;
+        }
+
+        if (input - delta > output) {
             revert PFS_SLIPPAGE(input, output);
         }
     }

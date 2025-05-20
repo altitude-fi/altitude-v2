@@ -17,7 +17,6 @@ import "../../../../interfaces/internal/strategy/farming/IMorphoVault.sol";
 
 contract MorphoVault is FarmDropStrategy, SkimStrategy, IMorphoVault {
     IERC4626 public immutable morphoVault;
-    address[] public rewardAssets;
 
     constructor(
         address farmDispatcherAddress_,
@@ -27,19 +26,10 @@ contract MorphoVault is FarmDropStrategy, SkimStrategy, IMorphoVault {
         address[] memory rewardAssets_,
         address[] memory nonSkimAssets_
     )
-        FarmDropStrategy(morphoVault_.asset(), farmDispatcherAddress_, rewardsAddress_, swapStrategy_)
+        FarmDropStrategy(morphoVault_.asset(), farmDispatcherAddress_, rewardsAddress_, rewardAssets_, swapStrategy_)
         SkimStrategy(nonSkimAssets_)
     {
         morphoVault = morphoVault_;
-        rewardAssets = rewardAssets_;
-    }
-
-    /// @notice Sets the reward tokens to be recognised
-    /// @param rewardAssets_ Token addresses
-    function setRewardAssets(address[] memory rewardAssets_) external onlyOwner {
-        emit SetRewardAssets(rewardAssets, rewardAssets_);
-
-        rewardAssets = rewardAssets_;
     }
 
     /// @notice Deposit into Morpho
@@ -84,14 +74,6 @@ contract MorphoVault is FarmDropStrategy, SkimStrategy, IMorphoVault {
         morphoVault.redeem(morphoVault.maxRedeem(address(this)), address(this), address(this));
     }
 
-    /// @notice Swap assets to borrow asset
-    /// @param assets Array of assets to swap
-    function _emergencySwap(address[] calldata assets) internal override {
-        for (uint256 i; i < assets.length; ++i) {
-            _swap(assets[i], asset, type(uint256).max);
-        }
-    }
-
     /// @notice Return farm asset ammount specific for the farm provider
     function _getFarmAssetAmount() internal view virtual override returns (uint256 farmAssetAmount) {
         uint256 shares = morphoVault.balanceOf(address(this));
@@ -108,24 +90,5 @@ contract MorphoVault is FarmDropStrategy, SkimStrategy, IMorphoVault {
 
         // Update drop percentage
         super._recogniseRewardsInBase();
-    }
-
-    /// @notice Swap between different assets
-    /// @param inputAsset Input asset address
-    /// @param outputAsset Output asset address
-    /// @param amount Amount to swap
-    function _swap(address inputAsset, address outputAsset, uint256 amount) internal returns (uint256) {
-        if (inputAsset != outputAsset) {
-            if (amount == type(uint256).max) {
-                amount = IERC20(inputAsset).balanceOf(address(this));
-            }
-
-            if (amount > 0) {
-                TransferHelper.safeApprove(inputAsset, address(swapStrategy), amount);
-                amount = swapStrategy.swapInBase(inputAsset, outputAsset, amount);
-            }
-        }
-
-        return amount;
     }
 }

@@ -37,6 +37,18 @@ contract RebalanceIncentivesControllerTest is VaultTestSuite {
         assertEq(controller.maxDeviation(), 0.10e18);
     }
 
+    function test_InitializationEmitsEvent() public {
+        vm.expectEmit(true, true, true, true);
+        emit IRebalanceIncentivesController.UpdateRebalanceDeviation(0.10e18, 0.20e18);
+
+        new RebalanceIncentivesController(
+            address(rewardToken),
+            address(vault),
+            0.10e18, // 10% deviation below target
+            0.20e18 // 20% deviation above target
+        );
+    }
+
     function test_MaxDeviationTooHigh() public {
         vm.expectRevert(IRebalanceIncentivesController.RIC_INVALID_DEVIATIONS.selector);
         new RebalanceIncentivesController(address(rewardToken), address(vault), 0.10e18, 1.1e18);
@@ -47,17 +59,27 @@ contract RebalanceIncentivesControllerTest is VaultTestSuite {
         new RebalanceIncentivesController(address(rewardToken), address(vault), 1.1e18, 0.10e18);
     }
 
-    function test_SetThresholds() public {
-        controller.setThresholds(0.5e18, 0.9e18);
+    function test_SetDeviation() public {
+        controller.setDeviation(0.5e18, 0.9e18);
         assertEq(controller.minDeviation(), 0.5e18);
         assertEq(controller.maxDeviation(), 0.9e18);
     }
 
-    function test_SetThresholdsUnauthorized() public {
+    function test_SetDeviationMinTooHigh() public {
+        vm.expectRevert(IRebalanceIncentivesController.RIC_INVALID_DEVIATIONS.selector);
+        controller.setDeviation(1.1e18, 0.9e18);
+    }
+
+    function test_SetDeviationMaxTooHigh() public {
+        vm.expectRevert(IRebalanceIncentivesController.RIC_INVALID_DEVIATIONS.selector);
+        controller.setDeviation(0.5e18, 1.1e18);
+    }
+
+    function test_SetDeviationUnauthorized() public {
         address unauthorized = address(0x123);
         vm.prank(unauthorized);
         vm.expectRevert("Ownable: caller is not the owner");
-        controller.setThresholds(0.5e18, 0.9e18);
+        controller.setDeviation(0.5e18, 0.9e18);
     }
 
     function test_CurrentThreshold() public {
@@ -98,7 +120,7 @@ contract RebalanceIncentivesControllerTest is VaultTestSuite {
 
     function test_CanRebalanceThresholdHigherThanMaxButFarmingAndVaultHasDebt() public {
         setBorrowLimits(0, 0, 0);
-        controller.setThresholds(0, 0);
+        controller.setDeviation(0, 0);
         setBorrowLimits(6e17, 7e17, 7e17);
 
         address user = vm.addr(1);
@@ -111,7 +133,7 @@ contract RebalanceIncentivesControllerTest is VaultTestSuite {
 
     function test_CanRebalanceThresholdHigherThanMaxButFarmingAndVaultHasNoDebt() public {
         setBorrowLimits(0, 0, 0);
-        controller.setThresholds(0, 0);
+        controller.setDeviation(0, 0);
         setBorrowLimits(6e17, 7e17, 7e17);
 
         address user = vm.addr(1);

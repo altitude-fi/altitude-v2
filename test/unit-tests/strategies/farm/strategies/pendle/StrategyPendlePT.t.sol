@@ -8,9 +8,10 @@ import {StrategyPendlePT} from "../../../../../../contracts/strategies/farming/s
 import {ISwapStrategy} from "../../../../../../contracts/interfaces/internal/strategy/swap/ISwapStrategy.sol";
 import "../../../../../../contracts/interfaces/internal/strategy/ISkimStrategy.sol";
 import {FarmStrategyUnitTest} from "../FarmStrategyUnitTest.sol";
+import "../../../../../../contracts/interfaces/internal/strategy/farming/IPendleFarmStrategy.sol";
 
 // Mocks
-import {RouterMock, OracleMock, MarketMock, RouterStaticMock} from "../../../../../mocks/PendleMock.sol";
+import {RouterMock, OracleMock, MarketMock, RouterStaticMock, SYMock} from "../../../../../mocks/PendleMock.sol";
 import "@pendle/core-v2/contracts/interfaces/IPMarket.sol";
 
 contract StrategyPendlePTTest is FarmStrategyUnitTest {
@@ -29,7 +30,7 @@ contract StrategyPendlePTTest is FarmStrategyUnitTest {
         oracle = address(new OracleMock(asset));
         market = new MarketMock(
             asset,
-            BaseGetter.getBaseERC20(18),
+            address(new SYMock(18)),
             BaseGetter.getBaseERC20(18),
             BaseGetter.getBaseERC20(18)
         );
@@ -84,6 +85,30 @@ contract StrategyPendlePTTest is FarmStrategyUnitTest {
         vm.prank(vm.addr(2));
         vm.expectRevert("Ownable: caller is not the owner");
         StrategyPendlePT(address(farmStrategy)).setRewardAssets(rewardAssets);
+    }
+
+    function test_SetSlippage() public {
+        StrategyPendlePT strategy = StrategyPendlePT(address(farmStrategy));
+        uint256 newSlippage = 5000; // 0.5%
+
+        strategy.setSlippage(newSlippage);
+        assertEq(strategy.slippage(), newSlippage);
+    }
+
+    function test_SetSlippageExceedsBase() public {
+        StrategyPendlePT strategy = StrategyPendlePT(address(farmStrategy));
+        uint256 invalidSlippage = strategy.SLIPPAGE_BASE() + 1;
+
+        vm.expectRevert(
+            abi.encodeWithSelector(IPendleFarmStrategy.PFS_SLIPPAGE.selector, strategy.slippage(), invalidSlippage)
+        );
+        strategy.setSlippage(invalidSlippage);
+    }
+
+    function test_NonOwnerSetsSlippage() public {
+        vm.prank(vm.addr(2));
+        vm.expectRevert("Ownable: caller is not the owner");
+        StrategyPendlePT(address(farmStrategy)).setSlippage(5000);
     }
 
     function test_Skim() public {

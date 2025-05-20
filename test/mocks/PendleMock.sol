@@ -3,6 +3,7 @@ pragma solidity 0.8.28;
 
 import {IToken} from "../interfaces/IToken.sol";
 import {TokensGenerator} from "../utils/TokensGenerator.sol";
+import {BaseERC20} from "../base/BaseERC20.sol";
 import "@pendle/core-v2/contracts/interfaces/IPMarket.sol";
 import "@pendle/core-v2/contracts/interfaces/IPAllActionV3.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
@@ -143,6 +144,20 @@ contract RouterStaticMock is TokensGenerator {
         return (exactYtIn, 0, 0, 0, 0, 0, 0, 0);
     }
 }
+
+contract SYMock is BaseERC20 {
+    constructor(uint8 decimals) BaseERC20(decimals, "BaseERC20", "BASE") {
+
+    }
+
+    function previewDeposit(
+        address tokenIn,
+        uint256 amountTokenToDeposit
+    ) external view returns (uint256) {
+        return amountTokenToDeposit;
+    }
+}
+
 
 contract MarketMock is ERC20("Token", "TKN") {
     address public asset;

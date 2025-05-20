@@ -6,7 +6,7 @@ pragma solidity 0.8.28;
  **/
 
 interface IRebalanceIncentivesController {
-    event UpdateRebalanceThresholds(uint256 minDeviation_, uint256 maxDeviation_);
+    event UpdateRebalanceDeviation(uint256 minDeviation_, uint256 maxDeviation_);
 
     // Rebalance Incentives Controller Errors
     error RIC_CAN_NOT_REBALANCE();
@@ -24,7 +24,7 @@ interface IRebalanceIncentivesController {
 
     function canRebalance() external view returns (bool);
 
-    function setThresholds(uint256 minDeviation_, uint256 maxDeviation_) external;
+    function setDeviation(uint256 minDeviation_, uint256 maxDeviation_) external;
 
     function rebalance() external;
 }
