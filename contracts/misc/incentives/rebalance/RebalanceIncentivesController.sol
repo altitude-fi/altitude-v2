@@ -35,23 +35,16 @@ contract RebalanceIncentivesController is Ownable, IRebalanceIncentivesControlle
      */
     constructor(address rewardToken_, address vaultAddress_, uint256 minDeviation_, uint256 maxDeviation_) {
         vault = vaultAddress_;
-        _validateDeviations(minDeviation_, maxDeviation_);
         rewardToken = rewardToken_;
 
-        minDeviation = minDeviation_;
-        maxDeviation = maxDeviation_;
+        _setDeviation(minDeviation_, maxDeviation_);
     }
 
-    /// @notice Set rebalance thresholds
+    /// @notice Set rebalance deviation
     /// @param minDeviation_ minDeviation_ value
     /// @param maxDeviation_ maxDeviation_ value
-    function setThresholds(uint256 minDeviation_, uint256 maxDeviation_) external override onlyOwner {
-        _validateDeviations(minDeviation_, maxDeviation_);
-
-        minDeviation = minDeviation_;
-        maxDeviation = maxDeviation_;
-
-        emit UpdateRebalanceThresholds(minDeviation_, maxDeviation_);
+    function setDeviation(uint256 minDeviation_, uint256 maxDeviation_) external override onlyOwner {
+        _setDeviation(minDeviation_, maxDeviation_);
     }
 
     function rebalance() external override {
@@ -117,5 +110,16 @@ contract RebalanceIncentivesController is Ownable, IRebalanceIncentivesControlle
             // 1e18 represents a 100%. minDeviation_ is in percentage
             revert RIC_INVALID_DEVIATIONS();
         }
+    }
+
+    /// @notice Internal function to set rebalance deviation
+    /// @param minDeviation_ minDeviation_ value
+    /// @param maxDeviation_ maxDeviation_ value
+    function _setDeviation(uint256 minDeviation_, uint256 maxDeviation_) internal {
+        _validateDeviations(minDeviation_, maxDeviation_);
+        minDeviation = minDeviation_;
+        maxDeviation = maxDeviation_;
+
+        emit UpdateRebalanceDeviation(minDeviation_, maxDeviation_);
     }
 }

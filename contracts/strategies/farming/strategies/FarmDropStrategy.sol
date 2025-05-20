@@ -24,8 +24,9 @@ abstract contract FarmDropStrategy is Ownable, FarmStrategy, IFarmDropStrategy {
         address farmAssetAddress,
         address farmDispatcherAddress,
         address rewardsAddress,
+        address[] memory rewardAssets_,
         address swapStrategyAddress
-    ) FarmStrategy(farmAssetAddress, farmDispatcherAddress, rewardsAddress, swapStrategyAddress) {}
+    ) FarmStrategy(farmAssetAddress, farmDispatcherAddress, rewardsAddress, rewardAssets_, swapStrategyAddress) {}
 
     /// @notice Set the threshold for reverting deposit/withdraw
     /// @param dropThreshold_ The new threshold in percentage (of DROP_UNITS, 1e18)

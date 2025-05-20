@@ -9,6 +9,8 @@ interface IBorrowVerifier {
     // Borrow Verifier Errors
     error BV_DEADLINE_PASSED();
     error BV_INVALID_SIGNATURE();
+    error BV_ONLY_VAULT();
+    error BV_INVALID_VAULT();
 
     function nonce(address) external returns (uint256);
 

@@ -25,9 +25,11 @@ library BaseGetter {
     function getBaseFarmStrategy(
         address assetAddress,
         address dispatcherAddress,
+        address[] memory rewardAssets_,
         address rewardsAddress
     ) external returns (address) {
-        return address(new BaseFarmStrategy(assetAddress, dispatcherAddress, rewardsAddress, address(0)));
+        return
+            address(new BaseFarmStrategy(assetAddress, dispatcherAddress, rewardsAddress, rewardAssets_, address(0)));
     }
 
     function getBaseLenderStrategy(

@@ -248,7 +248,12 @@ contract FarmDispatcherTest is Test {
     }
 
     function test_Dispatch() public {
-        address newStrategy1 = BaseGetter.getBaseFarmStrategy(workingAsset, address(dispatcher), address(dispatcher));
+        address newStrategy1 = BaseGetter.getBaseFarmStrategy(
+            workingAsset,
+            address(dispatcher),
+            new address[](0),
+            address(dispatcher)
+        );
         dispatcher.addStrategy(newStrategy1, CAP, address(0));
         IToken(workingAsset).mint(address(dispatcher), CAP);
         dispatcher.dispatch();
@@ -260,8 +265,18 @@ contract FarmDispatcherTest is Test {
     }
 
     function test_DispatchInManyStrategies() public {
-        address newStrategy1 = BaseGetter.getBaseFarmStrategy(workingAsset, address(dispatcher), address(dispatcher));
-        address newStrategy2 = BaseGetter.getBaseFarmStrategy(workingAsset, address(dispatcher), address(dispatcher));
+        address newStrategy1 = BaseGetter.getBaseFarmStrategy(
+            workingAsset,
+            address(dispatcher),
+            new address[](0),
+            address(dispatcher)
+        );
+        address newStrategy2 = BaseGetter.getBaseFarmStrategy(
+            workingAsset,
+            address(dispatcher),
+            new address[](0),
+            address(dispatcher)
+        );
         dispatcher.addStrategy(newStrategy1, CAP, address(0));
         dispatcher.addStrategy(newStrategy2, CAP, newStrategy1);
         IToken(workingAsset).mint(address(dispatcher), CAP * 2);
@@ -276,8 +291,18 @@ contract FarmDispatcherTest is Test {
     }
 
     function test_DispatchMoreThanCAP() public {
-        address newStrategy1 = BaseGetter.getBaseFarmStrategy(workingAsset, address(dispatcher), address(dispatcher));
-        address newStrategy2 = BaseGetter.getBaseFarmStrategy(workingAsset, address(dispatcher), address(dispatcher));
+        address newStrategy1 = BaseGetter.getBaseFarmStrategy(
+            workingAsset,
+            address(dispatcher),
+            new address[](0),
+            address(dispatcher)
+        );
+        address newStrategy2 = BaseGetter.getBaseFarmStrategy(
+            workingAsset,
+            address(dispatcher),
+            new address[](0),
+            address(dispatcher)
+        );
         dispatcher.addStrategy(newStrategy1, CAP, address(0));
         dispatcher.addStrategy(newStrategy2, CAP, newStrategy1);
         IToken(workingAsset).mint(address(dispatcher), CAP * 3);
@@ -293,7 +318,12 @@ contract FarmDispatcherTest is Test {
     }
 
     function test_DispatchLocalBalance() public {
-        address newStrategy1 = BaseGetter.getBaseFarmStrategy(workingAsset, address(dispatcher), address(dispatcher));
+        address newStrategy1 = BaseGetter.getBaseFarmStrategy(
+            workingAsset,
+            address(dispatcher),
+            new address[](0),
+            address(dispatcher)
+        );
         IToken(workingAsset).mint(address(dispatcher), CAP);
         dispatcher.addStrategy(newStrategy1, CAP, address(0));
         assertEq(IToken(workingAsset).balanceOf(address(dispatcher)), CAP);
@@ -312,7 +342,12 @@ contract FarmDispatcherTest is Test {
     }
 
     function test_Withdraw() public {
-        address newStrategy1 = BaseGetter.getBaseFarmStrategy(workingAsset, address(dispatcher), address(dispatcher));
+        address newStrategy1 = BaseGetter.getBaseFarmStrategy(
+            workingAsset,
+            address(dispatcher),
+            new address[](0),
+            address(dispatcher)
+        );
         dispatcher.addStrategy(newStrategy1, CAP, address(0));
         IToken(workingAsset).mint(address(dispatcher), CAP);
         vm.startPrank(vaultAddress);
@@ -328,8 +363,18 @@ contract FarmDispatcherTest is Test {
     }
 
     function test_WithdrawFromManyStrategies() public {
-        address newStrategy1 = BaseGetter.getBaseFarmStrategy(workingAsset, address(dispatcher), address(dispatcher));
-        address newStrategy2 = BaseGetter.getBaseFarmStrategy(workingAsset, address(dispatcher), address(dispatcher));
+        address newStrategy1 = BaseGetter.getBaseFarmStrategy(
+            workingAsset,
+            address(dispatcher),
+            new address[](0),
+            address(dispatcher)
+        );
+        address newStrategy2 = BaseGetter.getBaseFarmStrategy(
+            workingAsset,
+            address(dispatcher),
+            new address[](0),
+            address(dispatcher)
+        );
         dispatcher.addStrategy(newStrategy1, CAP * 2, address(0));
         dispatcher.addStrategy(newStrategy2, CAP * 2, newStrategy1);
         IToken(workingAsset).mint(address(dispatcher), CAP * 4);
@@ -350,7 +395,12 @@ contract FarmDispatcherTest is Test {
     }
 
     function test_WithdrawFromLocalBalance() public {
-        address newStrategy1 = BaseGetter.getBaseFarmStrategy(workingAsset, address(dispatcher), address(dispatcher));
+        address newStrategy1 = BaseGetter.getBaseFarmStrategy(
+            workingAsset,
+            address(dispatcher),
+            new address[](0),
+            address(dispatcher)
+        );
         dispatcher.addStrategy(newStrategy1, CAP, address(0));
         IToken(workingAsset).mint(address(dispatcher), CAP * 3);
         vm.startPrank(vaultAddress);
@@ -366,7 +416,12 @@ contract FarmDispatcherTest is Test {
     }
 
     function test_WithdrawFromLocalAndFromStrategy() public {
-        address newStrategy1 = BaseGetter.getBaseFarmStrategy(workingAsset, address(dispatcher), address(dispatcher));
+        address newStrategy1 = BaseGetter.getBaseFarmStrategy(
+            workingAsset,
+            address(dispatcher),
+            new address[](0),
+            address(dispatcher)
+        );
         dispatcher.addStrategy(newStrategy1, CAP, address(0));
         IToken(workingAsset).mint(address(dispatcher), CAP * 3);
         vm.startPrank(vaultAddress);
@@ -382,8 +437,18 @@ contract FarmDispatcherTest is Test {
     }
 
     function test_WithdrawAsMuchAsPossible() public {
-        address newStrategy1 = BaseGetter.getBaseFarmStrategy(workingAsset, address(dispatcher), address(dispatcher));
-        address newStrategy2 = BaseGetter.getBaseFarmStrategy(workingAsset, address(dispatcher), address(dispatcher));
+        address newStrategy1 = BaseGetter.getBaseFarmStrategy(
+            workingAsset,
+            address(dispatcher),
+            new address[](0),
+            address(dispatcher)
+        );
+        address newStrategy2 = BaseGetter.getBaseFarmStrategy(
+            workingAsset,
+            address(dispatcher),
+            new address[](0),
+            address(dispatcher)
+        );
         dispatcher.addStrategy(newStrategy1, CAP * 2, address(0));
         dispatcher.addStrategy(newStrategy2, CAP, newStrategy1);
 
@@ -410,7 +475,12 @@ contract FarmDispatcherTest is Test {
     }
 
     function test_WithdrawMoreThenDeposited() public {
-        address newStrategy1 = BaseGetter.getBaseFarmStrategy(workingAsset, address(dispatcher), address(dispatcher));
+        address newStrategy1 = BaseGetter.getBaseFarmStrategy(
+            workingAsset,
+            address(dispatcher),
+            new address[](0),
+            address(dispatcher)
+        );
         dispatcher.addStrategy(newStrategy1, CAP, address(0));
         IToken(workingAsset).mint(address(dispatcher), CAP);
         vm.startPrank(vaultAddress);
@@ -431,7 +501,12 @@ contract FarmDispatcherTest is Test {
     }
 
     function test_IncreaseMaxCAP() public {
-        address newStrategy1 = BaseGetter.getBaseFarmStrategy(workingAsset, address(dispatcher), address(dispatcher));
+        address newStrategy1 = BaseGetter.getBaseFarmStrategy(
+            workingAsset,
+            address(dispatcher),
+            new address[](0),
+            address(dispatcher)
+        );
         dispatcher.addStrategy(newStrategy1, CAP, address(0));
         dispatcher.setStrategyMax(newStrategy1, CAP * 2);
 
@@ -440,7 +515,12 @@ contract FarmDispatcherTest is Test {
     }
 
     function test_DecreaseMaxCAPPartially() public {
-        address newStrategy1 = BaseGetter.getBaseFarmStrategy(workingAsset, address(dispatcher), address(dispatcher));
+        address newStrategy1 = BaseGetter.getBaseFarmStrategy(
+            workingAsset,
+            address(dispatcher),
+            new address[](0),
+            address(dispatcher)
+        );
         dispatcher.addStrategy(newStrategy1, CAP * 2, address(0));
         IToken(workingAsset).mint(address(dispatcher), CAP * 2);
         vm.prank(vaultAddress);
@@ -456,7 +536,12 @@ contract FarmDispatcherTest is Test {
     }
 
     function test_DecreaseMaxCAPEntirely() public {
-        address newStrategy1 = BaseGetter.getBaseFarmStrategy(workingAsset, address(dispatcher), address(dispatcher));
+        address newStrategy1 = BaseGetter.getBaseFarmStrategy(
+            workingAsset,
+            address(dispatcher),
+            new address[](0),
+            address(dispatcher)
+        );
         dispatcher.addStrategy(newStrategy1, CAP * 2, address(0));
         IToken(workingAsset).mint(address(dispatcher), CAP * 2);
         vm.prank(vaultAddress);
@@ -482,7 +567,12 @@ contract FarmDispatcherTest is Test {
     }
 
     function test_DeactivateStrategy() public {
-        address newStrategy1 = BaseGetter.getBaseFarmStrategy(workingAsset, address(dispatcher), address(dispatcher));
+        address newStrategy1 = BaseGetter.getBaseFarmStrategy(
+            workingAsset,
+            address(dispatcher),
+            new address[](0),
+            address(dispatcher)
+        );
         dispatcher.addStrategy(newStrategy1, CAP, address(0));
         IToken(workingAsset).mint(address(dispatcher), CAP);
         vm.prank(vaultAddress);
@@ -516,7 +606,12 @@ contract FarmDispatcherTest is Test {
     }
 
     function test_EmergencyDeactivateStrategy() public {
-        address newStrategy1 = BaseGetter.getBaseFarmStrategy(workingAsset, address(dispatcher), address(dispatcher));
+        address newStrategy1 = BaseGetter.getBaseFarmStrategy(
+            workingAsset,
+            address(dispatcher),
+            new address[](0),
+            address(dispatcher)
+        );
 
         dispatcher.addStrategy(newStrategy1, CAP, address(0));
         IToken(workingAsset).mint(address(dispatcher), CAP);
@@ -549,8 +644,18 @@ contract FarmDispatcherTest is Test {
     }
 
     function test_SkipRevertStrategyDeposit() public {
-        address newStrategy1 = BaseGetter.getBaseFarmStrategy(workingAsset, address(dispatcher), address(dispatcher));
-        address newStrategy2 = BaseGetter.getBaseFarmStrategy(workingAsset, address(dispatcher), address(dispatcher));
+        address newStrategy1 = BaseGetter.getBaseFarmStrategy(
+            workingAsset,
+            address(dispatcher),
+            new address[](0),
+            address(dispatcher)
+        );
+        address newStrategy2 = BaseGetter.getBaseFarmStrategy(
+            workingAsset,
+            address(dispatcher),
+            new address[](0),
+            address(dispatcher)
+        );
 
         dispatcher.addStrategy(newStrategy1, CAP, address(0));
         dispatcher.addStrategy(newStrategy2, CAP, newStrategy1);
@@ -570,8 +675,18 @@ contract FarmDispatcherTest is Test {
     }
 
     function test_SkipRevertStrategyWithdraw() public {
-        address newStrategy1 = BaseGetter.getBaseFarmStrategy(workingAsset, address(dispatcher), address(dispatcher));
-        address newStrategy2 = BaseGetter.getBaseFarmStrategy(workingAsset, address(dispatcher), address(dispatcher));
+        address newStrategy1 = BaseGetter.getBaseFarmStrategy(
+            workingAsset,
+            address(dispatcher),
+            new address[](0),
+            address(dispatcher)
+        );
+        address newStrategy2 = BaseGetter.getBaseFarmStrategy(
+            workingAsset,
+            address(dispatcher),
+            new address[](0),
+            address(dispatcher)
+        );
 
         dispatcher.addStrategy(newStrategy1, CAP, address(0));
         dispatcher.addStrategy(newStrategy2, CAP, newStrategy1);
@@ -593,9 +708,24 @@ contract FarmDispatcherTest is Test {
     }
 
     function test_BalanceAvailable() public {
-        address newStrategy1 = BaseGetter.getBaseFarmStrategy(workingAsset, address(dispatcher), address(dispatcher));
-        address newStrategy2 = BaseGetter.getBaseFarmStrategy(workingAsset, address(dispatcher), address(dispatcher));
-        address newStrategy3 = BaseGetter.getBaseFarmStrategy(workingAsset, address(dispatcher), address(dispatcher));
+        address newStrategy1 = BaseGetter.getBaseFarmStrategy(
+            workingAsset,
+            address(dispatcher),
+            new address[](0),
+            address(dispatcher)
+        );
+        address newStrategy2 = BaseGetter.getBaseFarmStrategy(
+            workingAsset,
+            address(dispatcher),
+            new address[](0),
+            address(dispatcher)
+        );
+        address newStrategy3 = BaseGetter.getBaseFarmStrategy(
+            workingAsset,
+            address(dispatcher),
+            new address[](0),
+            address(dispatcher)
+        );
 
         dispatcher.addStrategy(newStrategy1, CAP, address(0));
         dispatcher.addStrategy(newStrategy2, CAP, newStrategy1);
@@ -622,7 +752,12 @@ contract FarmDispatcherTest is Test {
     }
 
     function test_GetNextStrategy() public {
-        address newStrategy1 = BaseGetter.getBaseFarmStrategy(workingAsset, address(dispatcher), address(dispatcher));
+        address newStrategy1 = BaseGetter.getBaseFarmStrategy(
+            workingAsset,
+            address(dispatcher),
+            new address[](0),
+            address(dispatcher)
+        );
         dispatcher.addStrategy(newStrategy1, CAP, address(0));
 
         assertEq(dispatcher.getNextStrategy(address(0)), newStrategy1);
@@ -630,9 +765,19 @@ contract FarmDispatcherTest is Test {
     }
 
     function test_RecognizeRewards() public {
-        address newStrategy1 = BaseGetter.getBaseFarmStrategy(workingAsset, address(dispatcher), address(dispatcher));
+        address newStrategy1 = BaseGetter.getBaseFarmStrategy(
+            workingAsset,
+            address(dispatcher),
+            new address[](0),
+            address(dispatcher)
+        );
 
-        address newStrategy2 = BaseGetter.getBaseFarmStrategy(workingAsset, address(dispatcher), address(dispatcher));
+        address newStrategy2 = BaseGetter.getBaseFarmStrategy(
+            workingAsset,
+            address(dispatcher),
+            new address[](0),
+            address(dispatcher)
+        );
 
         dispatcher.addStrategy(newStrategy1, CAP, address(0));
         dispatcher.addStrategy(newStrategy2, CAP, newStrategy1);
@@ -651,7 +796,12 @@ contract FarmDispatcherTest is Test {
     }
 
     function test_RecognizeRewardsWithErrors() public {
-        address newStrategy1 = BaseGetter.getBaseFarmStrategy(workingAsset, address(dispatcher), address(dispatcher));
+        address newStrategy1 = BaseGetter.getBaseFarmStrategy(
+            workingAsset,
+            address(dispatcher),
+            new address[](0),
+            address(dispatcher)
+        );
 
         // Simulate rewards recognition revert
         vm.mockCallRevert(
@@ -660,7 +810,12 @@ contract FarmDispatcherTest is Test {
             "REVERT_MESSAGE"
         );
 
-        address newStrategy2 = BaseGetter.getBaseFarmStrategy(workingAsset, address(dispatcher), address(dispatcher));
+        address newStrategy2 = BaseGetter.getBaseFarmStrategy(
+            workingAsset,
+            address(dispatcher),
+            new address[](0),
+            address(dispatcher)
+        );
 
         dispatcher.addStrategy(newStrategy1, CAP, address(0));
         dispatcher.addStrategy(newStrategy2, CAP, newStrategy1);

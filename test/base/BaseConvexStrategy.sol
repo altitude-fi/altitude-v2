@@ -10,8 +10,9 @@ contract BaseConvexStrategy is StrategyGenericPool, TokensGenerator {
     constructor(
         address farmDispatcherAddress,
         address rewardsAddress,
+        address[] memory rewardAssets_,
         IConvexFarmStrategy.Config memory config
-    ) StrategyGenericPool(farmDispatcherAddress, rewardsAddress, config) {}
+    ) StrategyGenericPool(farmDispatcherAddress, rewardsAddress, rewardAssets_, config) {}
 
     function _curveDeposit(uint256 toDeposit, uint256 minLPOut) internal override {
         // Remove the tokens from the balance
