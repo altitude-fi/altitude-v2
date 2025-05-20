@@ -4,7 +4,6 @@ pragma solidity 0.8.28;
 import "./StrategyPendleBase.sol";
 import "../../../../libraries/uniswap-v3/TransferHelper.sol";
 import "../../../../libraries/utils/Utils.sol";
-
 /**
  * @title StrategyPendleLP Contract
  * @dev Contract for providing liquidity to a Pendle market
@@ -47,6 +46,7 @@ contract StrategyPendleLP is StrategyPendleBase {
             revert PFS_MARKET_EXPIRED();
         }
 
+        // LP rate is the only one in asset decimals, instead of 18
         uint256 twapLpRate = oracle.getLpToSyRate(address(market), twapDuration);
         uint256 twapYtRate = oracle.getYtToSyRate(address(market), twapDuration);
         amount = _swap(asset, farmAsset, amount);
@@ -60,10 +60,9 @@ contract StrategyPendleLP is StrategyPendleBase {
             _createTokenInputStruct(amount)
         );
 
-        uint256 outputWorth = Utils.scaleAmount(netLpOut * twapLpRate, 36, SY_DECIMALS) +
-            ((netYtOut * twapYtRate) / 1e18);
+        uint256 outputWorth = ((netLpOut * twapLpRate) / 1e18) + ((netYtOut * twapYtRate) / 1e18);
 
-        _validateRate(amount, outputWorth);
+        _validateRate(SY.previewDeposit(farmAsset, amount), outputWorth);
     }
 
     /// @notice Redeem LP tokens from Pendle market
@@ -75,8 +74,8 @@ contract StrategyPendleLP is StrategyPendleBase {
             amountToWithdraw = swapStrategy.getAmountIn(farmAsset, asset, amountToWithdraw);
         }
         uint256 farmAssetWant = amountToWithdraw;
-
         uint256 lpBalance = market.balanceOf(address(this));
+
         if (lpBalance > 0) {
             // Value if we remove all of our LP
             (uint256 farmBalance, , , , , , , ) = routerStatic.removeLiquiditySingleTokenStatic(
@@ -91,12 +90,15 @@ contract StrategyPendleLP is StrategyPendleBase {
                 amountToWithdraw = lpBalance;
             } else {
                 // Determine LP needed by proportion
-                amountToWithdraw = (lpBalance * (((amountToWithdraw * 1e18) / farmBalance) + 1)) / 1e18;
+                uint256 lpToWithdraw = (lpBalance * amountToWithdraw) / farmBalance;
+                uint256 lpBalanceReversed = (lpToWithdraw * farmBalance) / amountToWithdraw;
+                amountToWithdraw = lpToWithdraw + (lpBalance - lpBalanceReversed);
             }
 
+            // LP rate is the only one in asset decimals, instead of 18
             uint256 twapLpRate = oracle.getLpToSyRate(address(market), twapDuration);
             uint256 netTokenOut = _withdrawLP(amountToWithdraw);
-            _validateRate(Utils.scaleAmount(amountToWithdraw * twapLpRate, 36, SY_DECIMALS), netTokenOut);
+            _validateRate((amountToWithdraw * twapLpRate) / 1e18, SY.previewDeposit(farmAsset, netTokenOut));
 
             /// @dev amountToWithdraw is being reassigned in farmAsset token
             amountToWithdraw = Utils.subOrZero(farmAssetWant, netTokenOut);
@@ -109,12 +111,9 @@ contract StrategyPendleLP is StrategyPendleBase {
 
             if (ytBalance > 0) {
                 // amountToWithdraw is reassigned as amount of YT tokens needed to receive requested amount of farm asset
-                try routerStatic.swapYtForExactSyStatic(address(market), amountToWithdraw) returns (
-                    uint256 netYtIn,
-                    uint256,
-                    uint256,
-                    uint256
-                ) {
+                try
+                    routerStatic.swapYtForExactSyStatic(address(market), SY.previewDeposit(farmAsset, amountToWithdraw))
+                returns (uint256 netYtIn, uint256, uint256, uint256) {
                     if (netYtIn > ytBalance) {
                         // If requested amount is more than we have - withdraw all
                         amountToWithdraw = ytBalance;
@@ -129,7 +128,7 @@ contract StrategyPendleLP is StrategyPendleBase {
 
                 uint256 twapYtRate = oracle.getYtToSyRate(address(market), twapDuration);
                 uint256 netTokenOut = _withdrawYT(amountToWithdraw);
-                _validateRate((amountToWithdraw * twapYtRate) / 1e18, netTokenOut);
+                _validateRate((amountToWithdraw * twapYtRate) / 1e18, SY.previewDeposit(farmAsset, netTokenOut));
             }
         }
 

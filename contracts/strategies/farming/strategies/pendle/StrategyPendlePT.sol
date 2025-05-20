@@ -58,7 +58,8 @@ contract StrategyPendlePT is StrategyPendleBase {
             _createTokenInputStruct(amount),
             _emptyLimit()
         );
-        _validateRate((amount * 1e18) / twapRate, netPtOut);
+
+        _validateRate((SY.previewDeposit(farmAsset, amount) * 1e18) / twapRate, netPtOut);
     }
 
     function _exitExpiredMarket() internal returns (bool) {
@@ -89,12 +90,9 @@ contract StrategyPendlePT is StrategyPendleBase {
             uint256 ptBalance = PT.balanceOf(address(this));
 
             // amountToWithdraw is going to be reassigned as amount of PT tokens needed to receive requested amount of farm asset
-            try routerStatic.swapPtForExactSyStatic(address(market), amountToWithdraw) returns (
-                uint256 netPtIn,
-                uint256,
-                uint256,
-                uint256
-            ) {
+            try
+                routerStatic.swapPtForExactSyStatic(address(market), SY.previewDeposit(farmAsset, amountToWithdraw))
+            returns (uint256 netPtIn, uint256, uint256, uint256) {
                 if (netPtIn > ptBalance) {
                     // If requested amount is more than we have - withdraw all
                     amountToWithdraw = ptBalance;
@@ -115,7 +113,7 @@ contract StrategyPendlePT is StrategyPendleBase {
                 _emptyTokenOutputStruct(),
                 _emptyLimit()
             );
-            _validateRate((amountToWithdraw * twapRate) / 1e18, netTokenOut);
+            _validateRate((amountToWithdraw * twapRate) / 1e18, SY.previewDeposit(farmAsset, netTokenOut));
         }
 
         // Swap the farm asset to borrow asset (if required)
@@ -141,7 +139,7 @@ contract StrategyPendlePT is StrategyPendleBase {
         }
     }
 
-    /// @notice Return farm asset ammount specific for the farm provider
+    /// @notice Return farm asset amount specific for the farm provider
     function _getFarmAssetAmount() internal view virtual override returns (uint256) {
         uint256 ptBalance = PT.balanceOf(address(this));
         if (ptBalance > 0) {

@@ -139,7 +139,7 @@ contract SnapshotableManager is VaultStorage, HarvestableManager, SupplyLossMana
         // interestIndex update must exclude the injected supply
         debtToken.snapshot();
         supplyToken.snapshot();
-        // Deposit will update the stored lender balance
+        // Deposit will update the stored lender borrow and supply balance
         uint256 actualInjected = ILenderStrategy(activeLenderStrategy).deposit(amountToInject);
         // And now the new balance is at the previously calculated index,
         // so the injected supply isn't seen and distributed as interest

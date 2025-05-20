@@ -30,8 +30,6 @@ contract PoolGUSD is ConvexStrategy {
             0x0aE274c98c0415C0651AF8cF52b010136E4a0082,
             Constants.convex_Booster, // convex
             10, // convex pid
-            Constants.CVX,
-            Constants.CRV,
             0x7A7bBf95C44b144979360C3300B54A7D34b44985,
             2,
             BaseGetter.getBaseSwapStrategy(BaseGetter.getBasePriceSource()),
@@ -40,6 +38,10 @@ contract PoolGUSD is ConvexStrategy {
             Constants.USDC
         );
 
-        farmStrategy = new StrategyMetaPool(dispatcher, dispatcher, config);
+        address[] memory rewardAssets = new address[](2);
+        rewardAssets[0] = Constants.CVX;
+        rewardAssets[1] = Constants.CRV;
+
+        farmStrategy = new StrategyMetaPool(dispatcher, dispatcher, rewardAssets, config);
     }
 }

@@ -11,7 +11,7 @@ import {FarmStrategyUnitTest} from "../FarmStrategyUnitTest.sol";
 import "../../../../../../contracts/interfaces/internal/strategy/farming/IPendleFarmStrategy.sol";
 
 // Mocks
-import {RouterMock, OracleMock, MarketMock, RouterStaticMock} from "../../../../../mocks/PendleMock.sol";
+import {RouterMock, OracleMock, MarketMock, RouterStaticMock, SYMock} from "../../../../../mocks/PendleMock.sol";
 import "@pendle/core-v2/contracts/interfaces/IPMarket.sol";
 
 contract StrategyPendlePTTest is FarmStrategyUnitTest {
@@ -30,7 +30,7 @@ contract StrategyPendlePTTest is FarmStrategyUnitTest {
         oracle = address(new OracleMock(asset));
         market = new MarketMock(
             asset,
-            BaseGetter.getBaseERC20(18),
+            address(new SYMock(18)),
             BaseGetter.getBaseERC20(18),
             BaseGetter.getBaseERC20(18)
         );

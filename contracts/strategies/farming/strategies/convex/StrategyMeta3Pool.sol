@@ -15,8 +15,9 @@ contract StrategyMeta3Pool is StrategyGenericPool {
     constructor(
         address farmDispatcherAddress,
         address rewardsAddress,
+        address[] memory rewardAssets_,
         IConvexFarmStrategy.Config memory config
-    ) StrategyGenericPool(farmDispatcherAddress, rewardsAddress, config) {}
+    ) StrategyGenericPool(farmDispatcherAddress, rewardsAddress, rewardAssets_, config) {}
 
     /// @notice Used to deposit into Curve meta 3 pool
     /// @param toDeposit The amount of tokens to deposit

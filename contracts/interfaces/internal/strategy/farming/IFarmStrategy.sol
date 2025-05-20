@@ -13,8 +13,11 @@ interface IFarmStrategy is ISwapStrategyConfiguration {
     event RewardsRecognition(uint256 rewards);
     event EmergencyWithdraw();
     event EmergencySwap();
+    event SetRewardAssets(address[] oldAssets, address[] newAssets);
 
     error FS_ONLY_DISPATCHER();
+
+    function rewardAssets(uint256) external returns (address);
 
     function asset() external view returns (address);
 
@@ -37,4 +40,6 @@ interface IFarmStrategy is ISwapStrategyConfiguration {
     function balance() external view returns (uint256);
 
     function balanceAvailable() external view returns (uint256);
+
+    function setRewardAssets(address[] memory rewardAssets_) external;
 }

@@ -22,8 +22,6 @@ interface IConvexFarmStrategy is IFarmStrategy {
         address zapPool;
         address convex;
         uint256 convexPoolID;
-        address cvx;
-        address crv;
         address crvRewards;
         uint128 assetIndex;
         address swapStrategy;
@@ -51,10 +49,6 @@ interface IConvexFarmStrategy is IFarmStrategy {
     function convex() external view returns (IConvex);
 
     function convexPoolID() external view returns (uint256);
-
-    function cvx() external view returns (IERC20);
-
-    function crv() external view returns (IERC20);
 
     function crvRewards() external view returns (ICVXRewards);
 

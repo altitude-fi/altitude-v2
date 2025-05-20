@@ -62,6 +62,7 @@ contract HarvestableManager is VaultStorage, IHarvestableManager {
         // Update global variables
         harvestStorage.realUncommittedEarnings += newHarvest.farmEarnings;
         harvestStorage.harvests.push(newHarvest);
+        // @dev interestIndex is at current value due to an earlier _updateInterest() call
         snapshots.push(
             CommonTypes.SnapshotType(
                 numberOfHarvests,
