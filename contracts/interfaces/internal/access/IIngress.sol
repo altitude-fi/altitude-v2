@@ -64,7 +64,7 @@ interface IIngress is IAccessControl {
 
     function validateWithdraw(address withdrawer, address recipient, uint256 amount) external;
 
-    function validateBorrow(address borrower, address recipient, uint256 amount) external;
+    function validateBorrow(uint256 amount, address onBehalfOf, address receiver) external;
 
     function validateRepay(address repayer, address recipient) external view;
 

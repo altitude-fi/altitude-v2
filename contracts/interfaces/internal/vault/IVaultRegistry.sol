@@ -43,9 +43,7 @@ interface IVaultRegistryV1 {
         address indexed vault,
         address liquidatableManager,
         uint256 maxPositionLiquidation,
-        uint256 liquidationBonus,
-        uint256 minUsersToLiquidate,
-        uint256 minRepayAmount
+        uint256 liquidationBonus
     );
 
     event UpdateBorrowLimits(

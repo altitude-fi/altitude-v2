@@ -257,10 +257,10 @@ contract VaultRegistryTest is Test {
         vaultRegistry.setLiquidationConfig(
             deployer.supplyAsset(),
             deployer.borrowAsset(),
-            VaultTypes.LiquidatableConfig(address(0), 1e18, 1e18, 0, 0)
+            VaultTypes.LiquidatableConfig(address(0), 1e18, 1e18)
         );
 
-        (address liquidatableManager, , , , ) = vault.getLiquidationConfig();
+        (address liquidatableManager, , ) = vault.getLiquidationConfig();
         assertEq(liquidatableManager, address(0));
     }
 
@@ -272,7 +272,7 @@ contract VaultRegistryTest is Test {
         vaultRegistry.setLiquidationConfig(
             supplyAsset,
             borrowAsset,
-            VaultTypes.LiquidatableConfig(address(0), 1e18, 1e18, 0, 0)
+            VaultTypes.LiquidatableConfig(address(0), 1e18, 1e18)
         );
     }
 
@@ -285,7 +285,7 @@ contract VaultRegistryTest is Test {
         vaultRegistry.setLiquidationConfig(
             supplyAsset,
             borrowAsset,
-            VaultTypes.LiquidatableConfig(address(0), 1e18, 1e18, 0, 0)
+            VaultTypes.LiquidatableConfig(address(0), 1e18, 1e18)
         );
     }
 
@@ -298,7 +298,7 @@ contract VaultRegistryTest is Test {
         vaultRegistry.setLiquidationConfig(
             supplyAsset,
             borrowAsset,
-            VaultTypes.LiquidatableConfig(address(0), 1e18, 1e18 + 1, 0, 0)
+            VaultTypes.LiquidatableConfig(address(0), 1e18, 1e18 + 1)
         );
     }
 
@@ -311,7 +311,7 @@ contract VaultRegistryTest is Test {
         vaultRegistry.setLiquidationConfig(
             supplyAsset,
             borrowAsset,
-            VaultTypes.LiquidatableConfig(address(0), 1e18 + 1, 1e18, 0, 0)
+            VaultTypes.LiquidatableConfig(address(0), 1e18 + 1, 1e18)
         );
     }
 

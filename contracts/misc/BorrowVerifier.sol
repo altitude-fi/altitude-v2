@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: BUSL-1.1
 pragma solidity 0.8.28;
 
-import "@openzeppelin/contracts/utils/cryptography/draft-EIP712.sol";
+import "@openzeppelin/contracts/utils/cryptography/EIP712.sol";
 import "../interfaces/internal/misc/IBorrowVerifier.sol";
 
 /**
@@ -12,8 +12,21 @@ import "../interfaces/internal/misc/IBorrowVerifier.sol";
 
 contract BorrowVerifier is IBorrowVerifier, EIP712 {
     mapping(address => uint256) public override nonce;
+    address public vault;
 
-    constructor() EIP712("AltitudeBorrowVerifier", "1") {}
+    modifier onlyVault() {
+        if (msg.sender != vault) {
+            revert BV_ONLY_VAULT();
+        }
+        _;
+    }
+
+    constructor(address _vault) EIP712("AltitudeBorrowVerifier", "1") {
+        if (_vault == address(0)) {
+            revert BV_INVALID_VAULT();
+        }
+        vault = _vault;
+    }
 
     /// @notice Verifies the borrow parameters against the signature and burns a nonce
     /// @param amount The amount to borrow
@@ -27,7 +40,7 @@ contract BorrowVerifier is IBorrowVerifier, EIP712 {
         address receiver,
         uint256 deadline,
         bytes calldata signature
-    ) external override {
+    ) external override onlyVault {
         if (block.timestamp > deadline) {
             revert BV_DEADLINE_PASSED();
         }

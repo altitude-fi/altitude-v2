@@ -30,8 +30,6 @@ contract PoolCRVUSD_GHO is ConvexStrategy {
             Constants.curve_Pool_crvUSD_GHO,
             Constants.convex_Booster, // convex
             213, // convex pid
-            Constants.CVX,
-            Constants.CRV,
             0xC25d31c9DFBa32e3609233291772CACB30303338,
             1,
             BaseGetter.getBaseSwapStrategy(BaseGetter.getBasePriceSource()),
@@ -40,6 +38,10 @@ contract PoolCRVUSD_GHO is ConvexStrategy {
             Constants.crvUSD
         );
 
-        farmStrategy = new StrategyStable2Pool(dispatcher, dispatcher, config);
+        address[] memory rewardAssets = new address[](2);
+        rewardAssets[0] = Constants.CVX;
+        rewardAssets[1] = Constants.CRV;
+
+        farmStrategy = new StrategyStable2Pool(dispatcher, dispatcher, rewardAssets, config);
     }
 }

@@ -17,10 +17,10 @@ import "../../../interfaces/internal/strategy/farming/IFarmDispatcher.sol";
  **/
 
 abstract contract FarmStrategy is Ownable, SwapStrategyConfiguration, IFarmStrategy {
-    bool public override inEmergency;
     address public override asset; // baseAsset of farmDispatcher
     address public override farmAsset; // asset of the farm
     address public override farmDispatcher; // farmDispatcher address
+    address[] public override rewardAssets; // reward tokens to recognise
     address public override rewardsRecipient; // where to send rewards
 
     modifier onlyDispatcher() {
@@ -33,17 +33,28 @@ abstract contract FarmStrategy is Ownable, SwapStrategyConfiguration, IFarmStrat
     /// @param farmAssetAddress The address of the token we are farming with
     /// @param farmDispatcherAddress The manager of the strategy
     /// @param rewardsAddress Where to send any reward tokens
+    /// @param rewardAssets_ Reward tokens to recognise
     /// @param swapStrategyAddress Swap strategy needed in case farmAsset != baseAsset
     constructor(
         address farmAssetAddress,
         address farmDispatcherAddress,
         address rewardsAddress,
+        address[] memory rewardAssets_,
         address swapStrategyAddress
     ) SwapStrategyConfiguration(swapStrategyAddress) {
         farmAsset = farmAssetAddress;
         farmDispatcher = farmDispatcherAddress;
         rewardsRecipient = rewardsAddress;
+        rewardAssets = rewardAssets_;
         asset = IFarmDispatcher(farmDispatcher).asset();
+    }
+
+    /// @notice Sets the reward tokens to be recognised
+    /// @param rewardAssets_ Token addresses
+    function setRewardAssets(address[] memory rewardAssets_) external onlyOwner {
+        emit SetRewardAssets(rewardAssets, rewardAssets_);
+
+        rewardAssets = rewardAssets_;
     }
 
     /// @notice Deposits own funds into the Farm Provider
@@ -65,11 +76,16 @@ abstract contract FarmStrategy is Ownable, SwapStrategyConfiguration, IFarmStrat
     function withdraw(
         uint256 amountRequested
     ) public virtual override onlyDispatcher returns (uint256 amountWithdrawn) {
-        if (amountRequested > 0 && !inEmergency) {
+        if (amountRequested > 0) {
+            // When trying to withdraw all
+            if (amountRequested == type(uint256).max) {
+                // balanceAvailable() skips the swap slippage check, as that will happen in the actual withdraw
+                amountRequested = balanceAvailable();
+            }
+
             _withdraw(amountRequested);
             amountWithdrawn = IERC20(asset).balanceOf(address(this));
 
-            // Gas optimizations
             if (amountWithdrawn > 0) {
                 TransferHelper.safeTransfer(asset, msg.sender, amountWithdrawn);
             }
@@ -85,8 +101,6 @@ abstract contract FarmStrategy is Ownable, SwapStrategyConfiguration, IFarmStrat
     function emergencyWithdraw() public virtual onlyOwner {
         _emergencyWithdraw();
 
-        // Set inEmergency to true to lock the balance of the contract to not be withdrawable
-        inEmergency = true;
         emit EmergencyWithdraw();
     }
 
@@ -95,28 +109,18 @@ abstract contract FarmStrategy is Ownable, SwapStrategyConfiguration, IFarmStrat
     /// @return amountWithdrawn The amount withdrawn after swap
     function emergencySwap(
         address[] calldata assets
-    ) public virtual override onlyDispatcher returns (uint256 amountWithdrawn) {
-        if (!inEmergency) {
-            revert FM_NOT_IN_EMERGENCY_MODE();
-        }
-
+    ) public virtual override onlyOwner returns (uint256 amountWithdrawn) {
         _emergencySwap(assets);
+
         amountWithdrawn = IERC20(asset).balanceOf(address(this));
+        TransferHelper.safeTransfer(asset, farmDispatcher, amountWithdrawn);
 
-        TransferHelper.safeTransfer(asset, msg.sender, amountWithdrawn);
-
-        inEmergency = false;
         emit EmergencySwap();
     }
 
     /// @notice Claim and swap reward tokens to base asset. Then transfer to the dispatcher for compounding
     /// @return rewards An amount of rewards being recognised
     function recogniseRewardsInBase() public virtual override returns (uint256 rewards) {
-        // During an emergency balances should stay in the contract
-        if (inEmergency) {
-            revert FS_IN_EMERGENCY_MODE();
-        }
-
         _recogniseRewardsInBase();
 
         rewards = IERC20(asset).balanceOf(address(this));
@@ -126,14 +130,13 @@ abstract contract FarmStrategy is Ownable, SwapStrategyConfiguration, IFarmStrat
     }
 
     /// @notice Return the balance in borrow asset excluding rewards (includes slippage validations)
-    /// @dev Reverts is slippage is too high
+    /// @dev Reverts if slippage is too high
     /// @return balance that can be withdrawn from the farm
     function balance() public view virtual returns (uint256) {
         // Get amount of tokens
         uint256 farmAssetAmount = _getFarmAssetAmount();
         (uint256 totalBalance, uint256 swapAmount) = _balance(farmAssetAmount);
 
-        // gas optimisations
         if (swapAmount > 0) {
             // Validate slippage
             uint256 minimumAssetAmount = swapStrategy.getMinimumAmountOut(farmAsset, asset, farmAssetAmount);
@@ -149,7 +152,7 @@ abstract contract FarmStrategy is Ownable, SwapStrategyConfiguration, IFarmStrat
     }
 
     /// @notice Return the balance in borrow asset excluding rewards (no slippage validations)
-    /// @dev Function will not revert on high slippage, should not be used when executing transactions
+    /// @dev Function will not revert on high slippage, should used with care in transactions
     /// @return availableBalance Balance that can be withdrawn from the farm
     function balanceAvailable() public view virtual returns (uint256 availableBalance) {
         // No slippage validations
@@ -184,8 +187,33 @@ abstract contract FarmStrategy is Ownable, SwapStrategyConfiguration, IFarmStrat
 
     function _emergencyWithdraw() internal virtual;
 
-    function _emergencySwap(address[] calldata assets) internal virtual;
-
-    /// @notice Internal reusable function
     function _recogniseRewardsInBase() internal virtual;
+
+    /// @notice Swap assets to borrow asset
+    /// @param assets Array of assets to swap
+    function _emergencySwap(address[] calldata assets) internal virtual {
+        for (uint256 i; i < assets.length; ++i) {
+            _swap(assets[i], asset, type(uint256).max);
+        }
+    }
+
+    /// @notice Swap between different assets
+    /// @param inputAsset Input asset address
+    /// @param outputAsset Output asset address
+    /// @param amount Amount to swap
+    function _swap(address inputAsset, address outputAsset, uint256 amount) internal virtual returns (uint256) {
+        if (inputAsset != outputAsset) {
+            if (amount == type(uint256).max) {
+                amount = IERC20(inputAsset).balanceOf(address(this));
+            }
+
+            if (amount > 0) {
+                TransferHelper.safeApprove(inputAsset, address(swapStrategy), amount);
+
+                amount = swapStrategy.swapInBase(inputAsset, outputAsset, amount);
+            }
+        }
+
+        return amount;
+    }
 }

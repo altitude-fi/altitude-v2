@@ -172,4 +172,21 @@ contract IngressTest is Test {
         assertEq(ingress.isFunctionDisabled(newFunctions[0]), true);
         assertEq(ingress.isFunctionDisabled(newFunctions[1]), false);
     }
+
+    function test_rateLimitPermissions() public {
+        vm.startPrank(someUser);
+        vm.expectRevert();
+        ingress.validateWithdraw(address(1), address(1), 1);
+        vm.expectRevert();
+        ingress.validateBorrow(1, address(1), address(1));
+        vm.expectRevert();
+        ingress.validateClaimRewards(address(1), 1);
+        vm.stopPrank();
+
+        vm.startPrank(gammaUser);
+        ingress.validateWithdraw(address(1), address(1), 1);
+        ingress.validateBorrow(1, address(1), address(1));
+        ingress.validateClaimRewards(address(1), 1);
+        vm.stopPrank();
+    }
 }

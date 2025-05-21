@@ -740,11 +740,11 @@ contract SupplyLossScenariosTests is VaultTestSuite {
 
         // 4. Liquidate negative users
         // Reset the user to be for 50% liquidation only
-        (address liquidatableManager, , , , ) = vault.getLiquidationConfig();
+        (address liquidatableManager, , ) = vault.getLiquidationConfig();
         vaultRegistry.setLiquidationConfig(
             deployer.supplyAsset(),
             deployer.borrowAsset(),
-            VaultTypes.LiquidatableConfig(liquidatableManager, 5e17, 1e16, 0, 0)
+            VaultTypes.LiquidatableConfig(liquidatableManager, 5e17, 1e16)
         );
         uint256 liquidationAmount = vault.debtToken().balanceOf(users[2]);
         address[] memory liquidationUsers = new address[](1);

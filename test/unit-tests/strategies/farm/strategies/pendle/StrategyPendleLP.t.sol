@@ -8,11 +8,12 @@ import {BaseGetter} from "../../../../../base/BaseGetter.sol";
 import {StrategyPendleLP} from "../../../../../../contracts/strategies/farming/strategies/pendle/StrategyPendleLP.sol";
 import {ISwapStrategy} from "../../../../../../contracts/interfaces/internal/strategy/swap/ISwapStrategy.sol";
 import {FarmStrategyUnitTest} from "../FarmStrategyUnitTest.sol";
+import {IPendleFarmStrategy} from "../../../../../../contracts/interfaces/internal/strategy/farming/IPendleFarmStrategy.sol";
 
 import "../../../../../../contracts/interfaces/internal/strategy/ISkimStrategy.sol";
 
 // Mocks
-import {RouterMock, OracleMock, MarketMock, RouterStaticMock} from "../../../../../mocks/PendleMock.sol";
+import {RouterMock, OracleMock, MarketMock, RouterStaticMock, SYMock} from "../../../../../mocks/PendleMock.sol";
 import "@pendle/core-v2/contracts/interfaces/IPMarket.sol";
 
 contract StrategyPendleLPTest is FarmStrategyUnitTest {
@@ -31,7 +32,7 @@ contract StrategyPendleLPTest is FarmStrategyUnitTest {
         oracle = address(new OracleMock(asset));
         market = new MarketMock(
             asset,
-            BaseGetter.getBaseERC20(18),
+            address(new SYMock(18)),
             BaseGetter.getBaseERC20(18),
             BaseGetter.getBaseERC20(18)
         );
@@ -116,6 +117,71 @@ contract StrategyPendleLPTest is FarmStrategyUnitTest {
         vm.prank(vm.addr(2));
         vm.expectRevert("Ownable: caller is not the owner");
         StrategyPendleLP(address(farmStrategy)).skim(skimAssets, address(this));
+    }
+
+    function test_RevertWhenMarketIsExpired() public {
+        MarketMock expiredMarket = new MarketMock(
+            asset,
+            BaseGetter.getBaseERC20(18),
+            BaseGetter.getBaseERC20(18),
+            BaseGetter.getBaseERC20(18)
+        );
+        // Set isExpired to true
+        vm.mockCall(address(expiredMarket), abi.encodeWithSignature("isExpired()"), abi.encode(true));
+
+        // Verify isExpired is true
+        assertTrue(expiredMarket.isExpired());
+
+        address[] memory rewardAssets = new address[](1);
+        rewardAssets[0] = rewardAsset;
+
+        address[] memory nonSkimableAssets = new address[](2);
+        nonSkimableAssets[0] = asset;
+        nonSkimableAssets[1] = rewardAsset;
+
+        address swapStrategy = address(BaseGetter.getBaseSwapStrategy(BaseGetter.getBasePriceSource()));
+
+        vm.expectRevert(IPendleFarmStrategy.PFS_MARKET_EXPIRED.selector);
+        new StrategyPendleLP(
+            dispatcher,
+            swapStrategy,
+            router,
+            routerStatic,
+            oracle,
+            address(expiredMarket),
+            asset,
+            0,
+            address(this),
+            rewardAssets,
+            nonSkimableAssets
+        );
+    }
+
+    function test_RevertWhenSlippageTooHigh() public {
+        address[] memory rewardAssets = new address[](1);
+        rewardAssets[0] = rewardAsset;
+
+        address[] memory nonSkimableAssets = new address[](2);
+        nonSkimableAssets[0] = asset;
+        nonSkimableAssets[1] = rewardAsset;
+
+        address swapStrategy = address(BaseGetter.getBaseSwapStrategy(BaseGetter.getBasePriceSource()));
+        uint256 invalidSlippage = IPendleFarmStrategy(address(farmStrategy)).SLIPPAGE_BASE() + 1; // slippage > SLIPPAGE_BASE
+
+        vm.expectRevert(IPendleFarmStrategy.PFS_INVALID_SLIPPAGE.selector);
+        new StrategyPendleLP(
+            dispatcher,
+            swapStrategy,
+            router,
+            routerStatic,
+            oracle,
+            address(market),
+            asset,
+            invalidSlippage,
+            address(this),
+            rewardAssets,
+            nonSkimableAssets
+        );
     }
 
     function test_RewardsRecognition() public {

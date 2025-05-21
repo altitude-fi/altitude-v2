@@ -165,6 +165,7 @@ contract VaultGroomableTest is VaultTestSuite {
         address newStrategy1 = BaseGetter.getBaseFarmStrategy(
             vault.borrowUnderlying(),
             address(oldFarmDispatcher),
+            new address[](0),
             address(oldFarmDispatcher)
         );
         oldFarmDispatcher.addStrategy(newStrategy1, type(uint256).max, address(0));
@@ -188,6 +189,7 @@ contract VaultGroomableTest is VaultTestSuite {
         address newStrategy1 = BaseGetter.getBaseFarmStrategy(
             vault.borrowUnderlying(),
             address(oldFarmDispatcher),
+            new address[](0),
             address(oldFarmDispatcher)
         );
         oldFarmDispatcher.addStrategy(newStrategy1, type(uint256).max, address(0));

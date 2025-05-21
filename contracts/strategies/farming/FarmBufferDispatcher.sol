@@ -12,7 +12,7 @@ import "../../interfaces/internal/strategy/farming/IFarmBufferDispatcher.sol";
  **/
 
 contract FarmBufferDispatcher is FarmDispatcher, IFarmBufferDispatcher {
-    /** @notice Buffer for gas optimizaiton */
+    /** @notice Buffer for gas optimization */
     IFarmBuffer public override farmBuffer;
 
     function initialize(
@@ -96,6 +96,8 @@ contract FarmBufferDispatcher is FarmDispatcher, IFarmBufferDispatcher {
         if (amountLeft > 0) {
             TransferHelper.safeApprove(asset, address(farmBuffer), amountLeft);
             amountLeft = farmBuffer.fill(amountLeft);
+            // Reset approval
+            TransferHelper.safeApprove(asset, address(farmBuffer), 0);
         }
     }
 }

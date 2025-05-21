@@ -16,6 +16,7 @@ library Constants {
     address public constant sUSDe = 0x9D39A5DE30e57443BfF2A8307A4256c8797A3497;
     address public constant USDC = 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48;
     address public constant USDT = 0xdAC17F958D2ee523a2206206994597C13D831ec7;
+    address public constant aUSDC = 0x98C23E9d8f34FEFb1B7BD6a91B7FF122F4e16F5c;
 
     // Account addresses
     address public constant account_ALPHA = 0xACd03dadf67eCEEF4b5f871ACe553E4f79ea48a4;
@@ -107,4 +108,5 @@ library Constants {
     address public constant pendle_Router = 0x888888888889758F76e7103c6CbF23ABbF58F946;
     address public constant pendle_RouterStatic = 0x263833d47eA3fA4a30f269323aba6a107f9eB14C;
     address public constant pendle_Market_SUSDE_Mar_25 = 0xcDd26Eb5EB2Ce0f203a84553853667aE69Ca29Ce;
+    address public constant pendle_Market_aUSDC_Jun_25 = 0x8539B41CA14148d1F7400d399723827a80579414;
 }

@@ -29,17 +29,11 @@ library BorrowVerifierSigUtils {
             )
         );
 
-        (uint8 v, bytes32 r, bytes32 s) = vm.sign(
-            userPrivateKey,
-            keccak256(
-                abi.encodePacked(
-                    "\x19\x01",
-                    DOMAIN_SEPARATOR,
-                    keccak256(abi.encode(BORROW_APPROVAL_TYPEHASH, borrowAmount, user, user2, 1 days, 0))
-                )
-            )
-        );
+        bytes32 structHash = keccak256(abi.encode(BORROW_APPROVAL_TYPEHASH, borrowAmount, user, user2, 1 days, 0));
 
+        bytes32 digest = keccak256(abi.encodePacked("\x19\x01", DOMAIN_SEPARATOR, structHash));
+
+        (uint8 v, bytes32 r, bytes32 s) = vm.sign(userPrivateKey, digest);
         signature = abi.encodePacked(r, s, v);
     }
 }

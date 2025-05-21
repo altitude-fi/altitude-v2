@@ -220,7 +220,11 @@ contract Ingress is AccessControl, IIngress {
     /// @notice Validate if withdraw is allowed
     /// @param withdrawer The address the supply will be withdrawn from
     /// @param recipient The address that will receive the withdrawn currency
-    function validateWithdraw(address withdrawer, address recipient, uint256 amount) external override {
+    function validateWithdraw(
+        address withdrawer,
+        address recipient,
+        uint256 amount
+    ) external override onlyRole(Roles.GAMMA) {
         if (isFunctionDisabled[IIngress.validateWithdraw.selector]) {
             revert IN_V1_FUNCTION_PAUSED();
         }
@@ -239,9 +243,15 @@ contract Ingress is AccessControl, IIngress {
     }
 
     /// @notice Validate if borrow is allowed
-    /// @param borrower The address the debt will be assigned
-    /// @param recipient The address that will receive the borrowed currency
-    function validateBorrow(address borrower, address recipient, uint256 amount) external override {
+    /// @param amount amount requested to borrow
+    /// @param onBehalfOf account to incur the debt
+    /// @param receiver account to receive the tokens
+    /// @dev The vault has GAMMA role
+    function validateBorrow(
+        uint256 amount,
+        address onBehalfOf,
+        address receiver
+    ) external override onlyRole(Roles.GAMMA) {
         if (isFunctionDisabled[IIngress.validateBorrow.selector]) {
             revert IN_V1_FUNCTION_PAUSED();
         }
@@ -250,7 +260,7 @@ contract Ingress is AccessControl, IIngress {
             revert IN_V1_PROTOCOL_PAUSED();
         }
 
-        if (sanctioned[borrower] || sanctioned[recipient]) {
+        if (sanctioned[onBehalfOf] || sanctioned[receiver]) {
             revert IN_V1_ACCOUNT_HAS_BEEN_SANCTIONED();
         }
 
@@ -290,7 +300,7 @@ contract Ingress is AccessControl, IIngress {
 
     /// @notice Validate if claim rewards is allowed
     /// @param claimer Address to check if allowed to claim
-    function validateClaimRewards(address claimer, uint256 amount) external override {
+    function validateClaimRewards(address claimer, uint256 amount) external override onlyRole(Roles.GAMMA) {
         if (isFunctionDisabled[IIngress.validateClaimRewards.selector]) {
             revert IN_V1_FUNCTION_PAUSED();
         }

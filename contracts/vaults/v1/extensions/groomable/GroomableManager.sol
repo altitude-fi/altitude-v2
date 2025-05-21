@@ -72,7 +72,7 @@ contract GroomableManager is VaultStorage, IGroomableManager {
         // Deposit and withdraw in the new strategy has updated the principals to the current values.
         // We need the principal values from the old strategy, as the InterestToken indexes correspond to them.
         // Also this will preserve any supply loss state that we may need to snapshot later
-        ILenderStrategy(newStrategy).updatePrincipal(supplyPrincipalBefore, borrowPrincipalBefore);
+        ILenderStrategy(newStrategy).resetPrincipal(supplyPrincipalBefore, borrowPrincipalBefore);
 
         emit MigrateLenderStrategy(activeLenderStrategy, newStrategy);
         activeLenderStrategy = newStrategy;

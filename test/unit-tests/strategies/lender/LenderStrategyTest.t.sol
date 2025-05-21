@@ -217,4 +217,13 @@ contract LenderStrategyTest is Test, TokensGenerator {
         uint256 rewards = borrowAsset.balanceOf(vault) - before;
         assertEq(rewards, 100 * (10 ** borrowAsset.decimals()), "Receive rewards");
     }
+
+    function test_BorrowInsufficient() public {
+        _deposit(DEPOSIT);
+
+        lenderStrategy.setBorrowFee(50);
+        vm.expectRevert(abi.encodeWithSelector(ILenderStrategy.LS_BORROW_INSUFFICIENT.selector, BORROW, BORROW / 2));
+        vm.prank(vault);
+        lenderStrategy.borrow(BORROW);
+    }
 }

@@ -197,7 +197,7 @@ abstract contract VaultCoreV1 is
     /// @param onBehalfOf The address incurring the debt
     /// @param receiver The address receiving the borrowed amount
     function _borrow(uint256 amount, address onBehalfOf, address receiver) internal {
-        _validateBorrow(onBehalfOf, amount);
+        _validateBorrow(amount, onBehalfOf, receiver);
 
         uint256 desiredBorrow = amount;
 
@@ -249,27 +249,25 @@ abstract contract VaultCoreV1 is
 
         _validateWithdraw(msg.sender, to, withdrawAmount);
 
+        // The total sum of the users balances is slightly bigger then the one in the lender
+        // The last user exisitng the system is to withdraw a little less
+        uint256 totalSupplyBalance = ILenderStrategy(activeLenderStrategy).supplyBalance();
+        if (totalSupplyBalance < withdrawAmount) {
+            withdrawAmount = totalSupplyBalance;
+        }
+
+        // Withdraw fee is based on the true amount being withdrawn
         (uint256 withdrawFee, ) = calcWithdrawFee(msg.sender, withdrawAmount);
         withdrawAmount -= withdrawFee;
 
-        uint256 targetBorrow;
-        uint256 totalSupplyBalance = ILenderStrategy(activeLenderStrategy).supplyBalance();
-
-        // totalSupplyBalance could be lower than withdrawAmount with a few wei for the last user
-        if (totalSupplyBalance >= withdrawAmount) {
-            // Calculate the target borrow for the new target supply (= current - withdraw)
-            targetBorrow = HealthFactorCalculator.targetBorrow(
-                activeLenderStrategy,
-                supplyUnderlying,
-                borrowUnderlying,
-                targetThreshold,
-                totalSupplyBalance - withdrawAmount
-            );
-        } else {
-            // The total sum of the users balances is slightly bigger then the one in the lender
-            // The last user exisitng the system is to withdraw a little less
-            withdrawAmount = totalSupplyBalance;
-        }
+        // Calculate the target borrow for the new target supply (= current - withdraw)
+        uint256 targetBorrow = HealthFactorCalculator.targetBorrow(
+            activeLenderStrategy,
+            supplyUnderlying,
+            borrowUnderlying,
+            targetThreshold,
+            totalSupplyBalance - withdrawAmount
+        );
 
         uint256 totalBorrowBalance = ILenderStrategy(activeLenderStrategy).borrowBalance();
 
@@ -334,16 +332,25 @@ abstract contract VaultCoreV1 is
         address account,
         uint256 withdrawFee,
         uint256 withdrawAmount,
-        uint256 maxWithdrawalAmount
+        uint256 userBalance
     ) internal {
         // Manually apply the fee to be distributed among all the users by increasing the index
         uint256 balanceNow = supplyToken.storedTotalSupply();
+        uint256 userFinalBalance = userBalance - (withdrawAmount + withdrawFee);
 
-        uint256 indexIncrease = supplyToken.calcIndex(balanceNow - withdrawFee);
+        // Due to rounding, adjust the user final balance
+        if (balanceNow < userFinalBalance + withdrawFee) {
+            userFinalBalance = balanceNow - withdrawFee;
+        }
+
+        uint256 indexIncrease = supplyToken.calcIndex(
+            balanceNow - userFinalBalance - withdrawFee,
+            balanceNow - userFinalBalance
+        );
         supplyToken.setInterestIndex(indexIncrease);
 
         // Don't include user into the fee distribution
-        supplyToken.setBalance(account, maxWithdrawalAmount - (withdrawAmount + withdrawFee), indexIncrease);
+        supplyToken.setBalance(account, userFinalBalance, indexIncrease);
     }
 
     /// @notice Internal function to transfer vault debtTokens to reduce users debt
@@ -363,14 +370,16 @@ abstract contract VaultCoreV1 is
     /// @notice Internal function to perform the actual repayment
     /// @param amount Amount to repay
     /// @param onBehalfOf Address of the debt holder
-    /// @return repayAmount amount that was repaid
+    /// @return repayAmount amount that was repaid by the user to us
     /// @dev params should be validated beforehand
     function _repayUnchecked(uint256 amount, address onBehalfOf) internal returns (uint256 repayAmount) {
         uint256 userBalance = debtToken.balanceOf(onBehalfOf);
-        if (userBalance > 0) {
+        if (userBalance == 0) {
+            revert VC_V1_NO_DEBT_TO_REPAY();
+        } else if (userBalance > 0) {
             repayAmount = amount;
 
-            // Repay upto the users balance of the borrow asset
+            // Repay up to the users balance of the borrow asset
             if (userBalance < repayAmount) {
                 repayAmount = userBalance;
             }
@@ -378,18 +387,9 @@ abstract contract VaultCoreV1 is
             TransferHelper.safeTransferFrom(borrowUnderlying, msg.sender, address(this), repayAmount);
 
             debtToken.burn(onBehalfOf, repayAmount);
-
-            // Only repay the lenderStrategy if there is outstanding debt to repay
-            uint256 currentLenderBalance = ILenderStrategy(activeLenderStrategy).borrowBalance();
-
-            if (currentLenderBalance > 0) {
-                // Limit the repayment amount to the existing debt
-                if (repayAmount > currentLenderBalance) {
-                    repayAmount = currentLenderBalance;
-                }
-                TransferHelper.safeApprove(borrowUnderlying, activeLenderStrategy, repayAmount);
-                ILenderStrategy(activeLenderStrategy).repay(repayAmount);
-            }
+            TransferHelper.safeApprove(borrowUnderlying, activeLenderStrategy, repayAmount);
+            ILenderStrategy(activeLenderStrategy).repay(repayAmount);
+            TransferHelper.safeApprove(borrowUnderlying, activeLenderStrategy, 0);
 
             _updateEarningsRatio(onBehalfOf);
         }
@@ -409,17 +409,18 @@ abstract contract VaultCoreV1 is
     }
 
     /// @notice Validate if the borrow can proceed
-    /// @param account account to check
     /// @param amount amount requested to borrow
+    /// @param onBehalfOf account to incur the debt
+    /// @param receiver account to receive the tokens
     /// @dev We should call this function after the account's position has been updated
-    function _validateBorrow(address account, uint256 amount) internal {
-        IIngress(ingressControl).validateBorrow(msg.sender, account, amount);
+    function _validateBorrow(uint256 amount, address onBehalfOf, address receiver) internal {
+        IIngress(ingressControl).validateBorrow(amount, onBehalfOf, receiver);
 
         if (amount == 0) {
             revert VC_V1_INVALID_BORROW_AMOUNT();
         }
 
-        _validateHealthFactor(account, 0, amount);
+        _validateHealthFactor(onBehalfOf, 0, amount);
     }
 
     /// @notice Validate if the repay can proceed

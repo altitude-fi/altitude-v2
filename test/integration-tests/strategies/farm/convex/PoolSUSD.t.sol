@@ -31,8 +31,6 @@ contract PoolSUSD is ConvexStrategy {
             Constants.curve_sUSDZap,
             Constants.convex_Booster, // convex
             4, // convex pid
-            Constants.CVX,
-            Constants.CRV,
             Constants.convex_RewardsToken_sUSDC_CRV,
             0,
             BaseGetter.getBaseSwapStrategy(BaseGetter.getBasePriceSource()),
@@ -41,7 +39,11 @@ contract PoolSUSD is ConvexStrategy {
             Constants.DAI
         );
 
-        farmStrategy = new StrategyMetaPool(dispatcher, dispatcher, config);
+        address[] memory rewardAssets = new address[](2);
+        rewardAssets[0] = Constants.CVX;
+        rewardAssets[1] = Constants.CRV;
+
+        farmStrategy = new StrategyMetaPool(dispatcher, dispatcher, rewardAssets, config);
     }
 
     function _mintAsset(address to, uint256 amount) internal virtual override {

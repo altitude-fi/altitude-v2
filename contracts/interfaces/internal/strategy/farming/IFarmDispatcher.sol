@@ -21,20 +21,21 @@ interface IFarmDispatcher is IAccessControl {
     event Dispatch(uint256 amount);
     event StrategyError(address strategy, bytes lowLevelData);
 
-    event DeactivateStrategy(address strategyAddress);
-    event EmergencyDeactivateStrategy(address strategyAddress, uint256 amountWithdrawn);
+    event DeactivateStrategy(address strategyAddress, bool toWithdraw);
     event AddStrategy(address strategyAddress, uint256 max, address position);
     event RecogniseRewards(uint256 allRewards, uint256 failedStrategies);
 
     error FD_ONLY_VAULT();
     error FD_VAULT_OR_OWNER();
     error FD_STRATEGY_EXISTS();
+    error FD_ZERO_ASSET();
     error FS_EMPTY_STRATEGIES();
     error FS_STRATEGIES_MISMATCH();
     error FD_ZERO_STRATEGY_REMOVAL();
     error FD_STRATEGY_PRIORITY_THE_SAME();
     error FD_INACTIVE_STRATEGY();
     error FD_INACTIVE_STRATEGY_POSITION();
+    error FD_INVALID_STRATEGY_DISPATCHER();
 
     function vault() external view returns (address);
 
@@ -54,9 +55,7 @@ interface IFarmDispatcher is IAccessControl {
 
     function addStrategies(address[] calldata strategies, uint256[] calldata max, address position) external;
 
-    function deactivateStrategy(address strategyAddress) external;
-
-    function emergencyDeactivateStrategy(address strategyAddress, address[] calldata assets) external;
+    function deactivateStrategy(address strategyAddress, bool toWithdraw) external;
 
     function dispatch() external;
 

@@ -31,8 +31,6 @@ contract PoolCRVUSD_pyUSD is ConvexStrategy {
             Constants.curve_Pool_pyUSD_crvUSD,
             Constants.convex_Booster, // convex
             289, // convex pid
-            Constants.CVX,
-            Constants.CRV,
             0x79579633029a61963eDfbA1C0BE22498b6e0D33D,
             1,
             BaseGetter.getBaseSwapStrategy(BaseGetter.getBasePriceSource()),
@@ -41,6 +39,10 @@ contract PoolCRVUSD_pyUSD is ConvexStrategy {
             Constants.crvUSD
         );
 
-        farmStrategy = new StrategyStableNGPool(dispatcher, dispatcher, config);
+        address[] memory rewardAssets = new address[](2);
+        rewardAssets[0] = Constants.CVX;
+        rewardAssets[1] = Constants.CRV;
+
+        farmStrategy = new StrategyStableNGPool(dispatcher, dispatcher, rewardAssets, config);
     }
 }

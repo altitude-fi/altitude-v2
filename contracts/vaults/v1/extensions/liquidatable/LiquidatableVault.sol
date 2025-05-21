@@ -72,13 +72,11 @@ abstract contract LiquidatableVaultV1 is InterestVault, ProxyExtension, ILiquida
     }
 
     //// @notice Return liquidation config
-    function getLiquidationConfig() external view override returns (address, uint256, uint256, uint256, uint256) {
+    function getLiquidationConfig() external view override returns (address, uint256, uint256) {
         return (
             liquidatableStorage.liquidatableManager,
             liquidatableStorage.maxPositionLiquidation,
-            liquidatableStorage.liquidationBonus,
-            liquidatableStorage.minUsersToLiquidate,
-            liquidatableStorage.minRepayAmount
+            liquidatableStorage.liquidationBonus
         );
     }
 }

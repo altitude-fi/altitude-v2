@@ -31,8 +31,6 @@ contract PoolMIM_USDC is ConvexStrategy {
             Constants.curve_MIMZap,
             Constants.convex_Booster, // convex
             40, // convex pid
-            Constants.CVX,
-            Constants.CRV,
             Constants.convex_RewardsToken_MIM_CRV,
             2,
             BaseGetter.getBaseSwapStrategy(BaseGetter.getBasePriceSource()),
@@ -41,6 +39,10 @@ contract PoolMIM_USDC is ConvexStrategy {
             Constants.USDC
         );
 
-        farmStrategy = new StrategyMeta3Pool(dispatcher, dispatcher, config);
+        address[] memory rewardAssets = new address[](2);
+        rewardAssets[0] = Constants.CVX;
+        rewardAssets[1] = Constants.CRV;
+
+        farmStrategy = new StrategyMeta3Pool(dispatcher, dispatcher, rewardAssets, config);
     }
 }

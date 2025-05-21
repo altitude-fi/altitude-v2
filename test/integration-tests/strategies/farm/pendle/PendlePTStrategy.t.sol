@@ -12,7 +12,7 @@ import "../../../../../contracts/interfaces/internal/strategy/farming/IPendleFar
 contract PendlePTStrategy is FarmStrategyIntegrationTest {
     IPendleFarmStrategy public pendleStrategy;
 
-    function _setUp() internal override {
+    function _setUp() internal virtual override {
         // pendle_Market_SUSDE_Mar_25 must exist
         vm.rollFork(21261000);
 
