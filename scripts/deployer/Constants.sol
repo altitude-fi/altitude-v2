@@ -39,7 +39,7 @@ library Constants {
     // Morpho
     address public constant morpho_Pool = 0xBBBBBbbBBb9cC5e90e3b3Af64bdAF62C37EEFFCb;
     address public constant morpho_Vault_DAI = 0x500331c9fF24D9d11aee6B07734Aa72343EA74a5;
-    address public constant morpho_Vault_Gauntlet_Resolv_USDC = 0x132E6C9C33A62D7727cd359b1f51e5B566E485Eb;
+    address public constant morpho_Vault_MEV_Capital_USDC = 0xd63070114470f685b75B74D60EEc7c1113d33a3D;
     address public constant morpho_Vault_Gauntlet_USDC_Core = 0x8eB67A509616cd6A7c1B3c8C21D48FF57df3d458;
     bytes32 public constant morpho_Market_WSTETH_USDC =
         0xb323495f7e4148be5643a4ea4a8221eef163e4bccfdedc2a6f4696baacbc86cc;

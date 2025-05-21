@@ -42,10 +42,6 @@ interface IConfig {
 
     function LIQUIDATION_BONUS() external view returns (uint256);
 
-    function MIN_USERS_TO_LIQUIDATE() external view returns (uint256);
-
-    function MIN_REPAY_AMOUNT() external view returns (uint256);
-
     function MAX_MIGRATION_FEE_PERCENTAGE() external view returns (uint256);
 
     function RESERVE_FACTOR() external view returns (uint256);
