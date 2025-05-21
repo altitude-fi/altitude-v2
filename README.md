@@ -15,9 +15,22 @@ Each supply/borrow currency pair will be managed in a single vault, for example,
 - **Liquidations:** Enabling user funds to be liquidated when the user's position becomes unhealthy.
 - **Tokenization:** Tokenizing user supply and debt positions.
 
-## Setup & Testing
+## Setup & Development
 
-### .env
+### Prerequisites
+
+1. Install Foundry:
+```bash
+curl -L https://foundry.paradigm.xyz | bash
+foundryup
+```
+
+2. Install Node.js dependencies:
+```bash
+npm install
+```
+
+### Environment Setup
 
 Create a `.env` file in the root directory with the following content:
 
@@ -27,5 +40,45 @@ PRIVATE_KEY=<your_private_key>
 VAULT_TYPE=<vault_type>
 ```
 
-### Running Tests
-You can run the test suite using `npm run test`
+### Building
+
+Build the contracts:
+```bash
+forge build
+```
+
+### Testing
+
+Run the entire test suite:
+```bash
+forge test
+```
+
+Run tests with verbosity level for more details:
+```bash
+forge test -vv
+```
+
+Run a specific test:
+```bash
+forge test --match-test testFunctionName
+```
+
+Run tests with gas reporting:
+```bash
+forge test --gas-report
+```
+
+### Coverage
+
+Generate test coverage report:
+```bash
+forge coverage
+```
+
+### Troubleshooting
+
+If you encounter dependency-related errors:
+1. Update Foundry to the latest version: `foundryup`
+2. Clean the cache: `forge clean`
+3. Reinstall dependencies: `forge install`

@@ -22,5 +22,7 @@ interface IFarmDropStrategy is IFarmStrategy {
 
     function DROP_UNITS() external view returns (uint256);
 
+    function setDropThreshold(uint256 dropThreshold_) external;
+
     function reset() external;
 }

@@ -1,4 +1,4 @@
-name: Run Tests
+name: Run Tests and Lint
 
 on:
   push:
@@ -21,7 +21,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: "18"
 
       - name: Install dependencies
         run: npm install
@@ -38,4 +38,21 @@ jobs:
           RPC_URL: ${{ secrets.RPC_URL }}
           FORK_URL: ${{ secrets.FORK_URL }}
 
-     
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run linter
+        run: npm run lint

@@ -146,18 +146,12 @@ contract RouterStaticMock is TokensGenerator {
 }
 
 contract SYMock is BaseERC20 {
-    constructor(uint8 decimals) BaseERC20(decimals, "BaseERC20", "BASE") {
+    constructor(uint8 decimals) BaseERC20(decimals, "BaseERC20", "BASE") {}
 
-    }
-
-    function previewDeposit(
-        address tokenIn,
-        uint256 amountTokenToDeposit
-    ) external view returns (uint256) {
+    function previewDeposit(address tokenIn, uint256 amountTokenToDeposit) external view returns (uint256) {
         return amountTokenToDeposit;
     }
 }
-
 
 contract MarketMock is ERC20("Token", "TKN") {
     address public asset;
