@@ -40,8 +40,6 @@ contract TestDeployer is Deployer, Test {
     uint256 public constant override TARGET_THRESHOLD = 0.7e18; // 70%
     uint256 public constant override MAX_POSITION_LIQUIDATION = 1e18; // 100%
     uint256 public constant override LIQUIDATION_BONUS = 0.01e18; // 1%
-    uint256 public constant override MIN_USERS_TO_LIQUIDATE = 1;
-    uint256 public constant override MIN_REPAY_AMOUNT = 0;
     uint256 public constant override MAX_MIGRATION_FEE_PERCENTAGE = 1e18; // 100%
     uint256 public constant override RESERVE_FACTOR = 0.25e18; // 25%
 
