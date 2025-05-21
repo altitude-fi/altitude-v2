@@ -239,9 +239,7 @@ contract VaultRegistryV1 is AccessControl, Initializable, IVaultRegistryV1 {
             vaults[supplyAsset][borrowAsset],
             liquidatableConfig.liquidatableManager,
             liquidatableConfig.maxPositionLiquidation,
-            liquidatableConfig.liquidationBonus,
-            liquidatableConfig.minUsersToLiquidate,
-            liquidatableConfig.minRepayAmount
+            liquidatableConfig.liquidationBonus
         );
     }
 

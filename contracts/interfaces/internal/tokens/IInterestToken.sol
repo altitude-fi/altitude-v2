@@ -52,7 +52,7 @@ interface IInterestToken is IERC20Upgradeable, IERC20MetadataUpgradeable {
 
     function calcNewIndex() external view returns (uint256 index);
 
-    function calcIndex(uint256 balanceOld) external view returns (uint256);
+    function calcIndex(uint256 balanceOld, uint256 balanceNew) external view returns (uint256);
 
     function balanceStored(address account) external view returns (uint256);
 

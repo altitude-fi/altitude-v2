@@ -30,6 +30,16 @@ contract FarmDispatcher is Initializable, AccessControl, IFarmDispatcher {
     }
 
     function _initialize(address vaultAddress, address workingAsset, address admin) internal {
+        if (vaultAddress == address(0)) {
+            revert FD_VAULT_OR_OWNER();
+        }
+        if (workingAsset == address(0)) {
+            revert FD_ZERO_ASSET();
+        }
+        if (admin == address(0)) {
+            revert FD_VAULT_OR_OWNER();
+        }
+
         vault = vaultAddress;
         asset = workingAsset;
 
@@ -78,6 +88,10 @@ contract FarmDispatcher is Initializable, AccessControl, IFarmDispatcher {
     /// @param strategyAddress Address of the strategy to set
     /// @param newMax Cap amount of the strategy
     function setStrategyMax(address strategyAddress, uint256 newMax) external override onlyRole(Roles.BETA) {
+        if (strategyAddress == STRATEGY_ZERO) {
+            revert FD_ZERO_STRATEGY_REMOVAL();
+        }
+
         Strategy storage strategy = strategies[strategyAddress];
 
         if (!strategy.active) {
@@ -128,6 +142,11 @@ contract FarmDispatcher is Initializable, AccessControl, IFarmDispatcher {
             revert FD_INACTIVE_STRATEGY_POSITION();
         }
 
+        // Check if the strategy's farmDispatcher matches this contract
+        if (IFarmStrategy(strategyAddress).farmDispatcher() != address(this)) {
+            revert FD_INVALID_STRATEGY_DISPATCHER();
+        }
+
         strategies[strategyAddress] = Strategy(true, max, 0, position, strategies[position].next);
 
         availableLimit += max;
@@ -169,30 +188,7 @@ contract FarmDispatcher is Initializable, AccessControl, IFarmDispatcher {
 
     /// @notice Disable a strategy from the linkedlist
     /// @param strategyAddress Addresses of the strategy to be deactivated
-    function deactivateStrategy(address strategyAddress) external override onlyRole(Roles.GAMMA) {
-        _deactivateStrategy(strategyAddress);
-        emit DeactivateStrategy(strategyAddress);
-    }
-
-    /// @notice Remove a strategy in emergency. This will disable the strategy,
-    ///         perform an emergencySwap and withdraw all possible funds from the strategy
-    /// @dev run emergencyWithdraw on the strategy before executing this function
-    /// @param strategyAddress Addresses of the strategy to be removed
-    /// @param assets Assets to swap in emergencySwap (addresses)
-    function emergencyDeactivateStrategy(
-        address strategyAddress,
-        address[] calldata assets
-    ) external override onlyRole(Roles.BETA) {
-        _deactivateStrategy(strategyAddress);
-
-        uint256 amountWithdrawn = IFarmStrategy(strategyAddress).emergencySwap(assets);
-
-        emit EmergencyDeactivateStrategy(strategyAddress, amountWithdrawn);
-    }
-
-    /// @notice Re-usable function for deactivating a strategy
-    /// @param strategyAddress Addresses of the strategy to be deactivated
-    function _deactivateStrategy(address strategyAddress) internal {
+    function deactivateStrategy(address strategyAddress, bool toWithdraw) external override onlyRole(Roles.GAMMA) {
         Strategy storage strategy = strategies[strategyAddress];
 
         if (!strategy.active) {
@@ -206,8 +202,17 @@ contract FarmDispatcher is Initializable, AccessControl, IFarmDispatcher {
         availableLimit -= strategy.maxAmount - strategy.totalDeposit;
 
         strategy.active = false;
+
         strategies[strategy.prev].next = strategy.next;
         strategies[strategy.next].prev = strategy.prev;
+
+        if (toWithdraw) {
+            strategy.maxAmount = 0;
+            strategy.totalDeposit = 0;
+            IFarmStrategy(strategyAddress).withdraw(type(uint256).max);
+        }
+
+        emit DeactivateStrategy(strategyAddress, toWithdraw);
     }
 
     /// @notice Deposit any available funds into the strategies
@@ -251,6 +256,8 @@ contract FarmDispatcher is Initializable, AccessControl, IFarmDispatcher {
                         // Log a failed deposit
                         emit StrategyError(strategyAddress, lowLevelData);
                     }
+                    // Removes approval
+                    TransferHelper.safeApprove(asset, strategyAddress, 0);
                 }
             }
         }
@@ -304,19 +311,19 @@ contract FarmDispatcher is Initializable, AccessControl, IFarmDispatcher {
                         withdrawn += strategyWithdrawn;
 
                         // Decrease totalDeposit to release capacity
-                        if (strategy.totalDeposit < toWithdraw) {
-                            availableLimit += strategy.totalDeposit;
-                            strategy.totalDeposit = 0;
-                        } else {
+                        if (strategy.totalDeposit > toWithdraw) {
                             availableLimit += toWithdraw;
                             strategy.totalDeposit -= toWithdraw;
+                        } else {
+                            availableLimit += strategy.totalDeposit;
+                            strategy.totalDeposit = 0;
                         }
 
                         // Remainder to withdraw in the next iteration
-                        if (toWithdraw < withdrawn) {
-                            toWithdraw = 0;
-                        } else {
+                        if (requested > withdrawn) {
                             toWithdraw = requested - withdrawn;
+                        } else {
+                            toWithdraw = 0;
                         }
                     } catch (bytes memory lowLevelData) {
                         // Log a failed withdraw

@@ -190,7 +190,7 @@ abstract contract InterestToken is ERC20Upgradeable, IInterestToken {
     /// @notice Calculates the new index based on the latest balances
     /// @return interestIndex_ The new interest index
     function calcNewIndex() public view override returns (uint256) {
-        return calcIndex(storedTotalSupply());
+        return calcIndex(storedTotalSupply(), totalSupply());
     }
 
     /// @notice Calculates the index based on a given balance
@@ -199,9 +199,8 @@ abstract contract InterestToken is ERC20Upgradeable, IInterestToken {
     /// @dev Unexpected lender borrow reduction is handled by freezing the index until we reach again the corresponding borrowPrincipal
     /// @dev New index is based on the total lending strategy balance and the balance provided
     /// @return interestIndex_ The new interest index
-    function calcIndex(uint256 balanceOld) public view returns (uint256) {
+    function calcIndex(uint256 balanceOld, uint256 balanceNew) public view returns (uint256) {
         uint256 interestIndex_ = interestIndex;
-        uint256 balanceNew = totalSupply();
 
         if (balanceOld > 0 && balanceNew > 0 && balanceOld < balanceNew) {
             interestIndex_ = _calcIndexIncrease(interestIndex_, balanceOld, balanceNew);

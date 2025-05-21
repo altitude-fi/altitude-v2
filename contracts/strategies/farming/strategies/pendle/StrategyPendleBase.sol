@@ -10,7 +10,6 @@ import "@pendle/core-v2/contracts/interfaces/IPMarket.sol";
 import "@pendle/core-v2/contracts/interfaces/IPPYLpOracle.sol";
 import "@pendle/core-v2/contracts/interfaces/IPRouterStatic.sol";
 import "../../../../interfaces/internal/strategy/farming/IPendleFarmStrategy.sol";
-
 /**
  * @title StrategyPendleBase Contract
  * @dev Contract for interacting with Pendle protocol
@@ -54,6 +53,15 @@ abstract contract StrategyPendleBase is FarmDropStrategy, SkimStrategy, IPendleF
         routerStatic = IPRouterStatic(routerStatic_);
         oracle = IPPYLpOracle(oracle_);
         market = IPMarket(market_);
+
+        if (market.isExpired()) {
+            revert PFS_MARKET_EXPIRED();
+        }
+
+        if (slippage_ > SLIPPAGE_BASE) {
+            revert PFS_INVALID_SLIPPAGE();
+        }
+
         (SY, PT, YT) = IPMarket(market).readTokens();
         slippage = slippage_;
         SY_DECIMALS = SY.decimals();

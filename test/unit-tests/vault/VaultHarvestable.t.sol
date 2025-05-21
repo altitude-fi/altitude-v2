@@ -99,6 +99,25 @@ contract VaultHarvestableTest is VaultTestSuite {
         assertEq(uncommitted, (REWARDS - reserveExpected) / 2);
     }
 
+    function test_HarvestWithVault_Uncommitted_FarmLoss_So_Small() public {
+        address user = vm.addr(1);
+        deposit(user);
+        vault.rebalance();
+        harvestWithRewards(100e18);
+
+        uint256 reserveExpected = (100e18 * deployer.RESERVE_FACTOR()) / 1e18;
+
+        // 100% vault balance + 10 rewards loss
+        uint256 vaultBalance = vault.debtToken().balanceOf(address(vault));
+        harvestWithFarmLoss(vaultBalance + 100e18, vaultBalance + 10);
+
+        HarvestTypes.HarvestData memory harvest = vault.getHarvest(2);
+        assertEq(harvest.uncommittedLossPerc, 0); // 0%
+
+        (, uint256 uncommitted, ) = vault.getHarvestData();
+        assertEq(uncommitted, (100e18 - reserveExpected));
+    }
+
     function test_HarvestWithVault_Uncommitted_Claimable_FarmLoss() public {
         address user = vm.addr(1);
         deposit(user);
@@ -357,11 +376,11 @@ contract VaultHarvestableTest is VaultTestSuite {
         assertEq(claimableRewards, REWARDS);
         assertEq(dispatcher.balance(), REWARDS);
         assertEq(lenderStrategy.borrowBalance(), 0);
-        assertEq(vault.debtToken().balanceOf(address(vault)), 0 );
+        assertEq(vault.debtToken().balanceOf(address(vault)), 0);
 
         vm.prank(user);
         vault.claimRewards(claimableRewards); // claim all
-        
+
         assertEq(dispatcher.balance(), 0);
         (uint256 claimable, , ) = vault.getHarvestData();
         assertEq(claimable, 0);

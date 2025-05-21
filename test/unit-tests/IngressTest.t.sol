@@ -177,14 +177,14 @@ contract IngressTest is Test {
         vm.expectRevert();
         ingress.validateWithdraw(address(1), address(1), 1);
         vm.expectRevert();
-        ingress.validateBorrow(address(1), address(1), 1);
+        ingress.validateBorrow(1, address(1), address(1));
         vm.expectRevert();
         ingress.validateClaimRewards(address(1), 1);
         vm.stopPrank();
 
         vm.startPrank(gammaUser);
         ingress.validateWithdraw(address(1), address(1), 1);
-        ingress.validateBorrow(address(1), address(1), 1);
+        ingress.validateBorrow(1, address(1), address(1));
         ingress.validateClaimRewards(address(1), 1);
         vm.stopPrank();
     }

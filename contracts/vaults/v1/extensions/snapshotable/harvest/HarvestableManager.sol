@@ -163,7 +163,9 @@ contract HarvestableManager is VaultStorage, IHarvestableManager {
             harvestStorage.realUncommittedEarnings = 0;
         } else {
             uncommittedLossPerc = (loss * 1e18) / harvestStorage.realUncommittedEarnings;
-            harvestStorage.realUncommittedEarnings -= loss;
+            if (uncommittedLossPerc > 0) {
+                harvestStorage.realUncommittedEarnings -= loss;
+            }
             return (vaultBorrows, uncommittedLossPerc, 0);
         }
 
@@ -174,7 +176,9 @@ contract HarvestableManager is VaultStorage, IHarvestableManager {
             harvestStorage.realClaimableEarnings = 0;
         } else {
             claimableLossPerc = (loss * 1e18) / harvestStorage.realClaimableEarnings;
-            harvestStorage.realClaimableEarnings -= loss;
+            if (claimableLossPerc > 0) {
+                harvestStorage.realClaimableEarnings -= loss;
+            }
             return (vaultBorrows, uncommittedLossPerc, claimableLossPerc);
         }
 

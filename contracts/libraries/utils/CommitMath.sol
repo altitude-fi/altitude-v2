@@ -174,19 +174,28 @@ library CommitMath {
 
         // Distribute uncommitted earnings loss to the users
         if (harvestSnapshot.uncommittedLossPerc > 0) {
-            // Handle user loss part from the uncommitted
+            // Handle user loss part from the uncommitted, round up to prevent underflow
             uint256 uncommittedLoss = (harvestSnapshot.uncommittedLossPerc * commit.userHarvestUncommittedEarnings) /
                 1e18;
+            if (uncommittedLoss == 0 && commit.userHarvestUncommittedEarnings > 0) {
+                uncommittedLoss = 1;
+            }
             commit.userHarvestUncommittedEarnings -= uncommittedLoss;
-            // Handle vault reserve loss part from the uncommitted
+            // Handle vault reserve loss part from the uncommitted, round up to prevent underflow
             uint256 uncommittedReserveLoss = (harvestSnapshot.uncommittedLossPerc * commit.vaultReserveUncommitted) /
                 1e18;
+            if (uncommittedReserveLoss == 0 && commit.vaultReserveUncommitted > 0) {
+                uncommittedReserveLoss = 1;
+            }
             commit.vaultReserveUncommitted -= uncommittedReserveLoss;
         }
 
-        // Distribute claimable rewards loss to the users
+        // Distribute claimable rewards loss to the users, round up to prevent underflow
         if (harvestSnapshot.claimableLossPerc > 0) {
             uint256 claimableLoss = (harvestSnapshot.claimableLossPerc * commit.userClaimableEarnings) / 1e18;
+            if (claimableLoss == 0 && commit.userClaimableEarnings > 0) {
+                claimableLoss = 1;
+            }
             commit.userClaimableEarnings -= claimableLoss;
         }
 

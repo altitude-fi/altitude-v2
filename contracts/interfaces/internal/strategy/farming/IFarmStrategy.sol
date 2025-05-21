@@ -16,12 +16,8 @@ interface IFarmStrategy is ISwapStrategyConfiguration {
     event SetRewardAssets(address[] oldAssets, address[] newAssets);
 
     error FS_ONLY_DISPATCHER();
-    error FS_IN_EMERGENCY_MODE();
-    error FM_NOT_IN_EMERGENCY_MODE();
 
     function rewardAssets(uint256) external returns (address);
-
-    function inEmergency() external view returns (bool);
 
     function asset() external view returns (address);
 

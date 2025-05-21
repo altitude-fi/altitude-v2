@@ -147,7 +147,8 @@ contract SnapshotableManager is VaultStorage, HarvestableManager, SupplyLossMana
         if (actualInjected > amountToInject) {
             // Distribute the deposit rewards among the users
             uint256 indexIncrease = supplyToken.calcIndex(
-                supplyToken.totalSupply() - (actualInjected - amountToInject)
+                supplyToken.totalSupply() - (actualInjected - amountToInject),
+                supplyToken.totalSupply()
             );
             supplyToken.setInterestIndex(indexIncrease);
         }

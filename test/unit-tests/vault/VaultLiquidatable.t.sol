@@ -15,7 +15,7 @@ contract VaultLiquidatableTest is VaultTestSuite {
         super.setUp();
 
         // The price is 1:1 and for 70 debt repaid 70 supply + bonus should be taken out
-        (, , uint256 liquidationBonus, , ) = vault.getLiquidationConfig();
+        (, , uint256 liquidationBonus) = vault.getLiquidationConfig();
         supplyRemaining = DEPOSIT - (7e18 + (7e18 * liquidationBonus) / 1e18);
     }
 
@@ -123,17 +123,11 @@ contract VaultLiquidatableTest is VaultTestSuite {
     function test_LiquidateUsersByAmountNotByNumber() public {
         (address[] memory liquidationUsers, uint256 liquidationAmount) = _prepareLiquidation();
 
-        (address liquidatableManager, , , , ) = vault.getLiquidationConfig();
+        (address liquidatableManager, , ) = vault.getLiquidationConfig();
         vaultRegistry.setLiquidationConfig(
             deployer.supplyAsset(),
             deployer.borrowAsset(),
-            VaultTypes.LiquidatableConfig(
-                liquidatableManager,
-                1e18,
-                1e16,
-                4, // Set 4 users to be required for liquidation at least
-                MAX_BORROW
-            )
+            VaultTypes.LiquidatableConfig(liquidatableManager, 1e18, 1e16)
         );
 
         vault.liquidateUsers(liquidationUsers, liquidationAmount);
@@ -156,27 +150,6 @@ contract VaultLiquidatableTest is VaultTestSuite {
 
         vm.expectRevert(TransferHelper.TH_SAFE_TRANSFER_FROM_FAILED.selector);
         vault.liquidateUsers(liquidationUsers, liquidationAmount + MAX_BORROW);
-    }
-
-    // Should revert when trying to liquidate not enough users and repay amount
-    function test_LiquidateUsersWithNotEnoughAmountAndNumber() public {
-        (address[] memory liquidationUsers, uint256 liquidationAmount) = _prepareLiquidation();
-
-        (address liquidatableManager, , , , ) = vault.getLiquidationConfig();
-        vaultRegistry.setLiquidationConfig(
-            deployer.supplyAsset(),
-            deployer.borrowAsset(),
-            VaultTypes.LiquidatableConfig(
-                liquidatableManager,
-                1e18,
-                1e16,
-                4, // Set 4 users to be required for liquidation at least
-                MAX_BORROW * 4 // Set too high repay amount limit
-            )
-        );
-
-        vm.expectRevert(ILiquidatableManager.LQ_V1_LIQUIDATION_CONSTRAINTS.selector);
-        vault.liquidateUsers(liquidationUsers, liquidationAmount);
     }
 
     // Should revert when total repay amount is larger than repay amount limit

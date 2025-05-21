@@ -281,12 +281,10 @@ contract VaultCoreTest is VaultTestSuite {
         address user = vm.addr(1);
         deposit(user);
 
-        // Mint tokens for the repayment
-        repay(user);
-
-        assertEq(lenderStrategy.borrowBalance(), 0);
-        assertEq(vault.debtToken().balanceOf(user), 0);
-        assertEq(IToken(deployer.borrowAsset()).balanceOf(user), REPAY);
+        // Try to repay without having any debt
+        vm.expectRevert(IVaultCoreV1.VC_V1_NO_DEBT_TO_REPAY.selector);
+        vm.prank(user);
+        vault.repay(REPAY, user);
     }
 
     function test_RepayMoreThanUserBalance() public {
@@ -502,6 +500,32 @@ contract VaultCoreTest is VaultTestSuite {
         vault.withdraw(DEPOSIT + (DEPOSIT / 10), user);
         assertEq(vault.supplyToken().balanceOf(user), 0);
         assertEq(IToken(deployer.supplyAsset()).balanceOf(user), DEPOSIT + (DEPOSIT / 10));
+    }
+
+    function test_WithdrawFeeCorrectDistribution() public {
+        vaultRegistry.setVaultConfig(
+            deployer.supplyAsset(),
+            deployer.borrowAsset(),
+            VaultTypes.VaultConfig(
+                address(vault.borrowVerifier()),
+                1e17, // 10% fee tax
+                1000, // 1000 blocks fee
+                vault.configurableManager(),
+                vault.swapStrategy(),
+                vault.ingressControl()
+            )
+        );
+
+        address user = vm.addr(1);
+        address user2 = vm.addr(2);
+
+        deposit(user);
+        depositAndWithdraw(user2, DEPOSIT, DEPOSIT / 2);
+
+        uint256 withdrawFee = DEPOSIT / 2 / 10; // 10% fee
+        assertEq(vault.supplyToken().balanceOf(user2), DEPOSIT / 2);
+        assertEq(vault.supplyToken().balanceOf(user), DEPOSIT + withdrawFee); // deposit + 10% being distributed
+        assertEq(lenderStrategy.supplyBalance(), DEPOSIT / 2 + DEPOSIT + withdrawFee);
     }
 
     function test_WithdrawFeeStaysForTheProtocolWhenOneUser() public {
