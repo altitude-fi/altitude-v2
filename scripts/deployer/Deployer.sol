@@ -282,11 +282,12 @@ abstract contract Deployer is Config {
         address farmDispatcher = _farmDispatcher(vault);
         address lenderStrategy = _lenderStrategy(vault, farmDispatcher);
 
+        borrowVerifier = _borrowVerifier(vault);
         return
             VaultTypes.VaultData(
                 VaultTypes.VaultInit(
                     VaultTypes.VaultConfig(
-                        _borrowVerifier(vault),
+                        borrowVerifier,
                         this.WITHDRAW_FEE_FACTOR(),
                         this.WITHDRAW_FEE_PERIOD(),
                         _configurableManager(),
