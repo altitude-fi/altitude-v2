@@ -246,9 +246,18 @@ abstract contract Deployer is Config {
     /// @param registry The address of the vault registry.
     /// @return address of the deployed vault.
     function deployDefaultVault(VaultRegistryV1 registry) public virtual returns (IVaultCoreV1) {
-        address vaultAddress = registry.vaultAddress(this.supplyAsset(), this.borrowAsset());
+        return
+            deployDefaultVault(
+                registry,
+                _constructVaultData(registry.vaultAddress(this.supplyAsset(), this.borrowAsset()))
+            );
+    }
 
-        VaultTypes.VaultData memory vaultData = _constructVaultData(vaultAddress);
+    function deployDefaultVault(
+        VaultRegistryV1 registry,
+        VaultTypes.VaultData memory vaultData
+    ) public virtual returns (IVaultCoreV1) {
+        address vaultAddress = registry.vaultAddress(this.supplyAsset(), this.borrowAsset());
 
         // Registry should have granted deployer a role to create vaults beforehand
         registry.createVault(
@@ -345,56 +354,56 @@ abstract contract Deployer is Config {
     /// @param vault The address of the vault.
     /// @return address of the deployed farm dispatcher.
     function _farmDispatcher(address vault) internal returns (address) {
-        ProxyInitializable farmDispatcher = new ProxyInitializable();
-        console.log("ProxyInitializable, farmDispatcher, %s", address(farmDispatcher));
+        ProxyInitializable proxyDispatcher = new ProxyInitializable();
+        console.log("ProxyInitializable, proxyDispatcher, %s", address(proxyDispatcher));
 
-        farmDispatcher.initialize(
+        proxyDispatcher.initialize(
             this.UPGRADABILITY_EXECUTOR(),
             _farmDispatcherImpl(),
             abi.encodeWithSignature("initialize(address,address,address)", vault, this.borrowAsset(), deployerSender)
         );
 
-        dispatcher = FarmBufferDispatcher(address(farmDispatcher));
+        FarmBufferDispatcher farmDispatcher = FarmBufferDispatcher(address(proxyDispatcher));
 
         // Add strategies
-        dispatcher.grantRole(Roles.ALPHA, deployerSender);
-        address[] memory strategies = _farmStrategies(address(dispatcher));
+        farmDispatcher.grantRole(Roles.ALPHA, deployerSender);
+        address[] memory strategies = _farmStrategies(address(farmDispatcher));
         for (uint256 i = 1; i < strategies.length; i++) {
-            dispatcher.addStrategy(strategies[i], this.CAPS(i - 1), strategies[i - 1]);
+            farmDispatcher.addStrategy(strategies[i], this.CAPS(i - 1), strategies[i - 1]);
         }
-        dispatcher.revokeRole(
+        farmDispatcher.revokeRole(
             Roles.ALPHA, // Remove deployerSender roles
             deployerSender
         );
 
         // Load buffer [Tokens are to be transferred beforehand]
         if (this.BUFFER_SIZE() > 0) {
-            dispatcher.grantRole(Roles.BETA, deployerSender);
-            IToken(this.borrowAsset()).approve(address(dispatcher), this.BUFFER_SIZE());
-            dispatcher.increaseBufferSize(this.BUFFER_SIZE());
-            dispatcher.revokeRole(
+            farmDispatcher.grantRole(Roles.BETA, deployerSender);
+            IToken(this.borrowAsset()).approve(address(farmDispatcher), this.BUFFER_SIZE());
+            farmDispatcher.increaseBufferSize(this.BUFFER_SIZE());
+            farmDispatcher.revokeRole(
                 Roles.BETA, // Remove deployerSender roles
                 deployerSender
             );
         }
 
         // Grant/Revoke roles
-        RolesGranter._grantRoles(address(dispatcher), this);
-        dispatcher.grantRole(
+        RolesGranter._grantRoles(address(farmDispatcher), this);
+        farmDispatcher.grantRole(
             Roles.GAMMA, // Grant Gamma role to the vault for dispatching
             vault
         );
 
         // Check grand admin to not revoke entire admin access
         if (this.GRAND_ADMIN() != deployerSender) {
-            dispatcher.grantRole(
-                dispatcher.DEFAULT_ADMIN_ROLE(),
+            farmDispatcher.grantRole(
+                farmDispatcher.DEFAULT_ADMIN_ROLE(),
                 this.GRAND_ADMIN() // Grant grand admin role
             );
-            dispatcher.revokeRole(dispatcher.DEFAULT_ADMIN_ROLE(), deployerSender);
+            farmDispatcher.revokeRole(farmDispatcher.DEFAULT_ADMIN_ROLE(), deployerSender);
         }
 
-        return address(dispatcher);
+        return address(farmDispatcher);
     }
 
     /// @notice Deploys the rebalance incentives controller.
