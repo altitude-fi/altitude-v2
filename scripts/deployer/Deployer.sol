@@ -47,12 +47,15 @@ import {RebalanceIncentivesController} from "../../contracts/misc/incentives/reb
 abstract contract Deployer is Config {
     address internal deployerSender;
 
-    address public vaultInitImpl;
     address public borrowVerifier;
+    address public vaultInitImpl;
     address public configurableManager;
     address public liquidatableManager;
     address public groomableManager;
     address public snapshotableManager;
+    address public farmDispatcherImpl;
+    address public vaultETHImpl;
+    address public vaultERC20Impl;
 
     // Token implementations
     address public debtTokenImpl;
@@ -63,17 +66,7 @@ abstract contract Deployer is Config {
     /// @param grandAdmin The address of the grand admin
     function initDeployer(address signer, address grandAdmin) public {
         super.initConfig(grandAdmin);
-
         deployerSender = signer;
-
-        vaultInitImpl = _vaultInitImpl();
-        configurableManager = _configurableManager();
-        liquidatableManager = _liquidatableManager();
-        groomableManager = _groomableManager();
-        snapshotableManager = _snapshotableManager();
-
-        debtTokenImpl = _debtToken();
-        supplyTokenImpl = _supplyToken();
     }
 
     /// @notice Returns the address of the vault core implementation.
@@ -81,9 +74,15 @@ abstract contract Deployer is Config {
     function _vaultCoreImpl() internal returns (address) {
         address addr;
         if (this.isERC20Vault()) {
-            addr = address(new VaultERC20());
+            if (vaultERC20Impl == address(0)) {
+                vaultERC20Impl = address(new VaultERC20());
+            }
+            addr = vaultERC20Impl;
         } else {
-            addr = address(new VaultETH());
+            if (vaultETHImpl == address(0)) {
+                vaultETHImpl = address(new VaultETH());
+            }
+            addr = vaultETHImpl;
         }
         console.log("VaultCoreImpl, vaultCoreImpl, %s", addr);
         return addr;
@@ -92,9 +91,12 @@ abstract contract Deployer is Config {
     /// @notice Returns the address of the vault initializer implementation.
     /// @return address of the vault initializer implementation.
     function _vaultInitImpl() internal returns (address) {
-        address addr = address(new VaultCoreV1Initializer());
-        console.log("VaultInitImpl, vaultInitImpl, %s", addr);
-        return addr;
+        if (vaultInitImpl == address(0)) {
+            vaultInitImpl = address(new VaultCoreV1Initializer());
+        }
+        console.log("VaultCoreV1Initializer, vaultInitImpl, %s", vaultInitImpl);
+
+        return vaultInitImpl;
     }
 
     /// @notice Returns the address of the borrow verifier implementation.
@@ -108,49 +110,76 @@ abstract contract Deployer is Config {
     /// @notice Returns the address of the configurable manager implementation.
     /// @return address of the configurable manager implementation.
     function _configurableManager() internal returns (address) {
-        address addr = address(new ConfigurableManager());
-        console.log("ConfigurableManager, configurableManager, %s", addr);
-        return addr;
+        if (configurableManager == address(0)) {
+            configurableManager = address(new ConfigurableManager());
+        }
+        console.log("ConfigurableManager, configurableManager, %s", configurableManager);
+
+        return configurableManager;
     }
 
     /// @notice Returns the address of the liquidatable manager implementation.
     /// @return address of the liquidatable manager implementation.
     function _liquidatableManager() internal returns (address) {
-        address addr = address(new LiquidatableManager());
-        console.log("LiquidatableManager, liquidatableManager, %s", addr);
-        return addr;
+        if (liquidatableManager == address(0)) {
+            liquidatableManager = address(new LiquidatableManager());
+        }
+        console.log("LiquidatableManager, liquidatableManager, %s", liquidatableManager);
+
+        return liquidatableManager;
     }
 
     /// @notice Returns the address of the groomable manager implementation.
     /// @return address of the groomable manager implementation.
     function _groomableManager() internal returns (address) {
-        address addr = address(new GroomableManager());
-        console.log("GroomableManager, groomableManager, %s", addr);
-        return addr;
+        if (groomableManager == address(0)) {
+            groomableManager = address(new GroomableManager());
+        }
+        console.log("GroomableManager, groomableManager, %s", groomableManager);
+
+        return groomableManager;
     }
 
     /// @notice Returns the address of the snapshotable manager implementation.
     /// @return address of the snapshotable manager implementation.
     function _snapshotableManager() internal returns (address) {
-        address addr = address(new SnapshotableManager());
-        console.log("SnapshotableManager, snapshotableManager, %s", addr);
-        return addr;
+        if (snapshotableManager == address(0)) {
+            snapshotableManager = address(new SnapshotableManager());
+        }
+        console.log("SnapshotableManager, snapshotableManager, %s", snapshotableManager);
+
+        return snapshotableManager;
+    }
+
+    function _farmDispatcherImpl() internal returns (address) {
+        if (farmDispatcherImpl == address(0)) {
+            farmDispatcherImpl = address(new FarmBufferDispatcher());
+        }
+        console.log("FarmBufferDispatcher, farmDispatcherImpl, %s", farmDispatcherImpl);
+
+        return farmDispatcherImpl;
     }
 
     /// @notice Returns the address of the debt token implementation.
     /// @return address of the debt token implementation.
-    function _debtToken() internal returns (address) {
-        address addr = address(new DebtToken());
-        console.log("DebtToken, debtTokenImpl, %s", addr);
-        return addr;
+    function _debtTokenImpl() internal returns (address) {
+        if (debtTokenImpl == address(0)) {
+            debtTokenImpl = address(new DebtToken());
+        }
+        console.log("DebtToken, debtTokenImpl, %s", debtTokenImpl);
+
+        return debtTokenImpl;
     }
 
     /// @notice Returns the address of the supply token implementation.
     /// @return address of the supply token implementation.
-    function _supplyToken() internal returns (address) {
-        address addr = address(new SupplyToken());
-        console.log("SupplyToken, supplyTokenImpl, %s", addr);
-        return addr;
+    function _supplyTokenImpl() internal returns (address) {
+        if (supplyTokenImpl == address(0)) {
+            supplyTokenImpl = address(new SupplyToken());
+        }
+        console.log("SupplyToken, supplyTokenImpl, %s", supplyTokenImpl);
+
+        return supplyTokenImpl;
     }
 
     /// @notice Deploys the default protocol components.
@@ -175,7 +204,7 @@ abstract contract Deployer is Config {
                 VaultTypes.RegistryConfiguration(
                     deployerSender,
                     tokensFactory, // tokensFactory
-                    vaultInitImpl, // vaultInitImpl
+                    _vaultInitImpl(),
                     this.UPGRADABILITY_EXECUTOR()
                 )
             )
@@ -206,8 +235,8 @@ abstract contract Deployer is Config {
         console.log("TokensFactory, tokensFactory, %s", tokensFactory);
 
         TokensFactory(tokensFactory).setRegistry(address(registry));
-        TokensFactory(tokensFactory).setDebtTokenImplementation(debtTokenImpl);
-        TokensFactory(tokensFactory).setSupplyTokenImplementation(supplyTokenImpl);
+        TokensFactory(tokensFactory).setDebtTokenImplementation(_debtTokenImpl());
+        TokensFactory(tokensFactory).setSupplyTokenImplementation(_supplyTokenImpl());
         TokensFactory(tokensFactory).transferOwnership(admin);
 
         return tokensFactory;
@@ -230,10 +259,11 @@ abstract contract Deployer is Config {
             _vaultCoreImpl(),
             vaultData
         );
-        console.log("VaultCoreV1, vault, %s", vaultAddress);
-        console.log("VaultCoreV1, vault, %s", registry.vaults(this.supplyAsset(), this.borrowAsset()));
+        address vaultActual = registry.vaults(this.supplyAsset(), this.borrowAsset());
+        assert(vaultAddress == vaultActual); // expect computed == actual
+        console.log("VaultCoreV1, vault, %s", vaultActual);
 
-        return IVaultCoreV1(registry.vaults(this.supplyAsset(), this.borrowAsset()));
+        return IVaultCoreV1(vaultActual);
     }
 
     /// @notice Constructs the vault data.
@@ -243,15 +273,14 @@ abstract contract Deployer is Config {
         address farmDispatcher = _farmDispatcher(vault);
         address lenderStrategy = _lenderStrategy(vault, farmDispatcher);
 
-        borrowVerifier = _borrowVerifier(vault);
         return
             VaultTypes.VaultData(
                 VaultTypes.VaultInit(
                     VaultTypes.VaultConfig(
-                        borrowVerifier,
+                        _borrowVerifier(vault),
                         this.WITHDRAW_FEE_FACTOR(),
                         this.WITHDRAW_FEE_PERIOD(),
-                        configurableManager,
+                        _configurableManager(),
                         _swapStrategy(),
                         _ingressController(vault)
                     ),
@@ -263,15 +292,16 @@ abstract contract Deployer is Config {
                     VaultTypes.DefiProviders(lenderStrategy, farmDispatcher)
                 ),
                 VaultTypes.LiquidatableConfig(
-                    liquidatableManager,
+                    _liquidatableManager(),
                     this.MAX_POSITION_LIQUIDATION(),
                     this.LIQUIDATION_BONUS()
                 ),
-                VaultTypes.GroomableConfig(groomableManager, _flashLoanStrategy(), this.MAX_MIGRATION_FEE_PERCENTAGE()),
-                VaultTypes.SnapshotableConfig(
-                    snapshotableManager, // snapshotable manager implementation
-                    this.RESERVE_FACTOR()
-                )
+                VaultTypes.GroomableConfig(
+                    _groomableManager(),
+                    _flashLoanStrategy(),
+                    this.MAX_MIGRATION_FEE_PERCENTAGE()
+                ),
+                VaultTypes.SnapshotableConfig(_snapshotableManager(), this.RESERVE_FACTOR())
             );
     }
 
@@ -317,12 +347,10 @@ abstract contract Deployer is Config {
     function _farmDispatcher(address vault) internal returns (address) {
         ProxyInitializable farmDispatcher = new ProxyInitializable();
         console.log("ProxyInitializable, farmDispatcher, %s", address(farmDispatcher));
-        FarmBufferDispatcher dispatcher = new FarmBufferDispatcher();
-        console.log("FarmBufferDispatcher, dispatcher, %s", address(dispatcher));
 
         farmDispatcher.initialize(
             this.UPGRADABILITY_EXECUTOR(),
-            address(dispatcher),
+            _farmDispatcherImpl(),
             abi.encodeWithSignature("initialize(address,address,address)", vault, this.borrowAsset(), deployerSender)
         );
 
@@ -351,7 +379,7 @@ abstract contract Deployer is Config {
         }
 
         // Grant/Revoke roles
-        RolesGranter._grantRoles(address(farmDispatcher), this);
+        RolesGranter._grantRoles(address(dispatcher), this);
         dispatcher.grantRole(
             Roles.GAMMA, // Grant Gamma role to the vault for dispatching
             vault
@@ -366,7 +394,7 @@ abstract contract Deployer is Config {
             dispatcher.revokeRole(dispatcher.DEFAULT_ADMIN_ROLE(), deployerSender);
         }
 
-        return address(farmDispatcher);
+        return address(dispatcher);
     }
 
     /// @notice Deploys the rebalance incentives controller.
