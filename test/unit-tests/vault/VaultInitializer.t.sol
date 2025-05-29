@@ -21,18 +21,18 @@ contract VaultInitializerTest is Test {
 
     function test_CorrectConfigurableVault() public {
         IVaultCoreV1 vault = deployer.deployDefaultVault(vaultRegistry);
-        assertTrue(vault.owner() == address(vaultRegistry));
-        assertTrue(vault.swapStrategy() != address(0));
-        assertTrue(vault.ingressControl() != address(0));
-        assertTrue(address(vault.borrowVerifier()) == deployer.borrowVerifier());
-        assertTrue(vault.withdrawFeeFactor() == deployer.WITHDRAW_FEE_FACTOR());
-        assertTrue(vault.withdrawFeePeriod() == deployer.WITHDRAW_FEE_PERIOD());
-        assertTrue(vault.configurableManager() == deployer.configurableManager());
-        assertTrue(vault.targetThreshold() == deployer.TARGET_THRESHOLD());
-        assertTrue(vault.supplyThreshold() == deployer.SUPPLY_THRESHOLD());
-        assertTrue(vault.liquidationThreshold() == deployer.LIQUIDATION_THRESHOLD());
-        assertTrue(vault.activeFarmStrategy() != address(0));
-        assertTrue(vault.activeLenderStrategy() != address(0));
+        assertEq(vault.owner(), address(vaultRegistry), "Registry");
+        assertNotEq(vault.swapStrategy(), address(0), "Swap");
+        assertNotEq(vault.ingressControl(), address(0), "Ingress");
+        assertEq(address(vault.borrowVerifier()), deployer.borrowVerifier(), "Borrow");
+        assertEq(vault.withdrawFeeFactor(), deployer.WITHDRAW_FEE_FACTOR());
+        assertEq(vault.withdrawFeePeriod(), deployer.WITHDRAW_FEE_PERIOD());
+        assertEq(vault.configurableManager(), deployer.configurableManager());
+        assertEq(vault.targetThreshold(), deployer.TARGET_THRESHOLD());
+        assertEq(vault.supplyThreshold(), deployer.SUPPLY_THRESHOLD());
+        assertEq(vault.liquidationThreshold(), deployer.LIQUIDATION_THRESHOLD());
+        assertNotEq(vault.activeFarmStrategy(), address(0));
+        assertNotEq(vault.activeLenderStrategy(), address(0));
     }
 
     function test_WithdrawFeeFactorHigherThanLimit() public {
