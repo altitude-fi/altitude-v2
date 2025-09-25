@@ -27,6 +27,9 @@ contract RebalanceIncentivesController is Ownable, IRebalanceIncentivesControlle
     /// @notice The token used for rewards payment
     address public immutable rewardToken;
 
+    /// @notice When true, allows a single forced rebalance; resets to false after successful rebalance
+    bool public forceRebalance;
+
     /**
      * @param rewardToken_ The token being paid out as a reward
      * @param vaultAddress_ The vault the incentives will be provided for
@@ -47,11 +50,22 @@ contract RebalanceIncentivesController is Ownable, IRebalanceIncentivesControlle
         _setDeviation(minDeviation_, maxDeviation_);
     }
 
+    /// @notice Force-enable canRebalance until a successful rebalance occurs
+    /// @param forceRebalance_ New force flag value
+    function setForceRebalance(bool forceRebalance_) external override onlyOwner {
+        forceRebalance = forceRebalance_;
+        emit UpdateForceRebalance(forceRebalance_);
+    }
+
     function rebalance() external override {
         if (!canRebalance()) {
             revert RIC_CAN_NOT_REBALANCE();
         }
 
+        // Clear force flag before a rebalance
+        if (forceRebalance) {
+            forceRebalance = false;
+        }
         IVaultCoreV1(vault).rebalance();
     }
 
@@ -74,6 +88,9 @@ contract RebalanceIncentivesController is Ownable, IRebalanceIncentivesControlle
     /// @return true if the msg.sender will be incentivised for processing the rebalance
     /// @dev note: placeholder function - incentives are not active yet
     function canRebalance() public view override returns (bool) {
+        if (forceRebalance) {
+            return true;
+        }
         uint256 threshold = currentThreshold();
         address activeFarmStrategy = IVaultCoreV1(vault).activeFarmStrategy();
 
@@ -82,13 +99,17 @@ contract RebalanceIncentivesController is Ownable, IRebalanceIncentivesControlle
         uint256 maxThreshold = targetThreshold + (targetThreshold * maxDeviation) / 1e18;
 
         if (threshold < minThreshold) {
-            return true;
+            // should borrow
+            if (IFarmDispatcher(activeFarmStrategy).availableLimit() > 0) {
+                // has space to deposit
+                return true;
+            }
         }
         if (threshold > maxThreshold) {
-            if (
-                IFarmDispatcher(activeFarmStrategy).balance() > 0 &&
-                IVaultCoreV1(vault).debtToken().balanceOf(address(vault)) > 0
-            ) {
+            (uint256 balanceAvailable, ) = IFarmDispatcher(activeFarmStrategy).balanceAvailable();
+            // should repay
+            if (balanceAvailable > 0 && IVaultCoreV1(vault).debtToken().balanceOf(address(vault)) > 0) {
+                // has funds to withdraw
                 return true;
             }
         }
