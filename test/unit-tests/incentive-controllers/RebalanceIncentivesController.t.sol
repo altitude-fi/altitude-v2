@@ -94,6 +94,20 @@ contract RebalanceIncentivesControllerTest is VaultTestSuite {
         assertEq(controller.canRebalance(), true);
     }
 
+    function test_CanRebalanceThresholdLowerThanMinButNoFarm() public {
+        address user = vm.addr(1);
+        depositAndBorrow(user, DEPOSIT, 2e6);
+
+        // Simulate 100% farm loss
+        vm.mockCall(
+            vault.activeFarmStrategy(),
+            abi.encodeWithSelector(IFarmDispatcher.availableLimit.selector),
+            abi.encode(0)
+        );
+
+        assertEq(controller.canRebalance(), false);
+    }
+
     function test_CanRebalanceThresholdHigherThanMaxButNoFarming() public {
         address user = vm.addr(1);
         depositAndBorrow(user);
@@ -110,8 +124,8 @@ contract RebalanceIncentivesControllerTest is VaultTestSuite {
         // Simulate 100% farm loss
         vm.mockCall(
             vault.activeFarmStrategy(),
-            abi.encodeWithSelector(IFarmDispatcher.balance.selector),
-            abi.encode(0)
+            abi.encodeWithSelector(IFarmDispatcher.balanceAvailable.selector),
+            abi.encode(0, 0)
         );
 
         setPrice(deployer.supplyAsset(), deployer.borrowAsset(), 0.5e6);
@@ -169,6 +183,55 @@ contract RebalanceIncentivesControllerTest is VaultTestSuite {
         deposit(user);
 
         vaultRegistry.reduceVaultTargetThreshold(deployer.supplyAsset(), deployer.borrowAsset(), 0);
+        assertEq(controller.canRebalance(), false);
+    }
+
+    function test_ForceRebalance_DefaultFalse() public view {
+        // By default storage bools are false
+        assertEq(controller.forceRebalance(), false);
+    }
+
+    function test_SetForceRebalance_OnlyOwner() public {
+        address unauthorized = address(0xBEEF);
+        vm.prank(unauthorized);
+        vm.expectRevert("Ownable: caller is not the owner");
+        controller.setForceRebalance(true);
+
+        // Owner can set
+        vm.expectEmit(true, true, true, true);
+        emit IRebalanceIncentivesController.UpdateForceRebalance(true);
+        controller.setForceRebalance(true);
+        assertEq(controller.forceRebalance(), true);
+    }
+
+    function test_CanRebalance_WhenForced() public {
+        // Create a setup where canRebalance() would normally be false
+        address user = vm.addr(1);
+        deposit(user);
+        vault.rebalance();
+        assertEq(controller.canRebalance(), false);
+
+        // Force should short-circuit to true
+        controller.setForceRebalance(true);
+        assertEq(controller.canRebalance(), true);
+    }
+
+    function test_ForceRebalance_AllowsOneRebalanceAndResets() public {
+        // Normally cannot rebalance in this setup
+        address user = vm.addr(1);
+        deposit(user);
+        vault.rebalance();
+        vm.expectRevert(IRebalanceIncentivesController.RIC_CAN_NOT_REBALANCE.selector);
+        controller.rebalance();
+
+        // Force and then execute once
+        controller.setForceRebalance(true);
+        assertEq(controller.forceRebalance(), true);
+        controller.rebalance();
+        // After successful execution, the flag should be cleared
+        assertEq(controller.forceRebalance(), false);
+
+        // And canRebalance() returns to normal behavior (still false in this setup)
         assertEq(controller.canRebalance(), false);
     }
 }
