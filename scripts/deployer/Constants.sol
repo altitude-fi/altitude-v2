@@ -41,10 +41,20 @@ library Constants {
     address public constant morpho_Vault_DAI = 0x500331c9fF24D9d11aee6B07734Aa72343EA74a5;
     address public constant morpho_Vault_MEV_Capital_USDC = 0xd63070114470f685b75B74D60EEc7c1113d33a3D;
     address public constant morpho_Vault_Gauntlet_USDC_Core = 0x8eB67A509616cd6A7c1B3c8C21D48FF57df3d458;
+    address public constant morpho_Vault_Hyperithm_USDC = 0x777791C4d6DC2CE140D00D2828a7C93503c67777;
+    address public constant morpho_VaultV2_Steakhouse_USDC_HYI = 0xbeeff2C5bF38f90e3482a8b19F12E5a6D2FCa757;
     bytes32 public constant morpho_Market_WSTETH_USDC =
         0xb323495f7e4148be5643a4ea4a8221eef163e4bccfdedc2a6f4696baacbc86cc;
     bytes32 public constant morpho_Market_cbBTC_USDC =
         0x64d65c9a2d91c36d56fbc42d69e979335320169b3df63bf92789e2c8883fcc64;
+
+    // Euler earn vault
+    address public constant euler_earn_Hyperithm_USDC = 0x3cd3718f8f047aA32F775E2cb4245A164E1C99fB;
+    // Euler lend vault
+    address public constant euler_lend_Resolv_USDC = 0xcBC9B61177444A793B85442D3a953B90f6170b7D;
+
+    // Merkl
+    address public constant merkl_Distributor = 0x3Ef3D8bA38EBe18DB133cEc108f4D14CE00Dd9Ae;
 
     // Uniswap V3
     uint24 public constant uniswap_v3_FeeTier_100 = 100; // 0.01%

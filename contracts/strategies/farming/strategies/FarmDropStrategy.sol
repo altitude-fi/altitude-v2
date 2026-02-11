@@ -111,7 +111,7 @@ abstract contract FarmDropStrategy is Ownable, FarmStrategy, IFarmDropStrategy {
     /// @notice Track and handle any possible farm drop on recogniseRewardsInBase
     /// @return rewards The amount of rewards recognised
     function recogniseRewardsInBase() public virtual override(FarmStrategy, IFarmStrategy) returns (uint256 rewards) {
-        rewards = super.recogniseRewardsInBase();
+        rewards = FarmStrategy.recogniseRewardsInBase();
         expectedBalance = balance();
     }
 
